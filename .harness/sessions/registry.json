@@ -12,6 +12,26 @@
       "role": "orchestrator",
       "seed": true,
       "trusted": true
+    },
+    "ses_df27261c8ffeJbVXcZMsund3Hf": {
+      "role": "integrator",
+      "task_id": "P1-TOOL-BRANCH01",
+      "trusted": true
+    },
+    "ses_df27261c9ffcukQUulA8P0LN89": {
+      "role": "reviewer",
+      "task_id": "P1-TOOL-BRANCH01",
+      "trusted": true
+    },
+    "ses_df27261c9ffdiy0RA5Ko2oSdxl": {
+      "role": "tester",
+      "task_id": "P1-TOOL-BRANCH01",
+      "trusted": true
+    },
+    "ses_df2be4996ffek8O5wu7RwOeubn": {
+      "role": "implementer",
+      "task_id": "P1-TOOL-BRANCH01",
+      "trusted": true
     }
   },
   "trust_root": "orchestrator"
