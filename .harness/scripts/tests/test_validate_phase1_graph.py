@@ -24,7 +24,7 @@ class GraphValidatorSemanticTests(unittest.TestCase):
         cls.data = json.loads((ROOT / ".harness" / "TASKS.json").read_text())
         cls.plan = (ROOT / ".harness" / "PLANS" / "phase-1-vertical-slice.md").read_text()
         cls.baseline = VALIDATOR._load_baseline(ROOT, "5ce026d")
-        cls.history_baseline = VALIDATOR._load_baseline(ROOT, "63beab0")
+        cls.history_baseline = VALIDATOR._load_baseline(ROOT, "e54ecaf")
 
     def assert_invalid(self, mutate_data=None, mutate_plan=None) -> None:
         data = copy.deepcopy(self.data)
@@ -237,6 +237,57 @@ class GraphValidatorSemanticTests(unittest.TestCase):
 
     def test_d10_nonproducer_bare_dist_is_rejected(self) -> None:
         self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"].append("python3 tools/release/audit_artifacts.py --artifacts dist exits zero"))
+
+    def test_d11_ncanonical_seed_output_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-SESSION-SEED01")["acceptance_criteria"].__setitem__(0, next(t for t in d["tasks"] if t["id"] == "P1-SESSION-SEED01")["acceptance_criteria"][0].replace("--output .harness/sessions/registry.json", "--output evidence/P1-SESSION-SEED01/registry.json")))
+
+    def test_d12_duplicate_write_gate_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"].__setitem__(slice(None), [c.replace("--gate AR02-G1.integrated-properties", "--gate AR02-G1.integrated-properties --gate AR02-G1.schema") if "write_result.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"]]))
+
+    def test_d12_duplicate_write_task_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"].__setitem__(slice(None), [c.replace("--task P1-TST01", "--task P1-TST01 --task P1-PROTO01") if "write_result.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"]]))
+
+    def test_d12_duplicate_validate_result_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"].__setitem__(slice(None), [c.replace(" exits zero", " --result evidence/P1-TST01/wrong.json exits zero", 1) if "validate_result.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"]]))
+
+    def test_d12_duplicate_aggregate_inputs_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"].__setitem__(slice(None), [c.replace(" exits zero", " --inputs evidence/P1-TST01/./AR02-G1.json exits zero", 1) if "aggregate.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"]]))
+
+    def test_d12_duplicate_aggregate_output_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"].__setitem__(slice(None), [c.replace(" exits zero", " --output evidence/P1-TST01/wrong.json exits zero", 1) if "aggregate.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"]]))
+
+    def test_d13_removed_approval_bindings_are_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-READY-CERT01")["acceptance_criteria"].__setitem__(slice(None), [c.replace(" --approval-artifact evidence/P1-READY-CERT01/approval.json --approval-registry .harness/sessions/registry.json --approval-scope performance-certification", "") if "write_result.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-READY-CERT01")["acceptance_criteria"]]))
+
+    def test_d13_forged_approval_bindings_are_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-READY-CERT01")["acceptance_criteria"].__setitem__(slice(None), [c.replace("evidence/P1-READY-CERT01/approval.json", "forged.json").replace(".harness/sessions/registry.json", "untrusted.json").replace("performance-certification", "unrelated-claim") if "write_result.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-READY-CERT01")["acceptance_criteria"]]))
+
+    def test_d14_discarded_gh_output_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"].__setitem__(slice(None), [c.replace("> evidence/P1-PR-AUDIT01/pr.json", "> /dev/null").replace("> evidence/P1-PR-AUDIT01/changed-files.txt", "> /dev/null") if "gh pr " in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"]]))
+
+    def test_d14_fabricated_pr_artifacts_are_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"].extend(["printf '{}' > evidence/P1-PR-AUDIT01/pr.json exits zero", "printf 'fake' > evidence/P1-PR-AUDIT01/changed-files.txt exits zero"]))
+
+    def test_d15_wrong_postmerge_command_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TOOL-BRANCH01").update(postmerge_command="python3 tools/ci/record_merge.py --task P1-GATE-SCHEMA01 --output evidence/P1-GATE-SCHEMA01/merge.json"))
+
+    def test_d15_wrong_postmerge_record_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TOOL-BRANCH01").update(postmerge_record="evidence/P1-GATE-SCHEMA01/merge.json"))
+
+    def test_d16_wrong_verify_manifest_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"].__setitem__(slice(None), [c.replace("artifacts/release/<artifact-id>/manifest.json", "artifacts/local/<artifact-id>/manifest.json") if "store.py verify" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"]]))
+
+    def test_d16_dir_equals_audit_bypass_is_rejected(self) -> None:
+        def mutate(d):
+            task = next(t for t in d["tasks"] if t["id"] == "P1-LIC02")
+            task["acceptance_criteria"] = [
+                c.replace("--dir evidence/P1-LIC02/downloads", "--dir=evidence/P1-LIC02/downloads").replace("evidence/P1-LIC02/downloads/**", "somewhere-else/**")
+                for c in task["acceptance_criteria"]
+            ]
+        self.assert_invalid(mutate)
+
+    def test_d17_shell_escaped_dist_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"].append(r"python3 tools/release/audit_artifacts.py --artifacts d\ist/release/*.whl exits zero"))
 
 
 class GateResultSchemaTests(unittest.TestCase):

@@ -439,19 +439,30 @@
       "deps": [
         "P0-REM06"
       ],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
-        "D11 through D17 are directly closed in harness tooling and encoded in owning P1 task acceptance criteria",
-        "All independent D11-D17 attacks are rejected and root pytest passes with new regression tests",
-        "evidence/P0-REM08/validation.txt contains exact reproducible output",
-        "P0-AP01 and every Phase 1 task remain blocked at attempt zero"
+        "python3 .harness/scripts/validate_phase1_graph.py --baseline 5ce026d --history-baseline e54ecaf --self-test exits zero",
+        "python3 .harness/scripts/validate_handoff.py .harness/HANDOFFS/planner-to-red-team-P0-REM08-1.md --task-id P0-REM08 --to Red-Team-Planner --attempt 1 exits zero",
+        "python3 -m pytest -q exits zero from the repository root",
+        "D11 through D17 are directly closed in current tooling and encoded as adversarial acceptance gates on every owning P1 task",
+        "All 52 aggregators, 26 sub-gates and 78 result identities remain intact",
+        "P0-AP01 and every Phase 1 task remain blocked at attempt zero",
+        "evidence/P0-REM08/validation.txt contains exact reproducible output"
       ],
       "evidence_links": [
-        ".harness/PLANS/phase-0-remediation-round-4.md",
-        "evidence/P0-REM07/independent-verification.txt",
-        ".harness/REVIEWS/phase-0-remediation-red-team.md",
-        "evidence/P0-REM08/validation.txt"
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        ".harness/TASKS.json",
+        ".harness/schemas/gate-results.schema.json",
+        ".harness/scripts/seed_session_registry.py",
+        ".harness/scripts/validate_phase1_graph.py",
+        ".harness/scripts/validate_handoff.py",
+        ".harness/scripts/tests/test_validate_phase1_graph.py",
+        ".harness/scripts/tests/test_seed_session_registry.py",
+        "pytest.ini",
+        "evidence/P0-REM08/validation.txt",
+        ".harness/HANDOFFS/planner-to-red-team-P0-REM08-1.md",
+        "evidence/P0-REM07/independent-verification.txt"
       ]
     },
     {
@@ -461,8 +472,8 @@
       "deps": [
         "P0-REM08"
       ],
-      "status": "blocked",
-      "attempt_count": 1,
+      "status": "in_progress",
+      "attempt_count": 2,
       "acceptance_criteria": [
         "A different Red-Team session verifies direct D11-D17 closure and authoritative P1 gates",
         "The report recommends P0-AP01 approval or identifies exact residual blockers"
@@ -564,6 +575,8 @@
       "acceptance_criteria": [
         "python3 .harness/scripts/seed_session_registry.py --orchestrator-session <orchestrator-session> --output .harness/sessions/registry.json --approval .harness/sessions/seed-approval.json exits zero",
         "python3 .harness/scripts/seed_session_registry.py --self-test exits zero",
+        "python3 .harness/scripts/seed_session_registry.py --verify --output .harness/sessions/registry.json --approval .harness/sessions/seed-approval.json exits zero only when the approval hash matches the exact written registry bytes",
+        "python3 -m pytest -q .harness/scripts/tests/test_seed_session_registry.py exits zero and proves no-argument self-test, exact-byte hash binding, append-only reseed and canonical-output rejection",
         "sha256sum .harness/sessions/registry.json .harness/sessions/seed-approval.json > evidence/P1-SESSION-SEED01/seed-sha256.txt exits zero"
       ],
       "evidence_links": [
@@ -617,7 +630,8 @@
         "python3 tools/ci/branch_gate.py --self-test exits zero after verifying that missing reviewer, missing tester, commit mismatch and missing Integrator merge record each produce nonzero rejection",
         "python3 tools/ci/branch_gate.py verify --task P1-TOOL-BRANCH01 --state independently_verified --evidence evidence/P1-TOOL-BRANCH01/branch-evidence.json exits zero",
         "python3 tools/session/verify_roles.py --task P1-TOOL-BRANCH01 --evidence evidence/P1-TOOL-BRANCH01/branch-evidence.json exits zero",
-        "python3 tools/ci/record_merge.py --self-test exits zero after rejecting missing pre-merge evidence, non-Integrator role and merge-sha mismatch"
+        "python3 tools/ci/record_merge.py --self-test exits zero after rejecting missing pre-merge evidence, non-Integrator role and merge-sha mismatch",
+        "python3 tools/ci/record_merge.py --self-test exits zero after rejecting wrong-task, wrong-output and wrong-record merge identities"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
@@ -995,7 +1009,8 @@
         "python3 tools/release/verify_bundle.py --self-test exits zero after verifying nonzero rejection for nonreproducible hashes or missing raw logs",
         "python3 tools/release/artifact_gate.py --self-test exits zero after verifying nonzero rejection when downstream evidence references a superseded artifact hash",
         "python3 tools/ci/branch_gate.py verify --task P1-TOOL-RELEASE01 --state independently_verified --evidence evidence/P1-TOOL-RELEASE01/branch-evidence.json exits zero",
-        "python3 tools/session/verify_roles.py --task P1-TOOL-RELEASE01 --evidence evidence/P1-TOOL-RELEASE01/branch-evidence.json exits zero"
+        "python3 tools/session/verify_roles.py --task P1-TOOL-RELEASE01 --evidence evidence/P1-TOOL-RELEASE01/branch-evidence.json exits zero",
+        "python3 -m pytest -q tools/release/tests/test_dist_normalization.py exits zero and rejects shell-escaped d\\ist paths plus dot, brace and glob variants"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
@@ -1117,7 +1132,11 @@
         "python3 tools/gates/aggregate.py --self-test exits zero after rejecting missing sub-gates, stale hashes, inconclusive status and proof self-certification",
         "python3 tools/ci/branch_gate.py verify --task P1-GATE-SCHEMA01 --state independently_verified --evidence evidence/P1-GATE-SCHEMA01/branch-evidence.json exits zero",
         "python3 tools/session/verify_roles.py --task P1-GATE-SCHEMA01 --evidence evidence/P1-GATE-SCHEMA01/branch-evidence.json exits zero",
-        "python3 tools/gates/write_result.py --self-test exits zero after rejecting duplicate result paths, aggregate self-overwrite and schema validation before output creation"
+        "python3 tools/gates/write_result.py --self-test exits zero after rejecting duplicate result paths, aggregate self-overwrite and schema validation before output creation",
+        "python3 -m pytest -q tools/gates/tests/test_cli_ambiguity.py exits zero and rejects duplicate --gate, --task, --result, --inputs and --output flags",
+        "python3 tools/gates/write_result.py --self-test exits zero after rejecting duplicate CLI flags and task/gate/output identity mismatch",
+        "python3 tools/gates/aggregate.py --self-test exits zero after rejecting duplicate --inputs/--output and aggregate self-overwrite",
+        "python3 tools/gates/validate_result.py --self-test exits zero after rejecting duplicate --result flags"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
@@ -1178,7 +1197,8 @@
         "python3 tools/artifacts/store.py --self-test exits zero for a draft-release round trip and rejects hash mismatch, missing source commit, lockfile/toolchain mismatch, tag reuse and missing artifact",
         "artifacts/README.md records exact gh release create/upload/download commands, authenticated access, no automatic expiry and append-only retention policy",
         "python3 tools/ci/branch_gate.py verify --task P1-ARTIFACT-STORE01 --state independently_verified --evidence evidence/P1-ARTIFACT-STORE01/branch-evidence.json exits zero",
-        "python3 tools/session/verify_roles.py --task P1-ARTIFACT-STORE01 --evidence evidence/P1-ARTIFACT-STORE01/branch-evidence.json exits zero"
+        "python3 tools/session/verify_roles.py --task P1-ARTIFACT-STORE01 --evidence evidence/P1-ARTIFACT-STORE01/branch-evidence.json exits zero",
+        "python3 tools/artifacts/store.py --self-test exits zero after rejecting wrong manifest, --dir <path> mismatch, --dir=<path> mismatch and audit paths outside the verified download directory"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
@@ -1537,7 +1557,8 @@
         "python3 tools/gates/write_result.py --gate AR08-G6.approval --task P1-READY-CERT01 --evidence evidence/P1-READY-CERT01/gate-inputs.json --output evidence/P1-READY-CERT01/AR08-G6.approval.json --lockfile-state not_applicable --lockfile-reason approval-precedes-production-lockfile --approver-session <approver-session> --approval-artifact evidence/P1-READY-CERT01/approval.json --approval-registry .harness/sessions/registry.json --approval-scope performance-certification exits zero",
         "python3 tools/gates/validate_result.py --schema .harness/schemas/gate-results.schema.json --result evidence/P1-READY-CERT01/AR08-G6.approval.json exits zero",
         "python3 tools/session/verify_approval.py --result evidence/P1-READY-CERT01/AR08-G6.approval.json --registry .harness/sessions/registry.json --approval-artifact evidence/P1-READY-CERT01/approval.json exits zero",
-        "python3 tools/review/verify_proof.py --task P1-READY-CERT01 --review evidence/P1-READY-CERT01/review.json --test evidence/P1-READY-CERT01/independent-test.json --gate-result evidence/P1-READY-CERT01/AR08-G6.approval.json --registry .harness/sessions/registry.json exits zero"
+        "python3 tools/review/verify_proof.py --task P1-READY-CERT01 --review evidence/P1-READY-CERT01/review.json --test evidence/P1-READY-CERT01/independent-test.json --gate-result evidence/P1-READY-CERT01/AR08-G6.approval.json --registry .harness/sessions/registry.json exits zero",
+        "python3 -m pytest -q tools/gates/tests/test_approval_binding.py -k P1-READY-CERT01 exits zero and rejects removed or forged approval artifact, registry or scope values for performance-certification"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
@@ -1607,7 +1628,8 @@
         "python3 tools/gates/write_result.py --gate AR09-G4.wayland-disposition --task P1-READY-CLAIM01 --evidence evidence/P1-READY-CLAIM01/gate-inputs.json --output evidence/P1-READY-CLAIM01/AR09-G4.wayland-disposition.json --lockfile-state not_applicable --lockfile-reason approval-precedes-production-lockfile --approver-session <approver-session> --approval-artifact evidence/P1-READY-CLAIM01/approval.json --approval-registry .harness/sessions/registry.json --approval-scope wayland-signing-publication-claims exits zero",
         "python3 tools/gates/validate_result.py --schema .harness/schemas/gate-results.schema.json --result evidence/P1-READY-CLAIM01/AR09-G4.wayland-disposition.json exits zero",
         "python3 tools/session/verify_approval.py --result evidence/P1-READY-CLAIM01/AR09-G4.wayland-disposition.json --registry .harness/sessions/registry.json --approval-artifact evidence/P1-READY-CLAIM01/approval.json exits zero",
-        "python3 tools/review/verify_proof.py --task P1-READY-CLAIM01 --review evidence/P1-READY-CLAIM01/review.json --test evidence/P1-READY-CLAIM01/independent-test.json --gate-result evidence/P1-READY-CLAIM01/AR09-G4.wayland-disposition.json --registry .harness/sessions/registry.json exits zero"
+        "python3 tools/review/verify_proof.py --task P1-READY-CLAIM01 --review evidence/P1-READY-CLAIM01/review.json --test evidence/P1-READY-CLAIM01/independent-test.json --gate-result evidence/P1-READY-CLAIM01/AR09-G4.wayland-disposition.json --registry .harness/sessions/registry.json exits zero",
+        "python3 -m pytest -q tools/gates/tests/test_approval_binding.py -k P1-READY-CLAIM01 exits zero and rejects removed or forged approval artifact, registry or scope values for wayland-signing-publication-claims"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
@@ -1889,12 +1911,14 @@
       "write_scope": [
         "tools/ci/pr_audit_policy.json",
         "tools/ci/tests/test_pr_policy.py",
-        "evidence/P1-PR-AUDIT01/**"
+        "evidence/P1-PR-AUDIT01/**",
+        "tools/ci/tests/test_pr_authenticity.py"
       ],
       "produces": [
         "tools/ci/pr_audit_policy.json",
         "tools/ci/tests/test_pr_policy.py",
-        "evidence/P1-PR-AUDIT01/**"
+        "evidence/P1-PR-AUDIT01/**",
+        "tools/ci/tests/test_pr_authenticity.py"
       ],
       "size": "S",
       "estimate_range_days": [
@@ -1921,7 +1945,9 @@
         "python3 tools/gates/aggregate.py --gate AR09-G1 --schema .harness/schemas/gate-results.schema.json --inputs evidence/P1-LIC01/AR09-G1.repository-evidence.json,evidence/P1-PR-AUDIT01/AR09-G1.pr-enforcement.json --output evidence/P1-PR-AUDIT01/AR09-G1.json exits zero only when every required sub-gate passes with current hashes",
         "python3 tools/gates/validate_result.py --schema .harness/schemas/gate-results.schema.json --result evidence/P1-PR-AUDIT01/AR09-G1.json exits zero",
         "python3 tools/gates/aggregate.py --gate AR10-G3 --schema .harness/schemas/gate-results.schema.json --inputs evidence/P1-LIC01/AR10-G3.repository-evidence.json,evidence/P1-PR-AUDIT01/AR10-G3.pr-enforcement.json --output evidence/P1-PR-AUDIT01/AR10-G3.json exits zero only when every required sub-gate passes with current hashes",
-        "python3 tools/gates/validate_result.py --schema .harness/schemas/gate-results.schema.json --result evidence/P1-PR-AUDIT01/AR10-G3.json exits zero"
+        "python3 tools/gates/validate_result.py --schema .harness/schemas/gate-results.schema.json --result evidence/P1-PR-AUDIT01/AR10-G3.json exits zero",
+        "python3 -m pytest -q tools/ci/tests/test_pr_authenticity.py exits zero and rejects /dev/null capture, fabricated pr.json/changed-files.txt, fixture inputs and enforcement before capture",
+        "python3 tools/ci/pr_audit_gate.py --self-test exits zero after rejecting fabricated PR identity/diff artifacts and noncanonical capture paths"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
@@ -4454,7 +4480,8 @@
         "python3 tools/gates/write_result.py --gate AR09-G3 --task P1-LIC02 --evidence evidence/P1-LIC02/gate-inputs.json --output evidence/P1-LIC02/AR09-G3.json exits zero",
         "python3 tools/gates/validate_result.py --schema .harness/schemas/gate-results.schema.json --result evidence/P1-LIC02/AR09-G3.json exits zero",
         "python3 tools/gates/write_result.py --gate AR10-G2 --task P1-LIC02 --evidence evidence/P1-LIC02/gate-inputs.json --output evidence/P1-LIC02/AR10-G2.json exits zero",
-        "python3 tools/gates/validate_result.py --schema .harness/schemas/gate-results.schema.json --result evidence/P1-LIC02/AR10-G2.json exits zero"
+        "python3 tools/gates/validate_result.py --schema .harness/schemas/gate-results.schema.json --result evidence/P1-LIC02/AR10-G2.json exits zero",
+        "python3 -m pytest -q tools/artifacts/tests/test_consumer_binding.py -k P1-LIC02 exits zero and rejects wrong verify manifest, --dir= bypass and audit-path mismatch"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
@@ -4720,7 +4747,8 @@
         "python3 tools/release/audit_artifacts.py --stage license --artifacts evidence/P1-LICENSE-CLOSE01/downloads/** --notice evidence/P1-OWNER-NOTICE01/validated-notice.json --output evidence/P1-LICENSE-CLOSE01/license.json exits zero only with the official Apache-2.0 text, owner-supplied copyright notice, License-Expression and License-File in every downloaded artifact; missing notice exits nonzero",
         "python3 tools/review/verify_proof.py --task P1-LICENSE-CLOSE01 --review evidence/P1-LICENSE-CLOSE01/review.json --test evidence/P1-LICENSE-CLOSE01/independent-test.json --registry .harness/sessions/registry.json exits zero",
         "python3 tools/gates/write_result.py --gate AR10-G1 --task P1-LICENSE-CLOSE01 --evidence evidence/P1-LICENSE-CLOSE01/gate-inputs.json --output evidence/P1-LICENSE-CLOSE01/AR10-G1.json exits zero",
-        "python3 tools/gates/validate_result.py --schema .harness/schemas/gate-results.schema.json --result evidence/P1-LICENSE-CLOSE01/AR10-G1.json exits zero"
+        "python3 tools/gates/validate_result.py --schema .harness/schemas/gate-results.schema.json --result evidence/P1-LICENSE-CLOSE01/AR10-G1.json exits zero",
+        "python3 -m pytest -q tools/artifacts/tests/test_consumer_binding.py -k P1-LICENSE-CLOSE01 exits zero and rejects wrong verify manifest, --dir= bypass and audit-path mismatch"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
@@ -5351,7 +5379,8 @@
     ".harness/scripts/tests/test_validate_phase1_graph.py": "P0-PL01",
     ".harness/schemas/gate-results.schema.json": "P0-PL01",
     ".harness/scripts/validate_handoff.py": "P0-PL01",
-    ".harness/scripts/seed_session_registry.py": "P0-REM06"
+    ".harness/scripts/seed_session_registry.py": "P0-REM08",
+    ".harness/scripts/tests/test_seed_session_registry.py": "P0-REM08"
   },
   "artifact_store": {
     "mechanism": "GitHub draft release assets",
@@ -5746,5 +5775,6 @@
   "remediation_round_2_baseline": "4e307b2",
   "gate_result_policy": "Exactly one schema object is stored per unique gate/sub-gate result file. Aggregators read only sub-gate files and write a distinct full-gate file; schema validation runs after the result is created. No command may read and write the same result path.",
   "remediation_round_3_baseline": "63beab0",
-  "session_seed_policy": "P1-SESSION-SEED01 is an Orchestrator-controlled recorded trust-root task. It creates the initial .harness/sessions/registry.json before any merged build; P1-TOOL-BRANCH01 depends on it and P1-SESSION-REGISTRY01 later extends the same append-only registry."
+  "session_seed_policy": "P1-SESSION-SEED01 is an Orchestrator-controlled recorded trust-root task. It creates the initial .harness/sessions/registry.json before any merged build; P1-TOOL-BRANCH01 depends on it and P1-SESSION-REGISTRY01 later extends the same append-only registry.",
+  "remediation_round_4_baseline": "e54ecaf"
 }
