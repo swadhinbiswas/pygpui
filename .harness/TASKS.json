@@ -11,7 +11,8 @@
     "tracking_branch": "main -> origin/main",
     "authentication": "gh authenticated as swadhinbiswas",
     "branch_workflow": "Each build task uses a short-lived branch/worktree from green main, pushes the branch and opens a PR against main with gh pr create.",
-    "merge_policy": "No direct pushes to main, no force-push, no self-merge of unreviewed work; independent Reviewer and Test-Engineer verification required; Integrator-only merges in dependency order."
+    "merge_policy": "No direct pushes to main, no force-push, no self-merge of unreviewed work; independent Reviewer and Test-Engineer verification required; Integrator-only merges in dependency order.",
+    "control_plane": "Feature branches append their own LOG/handoff files; the Orchestrator serializes STATE.md and TASKS.json changes and resolves control-plane conflicts before Integrator merge."
   },
   "attempt_policy": "Maximum four attempts per task; at attempt four pass all gates or stop and escalate to the Orchestrator. No fifth attempt is authorized.",
   "tasks": [
@@ -40,7 +41,9 @@
       "id": "P0-R01A",
       "title": "Research GPUI internals and clean-room boundaries",
       "owner_role": "Researcher-Prior-Art",
-      "deps": ["H-001"],
+      "deps": [
+        "H-001"
+      ],
       "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
@@ -57,7 +60,9 @@
       "id": "P0-R01B",
       "title": "Research cross-framework retained/immediate rendering models",
       "owner_role": "Researcher-Prior-Art",
-      "deps": ["H-001"],
+      "deps": [
+        "H-001"
+      ],
       "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
@@ -74,7 +79,9 @@
       "id": "P0-R02A",
       "title": "Research core Rust rendering/layout/text dependencies",
       "owner_role": "Researcher-Libs",
-      "deps": ["H-001"],
+      "deps": [
+        "H-001"
+      ],
       "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
@@ -91,7 +98,9 @@
       "id": "P0-R02B",
       "title": "Research PyO3, maturin, abi3 and strict typing constraints",
       "owner_role": "Researcher-Libs",
-      "deps": ["H-001"],
+      "deps": [
+        "H-001"
+      ],
       "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
@@ -108,7 +117,9 @@
       "id": "P0-R03A",
       "title": "Research FFI/GIL and per-frame rendering cost models",
       "owner_role": "Researcher-Perf",
-      "deps": ["H-001"],
+      "deps": [
+        "H-001"
+      ],
       "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
@@ -125,7 +136,9 @@
       "id": "P0-R03B",
       "title": "Design reproducible performance benchmark protocol",
       "owner_role": "Researcher-Perf",
-      "deps": ["H-001"],
+      "deps": [
+        "H-001"
+      ],
       "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
@@ -142,7 +155,9 @@
       "id": "P0-R04A",
       "title": "Research desktop platform rendering and windowing constraints",
       "owner_role": "Researcher-Platform",
-      "deps": ["H-001"],
+      "deps": [
+        "H-001"
+      ],
       "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
@@ -159,7 +174,9 @@
       "id": "P0-R04B",
       "title": "Research IME, accessibility and cross-platform distribution edge cases",
       "owner_role": "Researcher-Platform",
-      "deps": ["H-001"],
+      "deps": [
+        "H-001"
+      ],
       "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
@@ -176,7 +193,16 @@
       "id": "P0-SK01",
       "title": "Falsify and classify combined Phase 0 research",
       "owner_role": "Skeptic",
-      "deps": ["P0-R01A", "P0-R01B", "P0-R02A", "P0-R02B", "P0-R03A", "P0-R03B", "P0-R04A", "P0-R04B"],
+      "deps": [
+        "P0-R01A",
+        "P0-R01B",
+        "P0-R02A",
+        "P0-R02B",
+        "P0-R03A",
+        "P0-R03B",
+        "P0-R04A",
+        "P0-R04B"
+      ],
       "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
@@ -194,7 +220,9 @@
       "id": "P0-AR01",
       "title": "Draft accepted architecture decision records",
       "owner_role": "Architect",
-      "deps": ["P0-SK01"],
+      "deps": [
+        "P0-SK01"
+      ],
       "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
@@ -211,21 +239,27 @@
       "id": "P0-PL01",
       "title": "Produce Phase 1 machine-checkable task graph",
       "owner_role": "Planner",
-      "deps": ["P0-AR01"],
-      "status": "in_progress",
+      "deps": [
+        "P0-AR01"
+      ],
+      "status": "done",
       "attempt_count": 2,
       "acceptance_criteria": [
-        "Phase 1 tasks in TASKS.json have owners, deps, status, acceptance criteria, evidence links and attempt counts",
-        "Acceptance criteria name tests, benchmark thresholds or commands that exit zero",
-        "At least one thin end-to-end demoable vertical slice precedes broader framework work",
-        "Every ARxx-Gn gate maps to at least one Phase 1 task in the plan traceability matrix",
-        "All Phase 1 tasks depend transitively on P0-AP01 and start blocked at attempt zero"
+        "python3 .harness/scripts/validate_phase1_graph.py --baseline 5ce026d --self-test exits zero",
+        "python3 .harness/scripts/validate_handoff.py .harness/HANDOFFS/planner-to-red-team-P0-RT01-2.md exits zero",
+        "Every Red-Team blocker B-01 through B-11 has an owned task, tool, contract, dependency or executable gate in the plan and graph",
+        "All 52 ARxx-Gn obligations retain executable semantics and fail-closed evidence rules",
+        "Every Phase 1 task has required fields, a producer/write-scope contract and remains blocked at attempt zero behind P0-AP01",
+        "evidence/P0-PL01/validation-attempt-2.txt contains the exact reproducible validator output"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
         ".harness/TASKS.json",
-        ".harness/HANDOFFS/planner-to-red-team-P0-PL01-1.md",
-        "evidence/P0-PL01/validation.txt",
+        ".harness/scripts/validate_phase1_graph.py",
+        ".harness/scripts/validate_handoff.py",
+        ".harness/scripts/tests/test_validate_phase1_graph.py",
+        "evidence/P0-PL01/validation-attempt-2.txt",
+        ".harness/HANDOFFS/planner-to-red-team-P0-RT01-2.md",
         ".harness/REVIEWS/phase-0-plan-red-team.md"
       ]
     },
@@ -233,9 +267,11 @@
       "id": "P0-RT01",
       "title": "Red-team the Phase 0 ADRs and Phase 1 plan",
       "owner_role": "Red-Team-Planner",
-      "deps": ["P0-PL01"],
-      "status": "blocked",
-      "attempt_count": 1,
+      "deps": [
+        "P0-PL01"
+      ],
+      "status": "in_progress",
+      "attempt_count": 2,
       "acceptance_criteria": [
         "REVIEWS/phase-0-plan-red-team.md checks dependencies, hidden coupling, estimates, rollback and acceptance-criteria quality",
         "Findings are severity-tagged with exact file/task references",
@@ -250,7 +286,9 @@
       "id": "P0-AP01",
       "title": "Approve Phase 0 gate and authorize Phase 1",
       "owner_role": "Orchestrator",
-      "deps": ["P0-RT01"],
+      "deps": [
+        "P0-RT01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "acceptance_criteria": [
@@ -262,787 +300,2825 @@
     },
     {
       "id": "P1-GOV01",
-      "title": "Authorize and register the Phase 1 execution environment",
+      "title": "Authorize Phase 1 and record execution readiness",
       "owner_role": "Orchestrator",
-      "deps": ["P0-AP01"],
+      "deps": [
+        "P0-AP01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
       "dispatch_wave": "0",
-      "write_scope": [".harness/PHASE1-EVIDENCE.md", ".harness/HANDOFFS/orchestrator-*"],
+      "workflow": "control",
+      "completion_state": "recorded",
+      "write_scope": [
+        ".harness/PHASE1-EVIDENCE.md",
+        "evidence/P1-GOV01/**"
+      ],
+      "produces": [
+        ".harness/PHASE1-EVIDENCE.md",
+        "evidence/P1-GOV01/**"
+      ],
       "size": "S",
-      "estimate_range_days": [1, 2],
+      "estimate_range_days": [
+        1,
+        2
+      ],
       "gates": [],
       "acceptance_criteria": [
         "python3 .harness/scripts/validate_phase1_graph.py --baseline 5ce026d exits zero",
-        "PHASE1-EVIDENCE.md records candidate hardware/runner availability, unresolved OQs, branch/worktree/PR naming, rollback owner and the four-attempt rule",
-        "git remote get-url origin, git branch -vv and gh auth status confirm origin=https://github.com/swadhinbiswas/pygpui.git, main tracking origin/main and authenticated gh access",
-        "The graph validator confirms every Phase 1 task is blocked at attempt zero until P0-AP01 is done"
+        "git remote get-url origin exits zero with https://github.com/swadhinbiswas/pygpui.git and git branch -vv shows main tracking origin/main",
+        "gh auth status exits zero and .harness/PHASE1-EVIDENCE.md records task waves, readiness blockers, branch/PR policy and four-attempt escalation"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
-        ".harness/PHASE1-EVIDENCE.md",
-        "evidence/P1-GOV01/graph-validation.txt"
+        "evidence/P1-GOV01/README.md"
+      ]
+    },
+    {
+      "id": "P1-TOOL-BRANCH01",
+      "title": "Own branch evidence, isolated red-main, tag and rollback tooling",
+      "owner_role": "Release-CI-Engineer",
+      "deps": [
+        "P1-GOV01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1-tools",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "tools/ci/**",
+        "evidence/P1-TOOL-BRANCH01/**"
+      ],
+      "produces": [
+        "tools/ci/branch_gate.py",
+        "tools/ci/run_local_gate.py",
+        "tools/ci/red_main_drill.py",
+        "tools/ci/rollback_drill.py",
+        "tools/ci/tag_point.py",
+        "tools/ci/tests/**",
+        "evidence/P1-TOOL-BRANCH01/**"
+      ],
+      "size": "L",
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 -m pytest tools/ci/tests exits zero",
+        "python3 tools/ci/red_main_drill.py --fixture /tmp/opencode/red-main-fixture exits zero without modifying production origin/main",
+        "python3 tools/ci/rollback_drill.py --fixture /tmp/opencode/rollback-fixture --tag phase1/contracts-premerge exits zero and archives revert, gate, revert-of-revert and restored green hashes",
+        "python3 tools/ci/branch_gate.py --self-test exits zero after verifying that missing reviewer, missing tester, commit mismatch and missing Integrator merge record each produce nonzero rejection",
+        "python3 tools/ci/branch_gate.py verify --task P1-TOOL-BRANCH01 --state merged --evidence evidence/P1-TOOL-BRANCH01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-TOOL-BRANCH01/README.md",
+        "evidence/P1-TOOL-BRANCH01/review.json",
+        "evidence/P1-TOOL-BRANCH01/independent-test.json",
+        "evidence/P1-TOOL-BRANCH01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-TOOL-BRANCH01-own-branch-evidence,-isolated-red-main,-tag-and-",
+      "review_evidence": "evidence/P1-TOOL-BRANCH01/review.json",
+      "test_evidence": "evidence/P1-TOOL-BRANCH01/independent-test.json",
+      "merge_evidence": "evidence/P1-TOOL-BRANCH01/merge.json"
+    },
+    {
+      "id": "P1-TOOL-GRAPH01",
+      "title": "Own and negatively test graph and contract-freeze validators",
+      "owner_role": "Release-CI-Engineer",
+      "deps": [
+        "P1-GOV01",
+        "P1-TOOL-BRANCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1-tools",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        ".harness/scripts/**",
+        "evidence/P1-TOOL-GRAPH01/**"
+      ],
+      "produces": [
+        ".harness/scripts/validate_phase1_graph.py",
+        ".harness/scripts/check_contract_freeze.py",
+        ".harness/scripts/tests/**",
+        "evidence/P1-TOOL-GRAPH01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 -m pytest .harness/scripts/tests/test_validate_phase1_graph.py exits zero",
+        "python3 .harness/scripts/validate_phase1_graph.py --baseline 5ce026d --self-test exits zero",
+        "python3 .harness/scripts/check_contract_freeze.py --self-test exits zero and rejects missing, changed and extra contract hashes with nonzero exit",
+        "python3 tools/ci/branch_gate.py verify --task P1-TOOL-GRAPH01 --state merged --evidence evidence/P1-TOOL-GRAPH01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-TOOL-GRAPH01/README.md",
+        "evidence/P1-TOOL-GRAPH01/review.json",
+        "evidence/P1-TOOL-GRAPH01/independent-test.json",
+        "evidence/P1-TOOL-GRAPH01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-TOOL-GRAPH01-own-and-negatively-test-graph-and-contract-freez",
+      "review_evidence": "evidence/P1-TOOL-GRAPH01/review.json",
+      "test_evidence": "evidence/P1-TOOL-GRAPH01/independent-test.json",
+      "merge_evidence": "evidence/P1-TOOL-GRAPH01/merge.json"
+    },
+    {
+      "id": "P1-TOOL-AUDIT01",
+      "title": "Own fail-closed provenance, source, safety and per-PR audit tools",
+      "owner_role": "License-Compliance-Reviewer",
+      "deps": [
+        "P1-GOV01",
+        "P1-TOOL-BRANCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1-tools",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "tools/license/**",
+        "tools/audit/**",
+        "evidence/P1-TOOL-AUDIT01/**"
+      ],
+      "produces": [
+        "tools/license/provenance_audit.py",
+        "tools/license/authored_scope_audit.py",
+        "tools/audit/slotmap_policy.py",
+        "tools/audit/map_rebuild_safety.py",
+        "tools/audit/frame_closure.py",
+        "tools/audit/tests/**",
+        "evidence/P1-TOOL-AUDIT01/**"
+      ],
+      "size": "L",
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 -m pytest tools/audit/tests exits zero",
+        "python3 tools/license/provenance_audit.py --self-test exits zero and rejects missing provenance, unapproved source derivation and stale lockfile input",
+        "python3 tools/license/authored_scope_audit.py --self-test exits zero and rejects authored files without Apache-2.0 coverage or an approved exception",
+        "python3 tools/audit/frame_closure.py --self-test exits zero after verifying that a Python entry, attach, object access or finalizer path reachable from the frame closure produces nonzero rejection",
+        "python3 tools/ci/branch_gate.py verify --task P1-TOOL-AUDIT01 --state merged --evidence evidence/P1-TOOL-AUDIT01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-TOOL-AUDIT01/README.md",
+        "evidence/P1-TOOL-AUDIT01/review.json",
+        "evidence/P1-TOOL-AUDIT01/independent-test.json",
+        "evidence/P1-TOOL-AUDIT01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-TOOL-AUDIT01-own-fail-closed-provenance,-source,-safety-and-p",
+      "review_evidence": "evidence/P1-TOOL-AUDIT01/review.json",
+      "test_evidence": "evidence/P1-TOOL-AUDIT01/independent-test.json",
+      "merge_evidence": "evidence/P1-TOOL-AUDIT01/merge.json"
+    },
+    {
+      "id": "P1-TOOL-PLATFORM01",
+      "title": "Own readiness, platform, IME, AT and support-manifest gate tools",
+      "owner_role": "Platform-Test-Engineer",
+      "deps": [
+        "P1-GOV01",
+        "P1-TOOL-BRANCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1-tools",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "tools/platform/**",
+        "evidence/P1-TOOL-PLATFORM01/**"
+      ],
+      "produces": [
+        "tools/platform/check_readiness.py",
+        "tools/platform/platform_gate.py",
+        "tools/platform/ime_gate.py",
+        "tools/platform/at_gate.py",
+        "tools/platform/support_manifest.py",
+        "tools/platform/tests/**",
+        "evidence/P1-TOOL-PLATFORM01/**"
+      ],
+      "size": "L",
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 -m pytest tools/platform/tests exits zero",
+        "python3 tools/platform/platform_gate.py --self-test exits zero after verifying nonzero rejection for missing presented-frame, surface-status, DPI, soak or artifact-hash evidence",
+        "python3 tools/platform/ime_gate.py --self-test exits zero after verifying nonzero rejection for missing physical IME logs or unexercised cited defects",
+        "python3 tools/platform/at_gate.py --self-test exits zero after verifying nonzero rejection for inspector-only evidence, missing IME dependency or missing AT workflow",
+        "python3 tools/platform/support_manifest.py --self-test exits zero after verifying nonzero rejection when any required platform gate is absent",
+        "python3 tools/ci/branch_gate.py verify --task P1-TOOL-PLATFORM01 --state merged --evidence evidence/P1-TOOL-PLATFORM01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-TOOL-PLATFORM01/README.md",
+        "evidence/P1-TOOL-PLATFORM01/review.json",
+        "evidence/P1-TOOL-PLATFORM01/independent-test.json",
+        "evidence/P1-TOOL-PLATFORM01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-TOOL-PLATFORM01-own-readiness,-platform,-ime,-at-and-support-man",
+      "review_evidence": "evidence/P1-TOOL-PLATFORM01/review.json",
+      "test_evidence": "evidence/P1-TOOL-PLATFORM01/independent-test.json",
+      "merge_evidence": "evidence/P1-TOOL-PLATFORM01/merge.json"
+    },
+    {
+      "id": "P1-TOOL-DOC01",
+      "title": "Own documentation build and claim-evidence audit tooling",
+      "owner_role": "Technical-Writer",
+      "deps": [
+        "P1-GOV01",
+        "P1-TOOL-BRANCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1-tools",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "tools/docs/**",
+        "evidence/P1-TOOL-DOC01/**"
+      ],
+      "produces": [
+        "tools/docs/audit_claims.py",
+        "tools/docs/tests/**",
+        "evidence/P1-TOOL-DOC01/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        2,
+        3
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 -m pytest tools/docs/tests exits zero",
+        "python3 tools/docs/audit_claims.py --self-test exits zero after verifying nonzero rejection for unsupported performance, platform, IME, accessibility, license or signing claims and for stale artifact hashes",
+        "python3 tools/ci/branch_gate.py verify --task P1-TOOL-DOC01 --state merged --evidence evidence/P1-TOOL-DOC01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-TOOL-DOC01/README.md",
+        "evidence/P1-TOOL-DOC01/review.json",
+        "evidence/P1-TOOL-DOC01/independent-test.json",
+        "evidence/P1-TOOL-DOC01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-TOOL-DOC01-own-documentation-build-and-claim-evidence-audit",
+      "review_evidence": "evidence/P1-TOOL-DOC01/review.json",
+      "test_evidence": "evidence/P1-TOOL-DOC01/independent-test.json",
+      "merge_evidence": "evidence/P1-TOOL-DOC01/merge.json"
+    },
+    {
+      "id": "P1-TOOL-RELEASE01",
+      "title": "Own artifact audit, clean-install, reproducibility and invalidation tools",
+      "owner_role": "Release-CI-Engineer",
+      "deps": [
+        "P1-GOV01",
+        "P1-TOOL-BRANCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1-tools",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "tools/release/**",
+        "evidence/P1-TOOL-RELEASE01/**"
+      ],
+      "produces": [
+        "tools/release/audit_artifacts.py",
+        "tools/release/clean_install_matrix.py",
+        "tools/release/verify_bundle.py",
+        "tools/release/artifact_gate.py",
+        "tools/release/check_readiness.py",
+        "tools/release/tests/**",
+        "evidence/P1-TOOL-RELEASE01/**"
+      ],
+      "size": "L",
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 -m pytest tools/release/tests exits zero",
+        "python3 tools/release/audit_artifacts.py --self-test exits zero after verifying nonzero rejection for missing ABI, repair, license, notice or hash evidence",
+        "python3 tools/release/verify_bundle.py --self-test exits zero after verifying nonzero rejection for nonreproducible hashes or missing raw logs",
+        "python3 tools/release/artifact_gate.py --self-test exits zero after verifying nonzero rejection when downstream evidence references a superseded artifact hash",
+        "python3 tools/ci/branch_gate.py verify --task P1-TOOL-RELEASE01 --state merged --evidence evidence/P1-TOOL-RELEASE01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-TOOL-RELEASE01/README.md",
+        "evidence/P1-TOOL-RELEASE01/review.json",
+        "evidence/P1-TOOL-RELEASE01/independent-test.json",
+        "evidence/P1-TOOL-RELEASE01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-TOOL-RELEASE01-own-artifact-audit,-clean-install,-reproducibili",
+      "review_evidence": "evidence/P1-TOOL-RELEASE01/review.json",
+      "test_evidence": "evidence/P1-TOOL-RELEASE01/independent-test.json",
+      "merge_evidence": "evidence/P1-TOOL-RELEASE01/merge.json"
+    },
+    {
+      "id": "P1-TOOL-BENCH01",
+      "title": "Own benchmark readiness, collector and interpreter diagnostic tools",
+      "owner_role": "Perf-Engineer",
+      "deps": [
+        "P1-GOV01",
+        "P1-TOOL-BRANCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1-tools",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "tools/bench/**",
+        "evidence/P1-TOOL-BENCH01/**"
+      ],
+      "produces": [
+        "tools/bench/check_readiness.py",
+        "tools/bench/collector_qualify.py",
+        "tools/bench/interpreter_matrix.py",
+        "tools/bench/tests/**",
+        "evidence/P1-TOOL-BENCH01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 -m pytest tools/bench/tests exits zero",
+        "python3 tools/bench/collector_qualify.py --self-test exits zero after verifying nonzero rejection for missing clock-domain, presentation endpoint or raw-capture evidence",
+        "python3 tools/bench/interpreter_matrix.py --self-test exits zero after verifying nonzero rejection unless separately installed GIL-enabled and free-threaded interpreters are launched and recorded",
+        "python3 tools/ci/branch_gate.py verify --task P1-TOOL-BENCH01 --state merged --evidence evidence/P1-TOOL-BENCH01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-TOOL-BENCH01/README.md",
+        "evidence/P1-TOOL-BENCH01/review.json",
+        "evidence/P1-TOOL-BENCH01/independent-test.json",
+        "evidence/P1-TOOL-BENCH01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-TOOL-BENCH01-own-benchmark-readiness,-collector-and-interpret",
+      "review_evidence": "evidence/P1-TOOL-BENCH01/review.json",
+      "test_evidence": "evidence/P1-TOOL-BENCH01/independent-test.json",
+      "merge_evidence": "evidence/P1-TOOL-BENCH01/merge.json"
+    },
+    {
+      "id": "P1-READY-PLATFORM01",
+      "title": "Record physical platform, IME and AT runner readiness",
+      "owner_role": "Orchestrator",
+      "deps": [
+        "P1-GOV01",
+        "P1-TOOL-PLATFORM01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1-readiness",
+      "workflow": "readiness",
+      "completion_state": "recorded",
+      "write_scope": [
+        "evidence/P1-READY-PLATFORM01/**",
+        "evidence/P1-READY-PLATFORM01/**"
+      ],
+      "produces": [
+        "evidence/P1-READY-PLATFORM01/readiness.json",
+        "evidence/P1-READY-PLATFORM01/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        1,
+        2
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 tools/platform/check_readiness.py --manifest evidence/P1-READY-PLATFORM01/readiness.json exits zero only when Ubuntu Wayland/Xorg GPU, Windows DX12, macOS Apple-silicon, physical IME and VoiceOver/Narrator/Orca runners are confirmed; missing readiness exits nonzero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-READY-PLATFORM01/README.md"
+      ]
+    },
+    {
+      "id": "P1-READY-BENCH01",
+      "title": "Record benchmark hardware, collector and OQ-02 readiness",
+      "owner_role": "Orchestrator",
+      "deps": [
+        "P1-GOV01",
+        "P1-TOOL-BENCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1-readiness",
+      "workflow": "readiness",
+      "completion_state": "recorded",
+      "write_scope": [
+        "evidence/P1-READY-BENCH01/**",
+        "evidence/P1-READY-BENCH01/**"
+      ],
+      "produces": [
+        "evidence/P1-READY-BENCH01/readiness.json",
+        "evidence/P1-READY-BENCH01/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        1,
+        2
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 tools/bench/check_readiness.py --manifest evidence/P1-READY-BENCH01/readiness.json exits zero only with approved hardware/display/driver, qualified collector, clock rule and OQ-02 decision; otherwise it exits nonzero and certification remains blocked"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-READY-BENCH01/README.md"
+      ]
+    },
+    {
+      "id": "P1-READY-RELEASE01",
+      "title": "Record CPython, copyright, Wayland and release-channel readiness",
+      "owner_role": "Orchestrator",
+      "deps": [
+        "P1-GOV01",
+        "P1-TOOL-RELEASE01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1-readiness",
+      "workflow": "readiness",
+      "completion_state": "recorded",
+      "write_scope": [
+        "evidence/P1-READY-RELEASE01/**",
+        "evidence/P1-READY-RELEASE01/**"
+      ],
+      "produces": [
+        "evidence/P1-READY-RELEASE01/readiness.json",
+        "evidence/P1-READY-RELEASE01/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        1,
+        2
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 tools/release/check_readiness.py --manifest evidence/P1-READY-RELEASE01/readiness.json exits zero only with CPython 3.11-3.15 GIL environments, owner copyright notice, Wayland disposition and channel/credential owner; missing items exit nonzero and block the affected release gate"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-READY-RELEASE01/README.md"
       ]
     },
     {
       "id": "P1-ARCH01",
-      "title": "Create the exact workspace, crate graph, pins and production lock",
+      "title": "Create exact workspace, crate graph, pins and production lock",
       "owner_role": "Integrator",
-      "deps": ["P1-GOV01"],
+      "deps": [
+        "P1-GOV01",
+        "P1-TOOL-GRAPH01",
+        "P1-TOOL-BRANCH01",
+        "P1-TOOL-AUDIT01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "1",
-      "write_scope": ["Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "crates/*/Cargo.toml", "tests/architecture/**"],
+      "dispatch_wave": "2-scaffold",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "Cargo.toml",
+        "Cargo.lock",
+        "rust-toolchain.toml",
+        "crates/*",
+        "crates/*/Cargo.toml",
+        "crates/pygpui-core/tests/crate_graph.rs",
+        "tests/architecture/**",
+        "evidence/P1-ARCH01/**"
+      ],
+      "produces": [
+        "Cargo.toml",
+        "Cargo.lock",
+        "rust-toolchain.toml",
+        "crates/*",
+        "crates/*/Cargo.toml",
+        "crates/pygpui-core/tests/crate_graph.rs",
+        "tests/architecture/**",
+        "evidence/P1-ARCH01/**"
+      ],
       "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR03-G5", "AR04-G1"],
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR03-G5",
+        "AR04-G1"
+      ],
       "acceptance_criteria": [
-        "cargo metadata --locked --format-version 1 exits zero and an architecture test asserts only the ADR 0003 dependency edges",
+        "cargo test -p pygpui-core --test crate_graph exits zero",
+        "cargo metadata --locked --format-version 1 exits zero",
         "cargo check --locked --all-targets exits zero",
-        "cargo metadata --locked --filter-platform x86_64-unknown-linux-gnu, --filter-platform x86_64-pc-windows-msvc and --filter-platform aarch64-apple-darwin each exit zero",
-        "A source/config audit exits zero for exact ADR 0004 direct pins and features, Rust 1.100.0, edition 2024, no GLES, no slice-1 AccessKit dependency and no Git/trunk dependencies"
+        "cargo metadata --locked --filter-platform x86_64-unknown-linux-gnu exits zero",
+        "cargo metadata --locked --filter-platform x86_64-pc-windows-msvc exits zero",
+        "cargo metadata --locked --filter-platform aarch64-apple-darwin exits zero",
+        "python3 tools/audit/slotmap_policy.py --manifest Cargo.toml --lock Cargo.lock exits zero for exact pins, no GLES, no slice-1 AccessKit and no Git/trunk dependencies",
+        "python3 tools/ci/branch_gate.py verify --task P1-ARCH01 --state merged --evidence evidence/P1-ARCH01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0003-public-python-api-and-module-boundaries.md",
-        ".harness/DECISIONS/0004-exact-dependency-feature-and-toolchain-baseline.md",
-        "Cargo.lock",
-        "evidence/P1-ARCH01/metadata-and-audit.txt"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-ARCH01/README.md",
+        "evidence/P1-ARCH01/gate-results.json",
+        "evidence/P1-ARCH01/review.json",
+        "evidence/P1-ARCH01/independent-test.json",
+        "evidence/P1-ARCH01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-ARCH01/gate-results.json",
+      "branch_prefix": "feat/P1-ARCH01-create-exact-workspace,-crate-graph,-pins-and-pr",
+      "review_evidence": "evidence/P1-ARCH01/review.json",
+      "test_evidence": "evidence/P1-ARCH01/independent-test.json",
+      "merge_evidence": "evidence/P1-ARCH01/merge.json"
+    },
+    {
+      "id": "P1-PACK01",
+      "title": "Create root Python packaging and locked development environment",
+      "owner_role": "Python-API-Engineer",
+      "deps": [
+        "P1-ARCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "2-scaffold",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "pyproject.toml",
+        "requirements-dev.lock",
+        "packaging/**",
+        "pygpui/__init__.py",
+        "tests/packaging/**",
+        "evidence/P1-PACK01/**"
+      ],
+      "produces": [
+        "pyproject.toml",
+        "requirements-dev.lock",
+        "packaging/**",
+        "pygpui/__init__.py",
+        "tests/packaging/**",
+        "evidence/P1-PACK01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 -m pytest tests/packaging/test_metadata.py exits zero",
+        "python3 -m pip install --require-hashes -r requirements-dev.lock exits zero",
+        "python3 -m mypy --version exits zero with mypy 2.4.1",
+        "python3 -m pytest --version exits zero from the locked environment",
+        "python3 tools/ci/branch_gate.py verify --task P1-PACK01 --state merged --evidence evidence/P1-PACK01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-PACK01/README.md",
+        "evidence/P1-PACK01/review.json",
+        "evidence/P1-PACK01/independent-test.json",
+        "evidence/P1-PACK01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-PACK01-create-root-python-packaging-and-locked-developm",
+      "review_evidence": "evidence/P1-PACK01/review.json",
+      "test_evidence": "evidence/P1-PACK01/independent-test.json",
+      "merge_evidence": "evidence/P1-PACK01/merge.json"
+    },
+    {
+      "id": "P1-CI01",
+      "title": "Configure local CI, per-PR audits and isolated red-main policy",
+      "owner_role": "Release-CI-Engineer",
+      "deps": [
+        "P1-ARCH01",
+        "P1-TOOL-BRANCH01",
+        "P1-TOOL-AUDIT01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "2-scaffold",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        ".github/workflows/**",
+        "tools/ci/pr_audit_gate.py",
+        "tools/ci/tests/test_pr_audit.py",
+        "evidence/P1-CI01/**"
+      ],
+      "produces": [
+        ".github/workflows/**",
+        "tools/ci/pr_audit_gate.py",
+        "tools/ci/tests/test_pr_audit.py",
+        "evidence/P1-CI01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 -m pytest tools/ci/tests/test_pr_audit.py exits zero",
+        "python3 tools/ci/run_local_gate.py --mode smoke exits zero",
+        "python3 tools/ci/red_main_drill.py --fixture /tmp/opencode/red-main-ci exits zero and records that production origin/main was untouched",
+        "python3 tools/ci/branch_gate.py verify --task P1-CI01 --state merged --evidence evidence/P1-CI01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-CI01/README.md",
+        "evidence/P1-CI01/review.json",
+        "evidence/P1-CI01/independent-test.json",
+        "evidence/P1-CI01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-CI01-configure-local-ci,-per-pr-audits-and-isolated-r",
+      "review_evidence": "evidence/P1-CI01/review.json",
+      "test_evidence": "evidence/P1-CI01/independent-test.json",
+      "merge_evidence": "evidence/P1-CI01/merge.json"
     },
     {
       "id": "P1-LIC01",
       "title": "Establish clean-room provenance and Apache-2.0 repository baseline",
       "owner_role": "License-Compliance-Reviewer",
-      "deps": ["P1-GOV01"],
+      "deps": [
+        "P1-ARCH01",
+        "P1-PACK01",
+        "P1-TOOL-AUDIT01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "1",
-      "write_scope": ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES", "CONTRIBUTING.md", "tools/license/**", "provenance/**"],
+      "dispatch_wave": "2-scaffold",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "LICENSE",
+        "NOTICE",
+        "THIRD_PARTY_NOTICES",
+        "CONTRIBUTING.md",
+        "provenance/**",
+        "evidence/P1-LIC01/**"
+      ],
+      "produces": [
+        "LICENSE",
+        "NOTICE",
+        "THIRD_PARTY_NOTICES",
+        "CONTRIBUTING.md",
+        "provenance/**",
+        "evidence/P1-LIC01/**"
+      ],
       "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR09-G1", "AR09-G5", "AR10-G1", "AR10-G3"],
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR09-G1",
+        "AR09-G5",
+        "AR10-G3"
+      ],
       "acceptance_criteria": [
-        "python3 tools/license/provenance_audit.py --mode repository exits zero with every authored file covered by Apache-2.0 or an approved exception",
-        "The source-exception workflow test exits zero: incomplete provenance is rejected and a complete record requires upstream URL, exact version/commit, path, copyright/license, modification notice, attributions and NOTICE treatment",
-        "cargo metadata --no-deps --format-version 1 and a repository metadata audit exit zero for Apache-2.0 workspace metadata and PEP 639 configuration",
-        "The official Apache-2.0 text hash matches; no copyright holder notice is invented, and missing owner notice keeps distribution blocked"
+        "cargo metadata --no-deps --format-version 1 exits zero",
+        "python3 tools/license/provenance_audit.py --mode repository --ledger provenance/ledger.json exits zero",
+        "python3 tools/license/authored_scope_audit.py --root . --ledger provenance/ledger.json exits zero",
+        "python3 tools/license/provenance_audit.py --self-test exits zero and rejects incomplete source-derived exception records",
+        "python3 tools/ci/branch_gate.py verify --task P1-LIC01 --state merged --evidence evidence/P1-LIC01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0009-clean-room-license-and-provenance-policy.md",
-        ".harness/DECISIONS/0010-license-pygpui-under-apache-2-0.md",
-        "THIRD_PARTY_NOTICES",
-        "evidence/P1-LIC01/provenance-and-license.txt"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-LIC01/README.md",
+        "evidence/P1-LIC01/gate-results.json",
+        "evidence/P1-LIC01/review.json",
+        "evidence/P1-LIC01/independent-test.json",
+        "evidence/P1-LIC01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-LIC01/gate-results.json",
+      "branch_prefix": "feat/P1-LIC01-establish-clean-room-provenance-and-apache-2.0-r",
+      "review_evidence": "evidence/P1-LIC01/review.json",
+      "test_evidence": "evidence/P1-LIC01/independent-test.json",
+      "merge_evidence": "evidence/P1-LIC01/merge.json"
+    },
+    {
+      "id": "P1-PR-AUDIT01",
+      "title": "Enforce provenance and authored-scope audits on every PR",
+      "owner_role": "License-Compliance-Reviewer",
+      "deps": [
+        "P1-CI01",
+        "P1-TOOL-AUDIT01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "2-scaffold",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "tools/ci/pr_audit_policy.json",
+        "tools/ci/tests/test_pr_policy.py",
+        "evidence/P1-PR-AUDIT01/**"
+      ],
+      "produces": [
+        "tools/ci/pr_audit_policy.json",
+        "tools/ci/tests/test_pr_policy.py",
+        "evidence/P1-PR-AUDIT01/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        2,
+        3
+      ],
+      "gates": [
+        "AR09-G1",
+        "AR10-G3"
+      ],
+      "acceptance_criteria": [
+        "python3 -m pytest tools/ci/tests/test_pr_policy.py exits zero",
+        "python3 tools/ci/pr_audit_gate.py --policy tools/ci/pr_audit_policy.json --self-test exits zero after verifying nonzero rejection for copied/adapted expression without an approved exception and for authored files without Apache-2.0 coverage",
+        "python3 tools/ci/branch_gate.py verify --task P1-PR-AUDIT01 --state merged --evidence evidence/P1-PR-AUDIT01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-PR-AUDIT01/README.md",
+        "evidence/P1-PR-AUDIT01/gate-results.json",
+        "evidence/P1-PR-AUDIT01/review.json",
+        "evidence/P1-PR-AUDIT01/independent-test.json",
+        "evidence/P1-PR-AUDIT01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-PR-AUDIT01/gate-results.json",
+      "branch_prefix": "feat/P1-PR-AUDIT01-enforce-provenance-and-authored-scope-audits-on-",
+      "review_evidence": "evidence/P1-PR-AUDIT01/review.json",
+      "test_evidence": "evidence/P1-PR-AUDIT01/independent-test.json",
+      "merge_evidence": "evidence/P1-PR-AUDIT01/merge.json"
     },
     {
       "id": "P1-PROTO01",
-      "title": "Define shared snapshot, command, event, error and identity contracts",
+      "title": "Define snapshot, command, event, error and identity contracts",
       "owner_role": "Protocol-Engineer",
-      "deps": ["P1-ARCH01"],
+      "deps": [
+        "P1-ARCH01",
+        "P1-PR-AUDIT01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "2",
-      "write_scope": ["crates/pygpui-protocol/**"],
+      "dispatch_wave": "3-contracts",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-protocol/**",
+        "evidence/P1-PROTO01/**"
+      ],
+      "produces": [
+        "crates/pygpui-protocol/**",
+        "evidence/P1-PROTO01/**"
+      ],
       "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR02-G1"],
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR02-G1"
+      ],
       "acceptance_criteria": [
         "cargo test -p pygpui-protocol --test contract_schema --test snapshot_properties exits zero",
-        "Golden-schema tests cover one complete immutable WindowSnapshot, stable keys, generations/versions, commands, coalesced semantic events, typed errors and rejected-snapshot rollback",
-        "A source audit exits zero proving the protocol crate has no PyO3, winit, wgpu or Taffy dependency and no Python reference type"
+        "python3 tools/audit/frame_closure.py --crate crates/pygpui-protocol exits zero and rejects PyO3, winit, wgpu, Taffy or Python reference types",
+        "python3 tools/ci/branch_gate.py verify --task P1-PROTO01 --state merged --evidence evidence/P1-PROTO01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0002-snapshot-first-full-window-rebuild.md",
-        ".harness/DECISIONS/0003-public-python-api-and-module-boundaries.md",
-        "crates/pygpui-protocol/src/lib.rs",
-        "evidence/P1-PROTO01/contract-tests.txt"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-PROTO01/README.md",
+        "evidence/P1-PROTO01/gate-results.json",
+        "evidence/P1-PROTO01/review.json",
+        "evidence/P1-PROTO01/independent-test.json",
+        "evidence/P1-PROTO01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-PROTO01/gate-results.json",
+      "branch_prefix": "feat/P1-PROTO01-define-snapshot,-command,-event,-error-and-ident",
+      "review_evidence": "evidence/P1-PROTO01/review.json",
+      "test_evidence": "evidence/P1-PROTO01/independent-test.json",
+      "merge_evidence": "evidence/P1-PROTO01/merge.json"
     },
     {
-      "id": "P1-CI01",
-      "title": "Stand up local-first CI and rehearse red-main recovery",
-      "owner_role": "Release-CI-Engineer",
-      "deps": ["P1-ARCH01"],
+      "id": "P1-TAG-CONTRACT01",
+      "title": "Create the immutable pre-contract rollback tag",
+      "owner_role": "Integrator",
+      "deps": [
+        "P1-PROTO01",
+        "P1-TOOL-BRANCH01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "2",
-      "write_scope": [".github/workflows/**", "tools/ci/**", "scripts/**"],
-      "size": "M",
-      "estimate_range_days": [3, 5],
+      "dispatch_wave": "3-contracts",
+      "workflow": "control",
+      "completion_state": "recorded",
+      "write_scope": [
+        "evidence/P1-TAG-CONTRACT01/**",
+        "evidence/P1-TAG-CONTRACT01/**"
+      ],
+      "produces": [
+        "evidence/P1-TAG-CONTRACT01/tag.txt",
+        "evidence/P1-TAG-CONTRACT01/**"
+      ],
+      "size": "XS",
+      "estimate_range_days": [
+        0.5,
+        1
+      ],
       "gates": [],
       "acceptance_criteria": [
-        "python3 tools/ci/run_local_gate.py --mode smoke exits zero for fmt, clippy, locked workspace tests and graph validation",
-        "python3 tools/ci/red_main_drill.py exits zero after injecting a failing commit on a throwaway feat/P1-CI01-red-main worktree, opening a PR, bisecting the failure, reverting/fixing it through a reviewed PR and restoring green origin/main",
-        "The drill records commands, PR URL and the restored green commit; it never pushes directly to main or force-pushes"
+        "python3 tools/ci/tag_point.py --tag phase1/contracts-premerge --ref origin/main --output evidence/P1-TAG-CONTRACT01/tag.txt exits zero without force-pushing"
       ],
       "evidence_links": [
-        ".harness/PROCESS.md",
-        "tools/ci/run_local_gate.py",
-        "evidence/P1-CI01/red-main-recovery.md"
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-TAG-CONTRACT01/README.md"
       ]
     },
     {
       "id": "P1-API01",
-      "title": "Freeze the typed Python API, handle semantics and public stub boundary",
+      "title": "Freeze typed Python API, handle semantics and public stubs",
       "owner_role": "Python-API-Engineer",
-      "deps": ["P1-PROTO01"],
+      "deps": [
+        "P1-PROTO01",
+        "P1-PACK01",
+        "P1-PR-AUDIT01",
+        "P1-TAG-CONTRACT01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "3",
-      "write_scope": ["pygpui/**", "examples/counter.py", "tests/typing/**"],
+      "dispatch_wave": "3-contracts",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "pygpui/**",
+        "examples/counter.py",
+        "tests/typing/**",
+        "evidence/P1-API01/**"
+      ],
+      "produces": [
+        "pygpui/**",
+        "examples/counter.py",
+        "tests/typing/**",
+        "evidence/P1-API01/**"
+      ],
       "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR03-G1", "AR07-G3"],
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR03-G1",
+        "AR07-G3"
+      ],
       "acceptance_criteria": [
-        "mypy --strict --disallow-any-explicit --python-version 3.11 examples/counter.py exits zero",
-        "pytest tests/typing/test_api_contract.py exits zero and verifies explicit __all__, private _native, reviewed stubs, py.typed and expected rejection of invalid actions/callbacks/native imports",
+        "python3 -m mypy --strict --disallow-any-explicit --python-version 3.11 examples/counter.py exits zero",
+        "python3 -m pytest tests/typing/test_api_contract.py exits zero",
         "python3 -m compileall -q pygpui exits zero",
-        "The API contract documents setup/event-turn-only entity access, read-only build, refresh coalescing, opaque non-owning handles, stale/wrong-kind typed errors and deferred lifecycle commands"
-      ],
-      "evidence_links": [
-        ".harness/DECISIONS/0003-public-python-api-and-module-boundaries.md",
-        ".harness/DECISIONS/0007-abi3-strict-typing-wheel-and-release-evidence.md",
-        "pygpui/__init__.pyi",
-        "evidence/P1-API01/typing-contract.txt"
-      ]
-    },
-    {
-      "id": "P1-BENCH00",
-      "title": "Freeze the benchmark CLI, scene, counter and artifact interface",
-      "owner_role": "Perf-Engineer",
-      "deps": ["P1-PROTO01"],
-      "status": "blocked",
-      "attempt_count": 0,
-      "max_attempts": 4,
-      "dispatch_wave": "3",
-      "write_scope": ["pygpui_bench/**", "benches/contracts/**", "BENCH/schema/**"],
-      "size": "S-M",
-      "estimate_range_days": [2, 3],
-      "gates": ["AR08-G1"],
-      "acceptance_criteria": [
-        "python -m pygpui_bench --help exits zero",
-        "python -m pygpui_bench scene verify --contract-only BENCH/schema/contract-fixture.json exits zero",
-        "The interface schema includes protocol ID, scene hash, environment fingerprint, collector, native callback/frame/attachment/finalizer counters, sentinel expectations, raw-run hashes, five-block/ten-pair ABBA fields and claim status",
-        "The contract rejects headless/submitted data as proof of presentation and preserves the literal provisional thresholds without claiming certification"
-      ],
-      "evidence_links": [
-        ".harness/DECISIONS/0008-benchmark-certification-and-regression-gates.md",
-        "BENCH/schema/benchmark-contract.json",
-        "evidence/P1-BENCH00/contract-validation.txt"
-      ]
-    },
-    {
-      "id": "P1-CONREV01",
-      "title": "Independently review and freeze all shared contracts",
-      "owner_role": "Independent-Reviewer",
-      "deps": ["P1-API01", "P1-BENCH00", "P1-PROTO01", "P1-LIC01", "P1-CI01"],
-      "status": "blocked",
-      "attempt_count": 0,
-      "max_attempts": 4,
-      "dispatch_wave": "4",
-      "write_scope": [".harness/REVIEWS/phase-1-contract-freeze.md", ".harness/CONTRACT-FREEZE.json"],
-      "size": "S",
-      "estimate_range_days": [1, 2],
-      "gates": ["AR03-G5"],
-      "acceptance_criteria": [
-        "python3 .harness/scripts/check_contract_freeze.py exits zero and records hashes for protocol, API/stubs, benchmark interface and crate graph",
-        "The independent review contains zero blocking findings and verifies non-overlapping implementation write scopes",
-        "Any requested interface change is resolved before the freeze; consumer branches do not patch frozen interfaces"
+        "python3 tools/ci/branch_gate.py verify --task P1-API01 --state merged --evidence evidence/P1-API01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-API01/README.md",
+        "evidence/P1-API01/gate-results.json",
+        "evidence/P1-API01/review.json",
+        "evidence/P1-API01/independent-test.json",
+        "evidence/P1-API01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-API01/gate-results.json",
+      "branch_prefix": "feat/P1-API01-freeze-typed-python-api,-handle-semantics-and-pu",
+      "review_evidence": "evidence/P1-API01/review.json",
+      "test_evidence": "evidence/P1-API01/independent-test.json",
+      "merge_evidence": "evidence/P1-API01/merge.json"
+    },
+    {
+      "id": "P1-BENCH00",
+      "title": "Freeze benchmark CLI, scene, counter and artifact interface",
+      "owner_role": "Perf-Engineer",
+      "deps": [
+        "P1-PROTO01",
+        "P1-PACK01",
+        "P1-PR-AUDIT01",
+        "P1-TAG-CONTRACT01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "3-contracts",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "pygpui_bench/**",
+        "benches/contracts/**",
+        "BENCH/schema/**",
+        "evidence/P1-BENCH00/**"
+      ],
+      "produces": [
+        "pygpui_bench/**",
+        "benches/contracts/**",
+        "BENCH/schema/**",
+        "evidence/P1-BENCH00/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        2,
+        3
+      ],
+      "gates": [
+        "AR08-G1"
+      ],
+      "acceptance_criteria": [
+        "python3 -m pygpui_bench --help exits zero",
+        "python3 -m pygpui_bench scene verify --contract-only BENCH/schema/contract-fixture.json exits zero",
+        "python3 -m pytest benches/contracts/test_schema.py exits zero and rejects headless data as presentation proof",
+        "python3 tools/ci/branch_gate.py verify --task P1-BENCH00 --state merged --evidence evidence/P1-BENCH00/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-BENCH00/README.md",
+        "evidence/P1-BENCH00/gate-results.json",
+        "evidence/P1-BENCH00/review.json",
+        "evidence/P1-BENCH00/independent-test.json",
+        "evidence/P1-BENCH00/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-BENCH00/gate-results.json",
+      "branch_prefix": "feat/P1-BENCH00-freeze-benchmark-cli,-scene,-counter-and-artifac",
+      "review_evidence": "evidence/P1-BENCH00/review.json",
+      "test_evidence": "evidence/P1-BENCH00/independent-test.json",
+      "merge_evidence": "evidence/P1-BENCH00/merge.json"
+    },
+    {
+      "id": "P1-RUSTCONTRACT01",
+      "title": "Define and compile-test internal Rust hand-offs and instrumentation contract",
+      "owner_role": "Integrator",
+      "deps": [
+        "P1-PROTO01",
+        "P1-PR-AUDIT01",
+        "P1-TAG-CONTRACT01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "3-contracts",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-scene/src/contracts/**",
+        "crates/pygpui-render/src/contracts/**",
+        "crates/pygpui-platform/src/contracts/**",
+        "crates/pygpui-core/src/instrumentation/**",
+        "crates/pygpui-core/tests/internal_contracts.rs",
+        "evidence/P1-RUSTCONTRACT01/**"
+      ],
+      "produces": [
+        "crates/pygpui-scene/src/contracts/**",
+        "crates/pygpui-render/src/contracts/**",
+        "crates/pygpui-platform/src/contracts/**",
+        "crates/pygpui-core/src/instrumentation/**",
+        "crates/pygpui-core/tests/internal_contracts.rs",
+        "evidence/P1-RUSTCONTRACT01/**"
+      ],
+      "size": "L",
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-core --test internal_contracts exits zero",
+        "cargo check --locked --all-targets exits zero",
+        "The compiled contract tests cover text measurement/shaping and glyph-atlas hand-off, scene-to-render paint input, hit/focus trees, platform event/surface orchestration and native counter/sentinel types",
+        "python3 tools/ci/branch_gate.py verify --task P1-RUSTCONTRACT01 --state merged --evidence evidence/P1-RUSTCONTRACT01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-RUSTCONTRACT01/README.md",
+        "evidence/P1-RUSTCONTRACT01/review.json",
+        "evidence/P1-RUSTCONTRACT01/independent-test.json",
+        "evidence/P1-RUSTCONTRACT01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-RUSTCONTRACT01-define-and-compile-test-internal-rust-hand-offs-",
+      "review_evidence": "evidence/P1-RUSTCONTRACT01/review.json",
+      "test_evidence": "evidence/P1-RUSTCONTRACT01/independent-test.json",
+      "merge_evidence": "evidence/P1-RUSTCONTRACT01/merge.json"
+    },
+    {
+      "id": "P1-CONREV01",
+      "title": "Independently review and freeze external and internal contracts",
+      "owner_role": "Independent-Reviewer",
+      "deps": [
+        "P1-API01",
+        "P1-BENCH00",
+        "P1-RUSTCONTRACT01",
+        "P1-LIC01",
+        "P1-CI01",
+        "P1-TOOL-GRAPH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "4-freeze",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        ".harness/CONTRACT-FREEZE.json",
         ".harness/REVIEWS/phase-1-contract-freeze.md",
-        ".harness/CONTRACT-FREEZE.json"
-      ]
+        "evidence/P1-CONREV01/**"
+      ],
+      "produces": [
+        ".harness/CONTRACT-FREEZE.json",
+        ".harness/REVIEWS/phase-1-contract-freeze.md",
+        "evidence/P1-CONREV01/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        1,
+        2
+      ],
+      "gates": [
+        "AR03-G5"
+      ],
+      "acceptance_criteria": [
+        "python3 .harness/scripts/check_contract_freeze.py --manifest .harness/CONTRACT-FREEZE.json exits zero",
+        "cargo test -p pygpui-core --test crate_graph --test internal_contracts exits zero",
+        "The freeze records protocol, API/stub, benchmark and internal Rust contract hashes; missing or changed hashes exit nonzero",
+        "python3 tools/ci/branch_gate.py verify --task P1-CONREV01 --state merged --evidence evidence/P1-CONREV01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-CONREV01/README.md",
+        "evidence/P1-CONREV01/gate-results.json",
+        "evidence/P1-CONREV01/review.json",
+        "evidence/P1-CONREV01/independent-test.json",
+        "evidence/P1-CONREV01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-CONREV01/gate-results.json",
+      "branch_prefix": "feat/P1-CONREV01-independently-review-and-freeze-external-and-int",
+      "review_evidence": "evidence/P1-CONREV01/review.json",
+      "test_evidence": "evidence/P1-CONREV01/independent-test.json",
+      "merge_evidence": "evidence/P1-CONREV01/merge.json"
     },
     {
       "id": "P1-CORE01",
-      "title": "Implement the bounded command queue and demand/idle scheduler",
+      "title": "Implement bounded command queue and demand/idle scheduler",
       "owner_role": "Rust-Core-Engineer",
-      "deps": ["P1-CONREV01"],
+      "deps": [
+        "P1-CONREV01",
+        "P1-PR-AUDIT01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "5a",
-      "write_scope": ["crates/pygpui-core/src/queue/**", "crates/pygpui-core/src/scheduler/**", "crates/pygpui-core/tests/bounded_queue.rs", "crates/pygpui-core/tests/idle_scheduler.rs"],
+      "dispatch_wave": "5-modules",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-core/src/queue/**",
+        "crates/pygpui-core/src/scheduler/**",
+        "crates/pygpui-core/tests/bounded_queue.rs",
+        "crates/pygpui-core/tests/idle_scheduler.rs",
+        "evidence/P1-CORE01/**"
+      ],
+      "produces": [
+        "crates/pygpui-core/src/queue/**",
+        "crates/pygpui-core/src/scheduler/**",
+        "crates/pygpui-core/tests/bounded_queue.rs",
+        "crates/pygpui-core/tests/idle_scheduler.rs",
+        "evidence/P1-CORE01/**"
+      ],
       "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR01-G4"],
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR01-G4"
+      ],
       "acceptance_criteria": [
         "cargo test -p pygpui-core --test bounded_queue --test idle_scheduler exits zero",
-        "cargo test -p pygpui-core --test idle_scheduler -- --ignored exits zero for a 60-second idle proving Wait/bounded WaitUntil, no indefinite Poll, no unchanged-frame submissions and bounded wakeups",
-        "Backpressure tests prove validated commands are bounded, coalesced where specified and fail with typed errors rather than unbounded growth"
+        "cargo test -p pygpui-core --test idle_scheduler -- --ignored exits zero for a 60-second idle with Wait/bounded WaitUntil, no indefinite Poll, no unchanged-frame submissions and bounded wakeups",
+        "python3 tools/ci/branch_gate.py verify --task P1-CORE01 --state merged --evidence evidence/P1-CORE01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0001-rust-owned-runtime-and-python-semantic-boundary.md",
-        "crates/pygpui-core/src/lib.rs",
-        "evidence/P1-CORE01/queue-idle-tests.txt"
-      ]
-    },
-    {
-      "id": "P1-CORE02",
-      "title": "Implement generation-safe handles, slot cap and deterministic teardown",
-      "owner_role": "Rust-Core-Engineer",
-      "deps": ["P1-CORE01"],
-      "status": "blocked",
-      "attempt_count": 0,
-      "max_attempts": 4,
-      "dispatch_wave": "5b",
-      "write_scope": ["crates/pygpui-core/src/identity/**", "crates/pygpui-core/tests/handles.rs", "crates/pygpui-core/tests/slotmap_guards.rs"],
-      "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR03-G2", "AR04-G3"],
-      "acceptance_criteria": [
-        "cargo test -p pygpui-core --test handles --test slotmap_guards exits zero",
-        "Tests cover strong/weak lifetime, generation reuse, wrong-kind/window handles, close-before-event, stale deferred commands, the 65,536 live-slot cap and stale-key reinsertion",
-        "python3 tools/audit/slotmap_policy.py exits zero and finds no detach/reattach calls in slice 1"
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-CORE01/README.md",
+        "evidence/P1-CORE01/gate-results.json",
+        "evidence/P1-CORE01/review.json",
+        "evidence/P1-CORE01/independent-test.json",
+        "evidence/P1-CORE01/merge.json"
       ],
-      "evidence_links": [
-        ".harness/DECISIONS/0003-public-python-api-and-module-boundaries.md",
-        ".harness/DECISIONS/0004-exact-dependency-feature-and-toolchain-baseline.md",
-        "evidence/P1-CORE02/handle-slot-tests.txt"
-      ]
-    },
-    {
-      "id": "P1-SCENE01",
-      "title": "Implement snapshot reconciliation, full rebuild and constrained layout",
-      "owner_role": "Rust-Scene-Engineer",
-      "deps": ["P1-CONREV01"],
-      "status": "blocked",
-      "attempt_count": 0,
-      "max_attempts": 4,
-      "dispatch_wave": "5a",
-      "write_scope": ["crates/pygpui-scene/src/layout/**", "crates/pygpui-scene/src/reconcile/**", "crates/pygpui-scene/tests/reconcile.rs", "crates/pygpui-scene/tests/taffy_constraints.rs", "crates/pygpui-scene/tests/rebuild_counters.rs"],
-      "size": "L",
-      "estimate_range_days": [6, 8],
-      "gates": ["AR02-G1", "AR02-G3", "AR04-G2", "AR04-G5"],
-      "acceptance_criteria": [
-        "cargo test -p pygpui-scene --test reconcile --test taffy_constraints --test rebuild_counters exits zero",
-        "Tests prove atomic replacement, rejected-snapshot rollback, stable-key reorder/insert/remove, duplicate-key rejection, stale handles and full-refresh equivalence",
-        "Native counters prove one root/layout/hit/focus/scene rebuild per semantic change and zero rebuilds for no change",
-        "Taffy #804/#1354/#1357 regressions and supported in-flow flex/block cases pass; unsupported public layouts return typed validation errors; one full rebuild is the fallback before fail-closed",
-        "python3 tools/audit/map_rebuild_safety.py exits zero and finds no rustc-hash #45 insertion-order rebuild pattern"
-      ],
-      "evidence_links": [
-        ".harness/DECISIONS/0002-snapshot-first-full-window-rebuild.md",
-        ".harness/DECISIONS/0004-exact-dependency-feature-and-toolchain-baseline.md",
-        "evidence/P1-SCENE01/reconcile-layout-tests.txt"
-      ]
+      "gate_evidence": "evidence/P1-CORE01/gate-results.json",
+      "branch_prefix": "feat/P1-CORE01-implement-bounded-command-queue-and-demand-idle-",
+      "review_evidence": "evidence/P1-CORE01/review.json",
+      "test_evidence": "evidence/P1-CORE01/independent-test.json",
+      "merge_evidence": "evidence/P1-CORE01/merge.json"
     },
     {
       "id": "P1-TEXT01",
       "title": "Implement cosmic-text shaping, glyph atlas and fallback",
       "owner_role": "Rust-Text-Engineer",
-      "deps": ["P1-CONREV01"],
+      "deps": [
+        "P1-CONREV01",
+        "P1-PR-AUDIT01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "5a",
-      "write_scope": ["crates/pygpui-scene/src/text/**", "crates/pygpui-scene/tests/text_atlas.rs"],
+      "dispatch_wave": "5-modules",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-scene/src/text/**",
+        "crates/pygpui-scene/tests/text_atlas.rs",
+        "evidence/P1-TEXT01/**"
+      ],
+      "produces": [
+        "crates/pygpui-scene/src/text/**",
+        "crates/pygpui-scene/tests/text_atlas.rs",
+        "evidence/P1-TEXT01/**"
+      ],
       "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR04-G4"],
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR04-G4"
+      ],
       "acceptance_criteria": [
-        "cargo test -p pygpui-scene --test text_atlas exits zero for ASCII, CJK, RTL, emoji and font fallback",
-        "The adapter avoids the cosmic-text #543 borrow pattern and reports #518 behavior for generic versus an explicit resolved monospace family",
-        "A source audit exits zero proving text caches are keyed only by native snapshot data and contain no Python reference"
+        "cargo test -p pygpui-scene --test text_atlas exits zero for ASCII, CJK, RTL, emoji and font fallback without the cosmic-text #543 borrow pattern",
+        "The text-atlas test output records cosmic-text #518 behavior for generic and explicit monospace families",
+        "python3 tools/ci/branch_gate.py verify --task P1-TEXT01 --state merged --evidence evidence/P1-TEXT01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0004-exact-dependency-feature-and-toolchain-baseline.md",
-        "crates/pygpui-scene/src/text/mod.rs",
-        "evidence/P1-TEXT01/atlas-tests.txt"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-TEXT01/README.md",
+        "evidence/P1-TEXT01/gate-results.json",
+        "evidence/P1-TEXT01/review.json",
+        "evidence/P1-TEXT01/independent-test.json",
+        "evidence/P1-TEXT01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-TEXT01/gate-results.json",
+      "branch_prefix": "feat/P1-TEXT01-implement-cosmic-text-shaping,-glyph-atlas-and-f",
+      "review_evidence": "evidence/P1-TEXT01/review.json",
+      "test_evidence": "evidence/P1-TEXT01/independent-test.json",
+      "merge_evidence": "evidence/P1-TEXT01/merge.json"
+    },
+    {
+      "id": "P1-CORE02",
+      "title": "Implement generation-safe handles, slot cap and teardown",
+      "owner_role": "Rust-Core-Engineer",
+      "deps": [
+        "P1-CORE01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5-modules",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-core/src/identity/**",
+        "crates/pygpui-core/tests/handles.rs",
+        "crates/pygpui-core/tests/slotmap_guards.rs",
+        "evidence/P1-CORE02/**"
+      ],
+      "produces": [
+        "crates/pygpui-core/src/identity/**",
+        "crates/pygpui-core/tests/handles.rs",
+        "crates/pygpui-core/tests/slotmap_guards.rs",
+        "evidence/P1-CORE02/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR03-G2",
+        "AR04-G3"
+      ],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-core --test handles --test slotmap_guards exits zero",
+        "python3 tools/audit/slotmap_policy.py --source crates/pygpui-core exits zero and rejects detach/reattach or a live-slot cap above 65536",
+        "python3 tools/ci/branch_gate.py verify --task P1-CORE02 --state merged --evidence evidence/P1-CORE02/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-CORE02/README.md",
+        "evidence/P1-CORE02/gate-results.json",
+        "evidence/P1-CORE02/review.json",
+        "evidence/P1-CORE02/independent-test.json",
+        "evidence/P1-CORE02/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-CORE02/gate-results.json",
+      "branch_prefix": "feat/P1-CORE02-implement-generation-safe-handles,-slot-cap-and-",
+      "review_evidence": "evidence/P1-CORE02/review.json",
+      "test_evidence": "evidence/P1-CORE02/independent-test.json",
+      "merge_evidence": "evidence/P1-CORE02/merge.json"
+    },
+    {
+      "id": "P1-SCENE01",
+      "title": "Implement snapshot reconciliation, full rebuild and constrained layout",
+      "owner_role": "Rust-Scene-Engineer",
+      "deps": [
+        "P1-TEXT01",
+        "P1-CONREV01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5-modules",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-scene/src/layout/**",
+        "crates/pygpui-scene/src/reconcile/**",
+        "crates/pygpui-scene/tests/reconcile.rs",
+        "crates/pygpui-scene/tests/taffy_constraints.rs",
+        "crates/pygpui-scene/tests/rebuild_counters.rs",
+        "evidence/P1-SCENE01/**"
+      ],
+      "produces": [
+        "crates/pygpui-scene/src/layout/**",
+        "crates/pygpui-scene/src/reconcile/**",
+        "crates/pygpui-scene/tests/reconcile.rs",
+        "crates/pygpui-scene/tests/taffy_constraints.rs",
+        "crates/pygpui-scene/tests/rebuild_counters.rs",
+        "evidence/P1-SCENE01/**"
+      ],
+      "size": "L",
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [
+        "AR02-G1",
+        "AR02-G3",
+        "AR04-G2",
+        "AR04-G5"
+      ],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-scene --test reconcile --test taffy_constraints --test rebuild_counters exits zero",
+        "python3 tools/audit/map_rebuild_safety.py --source crates/pygpui-scene exits zero and rejects the rustc-hash #45 insertion-order rebuild pattern",
+        "Native counters prove one root/layout/hit/focus/scene rebuild per semantic change and zero no-change rebuilds",
+        "python3 tools/ci/branch_gate.py verify --task P1-SCENE01 --state merged --evidence evidence/P1-SCENE01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-SCENE01/README.md",
+        "evidence/P1-SCENE01/gate-results.json",
+        "evidence/P1-SCENE01/review.json",
+        "evidence/P1-SCENE01/independent-test.json",
+        "evidence/P1-SCENE01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-SCENE01/gate-results.json",
+      "branch_prefix": "feat/P1-SCENE01-implement-snapshot-reconciliation,-full-rebuild-",
+      "review_evidence": "evidence/P1-SCENE01/review.json",
+      "test_evidence": "evidence/P1-SCENE01/independent-test.json",
+      "merge_evidence": "evidence/P1-SCENE01/merge.json"
     },
     {
       "id": "P1-INPUT01",
       "title": "Implement Rust-owned pointer, key, focus and IME state machines",
       "owner_role": "Rust-Input-Engineer",
-      "deps": ["P1-CONREV01"],
+      "deps": [
+        "P1-SCENE01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "5a",
-      "write_scope": ["crates/pygpui-scene/src/input/**", "crates/pygpui-scene/tests/input_focus.rs", "crates/pygpui-scene/tests/ime_state_machine.rs"],
+      "dispatch_wave": "5-modules",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-scene/src/input/**",
+        "crates/pygpui-scene/tests/input_focus.rs",
+        "crates/pygpui-scene/tests/ime_state_machine.rs",
+        "evidence/P1-INPUT01/**"
+      ],
+      "produces": [
+        "crates/pygpui-scene/src/input/**",
+        "crates/pygpui-scene/tests/input_focus.rs",
+        "crates/pygpui-scene/tests/ime_state_machine.rs",
+        "evidence/P1-INPUT01/**"
+      ],
       "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR06-G1"],
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR06-G1"
+      ],
       "acceptance_criteria": [
         "cargo test -p pygpui-scene --test input_focus --test ime_state_machine exits zero",
-        "Property tests cover direct commit, empty-preedit clearing, UTF-8 byte offsets with CJK/emoji/combining marks, focus A-B-C races, stale disable events, focus-loss reset, external text version conflicts and close during composition",
-        "Counter tests prove click and Enter/Space activation route once, repeat/synthetic events are identified, physical keys drive positional input and logical keys drive shortcuts, and raw KeyboardInput never duplicates Ime::Commit text"
+        "Property tests cover direct commit, empty preedit, UTF-8 offsets, focus races, stale disable events, focus-loss reset, external text versions and close during composition",
+        "python3 tools/ci/branch_gate.py verify --task P1-INPUT01 --state merged --evidence evidence/P1-INPUT01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0006-input-ime-focus-and-accessibility-ownership.md",
-        "evidence/P1-INPUT01/input-ime-properties.txt"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-INPUT01/README.md",
+        "evidence/P1-INPUT01/gate-results.json",
+        "evidence/P1-INPUT01/review.json",
+        "evidence/P1-INPUT01/independent-test.json",
+        "evidence/P1-INPUT01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-INPUT01/gate-results.json",
+      "branch_prefix": "feat/P1-INPUT01-implement-rust-owned-pointer,-key,-focus-and-ime",
+      "review_evidence": "evidence/P1-INPUT01/review.json",
+      "test_evidence": "evidence/P1-INPUT01/independent-test.json",
+      "merge_evidence": "evidence/P1-INPUT01/merge.json"
     },
     {
       "id": "P1-RENDER01",
-      "title": "Implement the wgpu renderer and bounded surface state machine",
+      "title": "Implement wgpu renderer, text draws and surface state machine",
       "owner_role": "Rust-Render-Engineer",
-      "deps": ["P1-CONREV01"],
+      "deps": [
+        "P1-SCENE01",
+        "P1-TEXT01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "5a",
-      "write_scope": ["crates/pygpui-render/**"],
+      "dispatch_wave": "5-modules",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-render/**",
+        "evidence/P1-RENDER01/**"
+      ],
+      "produces": [
+        "crates/pygpui-render/**",
+        "evidence/P1-RENDER01/**"
+      ],
       "size": "L",
-      "estimate_range_days": [6, 8],
-      "gates": ["AR05-G2"],
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [
+        "AR05-G2"
+      ],
       "acceptance_criteria": [
-        "cargo test -p pygpui-render exits zero for surface Success/Suboptimal/Outdated/Lost/Timeout/Occluded/Validation, zero extents, physical resize coalescing, adapter selection and device-loss handling",
-        "Tests assert explicit backend masks, nonempty format/present-mode lists, required features/limits, opaque SDR sRGB, Fifo and desired_maximum_frame_latency = 2",
-        "A headless golden-scene test exits zero with a deterministic scene hash; it is labelled capacity evidence, not presentation evidence",
-        "A source audit exits zero proving no PyO3 or winit import in the render crate"
+        "cargo test -p pygpui-render exits zero for every surface status, zero extents, physical resize, adapter selection, SDR sRGB, Fifo, desired latency 2 and device loss",
+        "python3 tools/audit/frame_closure.py --crate crates/pygpui-render exits zero and rejects PyO3 or winit imports",
+        "python3 tools/ci/branch_gate.py verify --task P1-RENDER01 --state merged --evidence evidence/P1-RENDER01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0005-platform-window-and-render-backend-baseline.md",
-        "crates/pygpui-render/src/lib.rs",
-        "evidence/P1-RENDER01/surface-tests.txt"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-RENDER01/README.md",
+        "evidence/P1-RENDER01/gate-results.json",
+        "evidence/P1-RENDER01/review.json",
+        "evidence/P1-RENDER01/independent-test.json",
+        "evidence/P1-RENDER01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-RENDER01/gate-results.json",
+      "branch_prefix": "feat/P1-RENDER01-implement-wgpu-renderer,-text-draws-and-surface-",
+      "review_evidence": "evidence/P1-RENDER01/review.json",
+      "test_evidence": "evidence/P1-RENDER01/independent-test.json",
+      "merge_evidence": "evidence/P1-RENDER01/merge.json"
     },
     {
       "id": "P1-PLATFORM01",
       "title": "Implement the single winit main-thread loop and event orchestration",
       "owner_role": "Rust-Platform-Engineer",
-      "deps": ["P1-CONREV01", "P1-RENDER01"],
+      "deps": [
+        "P1-CORE01",
+        "P1-SCENE01",
+        "P1-TEXT01",
+        "P1-INPUT01",
+        "P1-RENDER01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "5b",
-      "write_scope": ["crates/pygpui-platform/**"],
+      "dispatch_wave": "5-modules",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-platform/**",
+        "evidence/P1-PLATFORM01/**"
+      ],
+      "produces": [
+        "crates/pygpui-platform/**",
+        "evidence/P1-PLATFORM01/**"
+      ],
       "size": "L",
-      "estimate_range_days": [6, 8],
-      "gates": ["AR01-G1"],
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [
+        "AR01-G1"
+      ],
       "acceptance_criteria": [
         "cargo test -p pygpui-platform --test main_thread_lifecycle --test event_orchestration exits zero",
-        "Tests prove one platform-main-thread loop, no render worker, matching owned display/window handles, clean close and no use-after-drop of window/display/surface handles",
-        "The native turn drains events/timers, routes input, delivers coalesced semantic events, accepts one snapshot, rebuilds, submits/presents and coalesces follow-up demand without Python frame callbacks",
-        "A source audit exits zero proving no PyO3 import in the platform crate"
+        "python3 tools/audit/frame_closure.py --crate crates/pygpui-platform exits zero and rejects PyO3 imports",
+        "Tests prove one main-thread loop, no render worker, clean close and the complete native event-to-present turn",
+        "python3 tools/ci/branch_gate.py verify --task P1-PLATFORM01 --state merged --evidence evidence/P1-PLATFORM01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0001-rust-owned-runtime-and-python-semantic-boundary.md",
-        ".harness/DECISIONS/0005-platform-window-and-render-backend-baseline.md",
-        "evidence/P1-PLATFORM01/lifecycle-tests.txt"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-PLATFORM01/README.md",
+        "evidence/P1-PLATFORM01/gate-results.json",
+        "evidence/P1-PLATFORM01/review.json",
+        "evidence/P1-PLATFORM01/independent-test.json",
+        "evidence/P1-PLATFORM01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-PLATFORM01/gate-results.json",
+      "branch_prefix": "feat/P1-PLATFORM01-implement-the-single-winit-main-thread-loop-and-",
+      "review_evidence": "evidence/P1-PLATFORM01/review.json",
+      "test_evidence": "evidence/P1-PLATFORM01/independent-test.json",
+      "merge_evidence": "evidence/P1-PLATFORM01/merge.json"
     },
     {
       "id": "P1-PY01",
       "title": "Implement the PyO3 event actor and Python facade binding",
       "owner_role": "Python-Binding-Engineer",
-      "deps": ["P1-CONREV01", "P1-CORE02"],
+      "deps": [
+        "P1-PLATFORM01",
+        "P1-SCENE01",
+        "P1-CORE02"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "5b",
-      "write_scope": ["crates/pygpui-python/**"],
+      "dispatch_wave": "5-modules",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-python/**",
+        "evidence/P1-PY01/**"
+      ],
+      "produces": [
+        "crates/pygpui-python/**",
+        "evidence/P1-PY01/**"
+      ],
       "size": "L",
-      "estimate_range_days": [6, 8],
-      "gates": ["AR03-G3"],
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [
+        "AR03-G3"
+      ],
       "acceptance_criteria": [
-        "cargo test -p pygpui-python exits zero for event-actor conversion, bounded command validation and Send-only results",
-        "Tests prove App.run is synchronous and once per process on the platform main thread, detaches for native work, reattaches only at semantic/lifecycle boundaries and never exposes a Python frame callback",
-        "Reentrancy tests prove mutation during build, nested dispatch, run reentry, close during notification and release during callback raise typed errors without deadlock or panic",
-        "The binding uses PyO3 0.30.1 abi3-py311 with gil_used = true and is the only crate importing PyO3"
+        "cargo test -p pygpui-python exits zero",
+        "Tests prove synchronous once-per-process main-thread App.run, detached native work, semantic-boundary reattachment, typed reentrancy errors and Send-only results",
+        "python3 tools/audit/frame_closure.py --crate crates/pygpui-python exits zero for the event-actor boundary and rejects any frame callback export",
+        "python3 tools/ci/branch_gate.py verify --task P1-PY01 --state merged --evidence evidence/P1-PY01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0001-rust-owned-runtime-and-python-semantic-boundary.md",
-        ".harness/DECISIONS/0003-public-python-api-and-module-boundaries.md",
-        "evidence/P1-PY01/event-actor-tests.txt"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-PY01/README.md",
+        "evidence/P1-PY01/gate-results.json",
+        "evidence/P1-PY01/review.json",
+        "evidence/P1-PY01/independent-test.json",
+        "evidence/P1-PY01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-PY01/gate-results.json",
+      "branch_prefix": "feat/P1-PY01-implement-the-pyo3-event-actor-and-python-facade",
+      "review_evidence": "evidence/P1-PY01/review.json",
+      "test_evidence": "evidence/P1-PY01/independent-test.json",
+      "merge_evidence": "evidence/P1-PY01/merge.json"
+    },
+    {
+      "id": "P1-INSTRUMENT01",
+      "title": "Add production native counters and deliberate sentinels across the frame closure",
+      "owner_role": "Rust-Core-Engineer",
+      "deps": [
+        "P1-CORE02",
+        "P1-SCENE01",
+        "P1-RENDER01",
+        "P1-PLATFORM01",
+        "P1-PY01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5-modules",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-core/src/instrumentation/**",
+        "crates/pygpui-scene/src/instrumentation.rs",
+        "crates/pygpui-render/src/instrumentation.rs",
+        "crates/pygpui-platform/src/instrumentation.rs",
+        "crates/pygpui-python/src/instrumentation.rs",
+        "crates/pygpui-core/tests/instrumentation.rs",
+        "evidence/P1-INSTRUMENT01/**"
+      ],
+      "produces": [
+        "crates/pygpui-core/src/instrumentation/hooks.rs",
+        "crates/pygpui-scene/src/instrumentation.rs",
+        "crates/pygpui-render/src/instrumentation.rs",
+        "crates/pygpui-platform/src/instrumentation.rs",
+        "crates/pygpui-python/src/instrumentation.rs",
+        "crates/pygpui-core/tests/instrumentation.rs",
+        "evidence/P1-INSTRUMENT01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-core --test instrumentation exits zero",
+        "The test proves callback, frame-entry, GIL-acquire, attachment and finalizer counters plus callback/frame-entry sentinels are present in production paths and disabled counters fail closed",
+        "python3 tools/ci/branch_gate.py verify --task P1-INSTRUMENT01 --state merged --evidence evidence/P1-INSTRUMENT01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-INSTRUMENT01/README.md",
+        "evidence/P1-INSTRUMENT01/review.json",
+        "evidence/P1-INSTRUMENT01/independent-test.json",
+        "evidence/P1-INSTRUMENT01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-INSTRUMENT01-add-production-native-counters-and-deliberate-se",
+      "review_evidence": "evidence/P1-INSTRUMENT01/review.json",
+      "test_evidence": "evidence/P1-INSTRUMENT01/independent-test.json",
+      "merge_evidence": "evidence/P1-INSTRUMENT01/merge.json"
+    },
+    {
+      "id": "P1-BENCHCLI01",
+      "title": "Implement and negatively test every benchmark subcommand",
+      "owner_role": "Perf-Engineer",
+      "deps": [
+        "P1-BENCH00",
+        "P1-PACK01",
+        "P1-INSTRUMENT01",
+        "P1-PR-AUDIT01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5-modules",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "pygpui_bench/cli/**",
+        "pygpui_bench/commands/**",
+        "tests/bench/test_cli.py",
+        "evidence/P1-BENCHCLI01/**"
+      ],
+      "produces": [
+        "pygpui_bench/cli/**",
+        "pygpui_bench/commands/**",
+        "tests/bench/test_cli.py",
+        "evidence/P1-BENCHCLI01/**"
+      ],
+      "size": "L",
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 -m pytest tests/bench/test_cli.py exits zero",
+        "python3 -m pygpui_bench boundary verify --self-test exits zero after verifying nonzero rejection for disabled/missing counters and sentinels",
+        "python3 -m pygpui_bench compare --self-test exits zero after verifying nonzero rejection for a greater-than-10-percent fixture until profiling and diagnosis are linked",
+        "python3 -m pygpui_bench input qualify --self-test exits zero after verifying nonzero rejection for a submission endpoint, missing response token or unqualified clock",
+        "python3 -m pygpui_bench report --self-test exits zero after verifying nonzero rejection when OQ-02 or raw artifacts are missing",
+        "python3 tools/ci/branch_gate.py verify --task P1-BENCHCLI01 --state merged --evidence evidence/P1-BENCHCLI01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-BENCHCLI01/README.md",
+        "evidence/P1-BENCHCLI01/review.json",
+        "evidence/P1-BENCHCLI01/independent-test.json",
+        "evidence/P1-BENCHCLI01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-BENCHCLI01-implement-and-negatively-test-every-benchmark-su",
+      "review_evidence": "evidence/P1-BENCHCLI01/review.json",
+      "test_evidence": "evidence/P1-BENCHCLI01/independent-test.json",
+      "merge_evidence": "evidence/P1-BENCHCLI01/merge.json"
     },
     {
       "id": "P1-SLICE01",
-      "title": "Integrate the Counter vertical slice end to end",
+      "title": "Implement the Counter vertical slice on an unmerged feature branch",
       "owner_role": "Integrator",
-      "deps": ["P1-CORE01", "P1-CORE02", "P1-SCENE01", "P1-TEXT01", "P1-INPUT01", "P1-RENDER01", "P1-PLATFORM01", "P1-PY01"],
+      "deps": [
+        "P1-CORE02",
+        "P1-SCENE01",
+        "P1-TEXT01",
+        "P1-INPUT01",
+        "P1-RENDER01",
+        "P1-PLATFORM01",
+        "P1-PY01",
+        "P1-INSTRUMENT01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "6",
-      "write_scope": ["feat/P1-SLICE01-counter worktree", "examples/counter.py wiring", "tests/e2e/test_counter.py"],
+      "dispatch_wave": "6-counter",
+      "workflow": "implementation",
+      "completion_state": "implemented",
+      "write_scope": [
+        "crates/pygpui-platform/tests/counter_headless.rs",
+        "examples/counter.py",
+        "tests/e2e/**",
+        "tests/property/**",
+        "tests/typing/test_public_api.py",
+        "evidence/P1-SLICE01/**"
+      ],
+      "produces": [
+        "crates/pygpui-platform/tests/counter_headless.rs",
+        "examples/counter.py",
+        "tests/e2e/**",
+        "tests/property/**",
+        "tests/typing/test_public_api.py",
+        "evidence/P1-SLICE01/**"
+      ],
       "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR02-G2"],
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR02-G2"
+      ],
       "acceptance_criteria": [
         "cargo test --workspace --locked exits zero",
-        "cargo test -p pygpui-platform --test counter_headless exits zero and proves one complete snapshot, shaped Text plus Button, one rebuild and clean teardown",
-        "python examples/counter.py --headless --assert-scene-hash exits zero; the harness records click and key paths updating the label exactly once",
-        "The feat/P1-SLICE01-counter branch/worktree is pushed and gh pr create opens a PR against main linking the task, ADR gates, tests and rollback; the integration diff makes no presentation claim from headless evidence"
+        "cargo test -p pygpui-platform --test counter_headless exits zero",
+        "python3 examples/counter.py --headless --assert-scene-hash exits zero and records click/key updating the label exactly once",
+        "python3 tools/ci/tag_point.py --tag phase1/counter-premerge --ref origin/main --output evidence/P1-SLICE01/premerge-tag.txt exits zero without force-pushing"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0002-snapshot-first-full-window-rebuild.md",
-        "examples/counter.py",
-        "evidence/P1-SLICE01/counter-headless.txt"
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-SLICE01/README.md",
+        "evidence/P1-SLICE01/gate-results.json"
+      ],
+      "gate_evidence": "evidence/P1-SLICE01/gate-results.json",
+      "review_task": "P1-REV01",
+      "test_task": "P1-TST01",
+      "merge_task": "P1-INT01"
+    },
+    {
+      "id": "P1-LOCALWHEEL01",
+      "title": "Build and hash a local Linux wheel from the Counter branch",
+      "owner_role": "Release-CI-Engineer",
+      "deps": [
+        "P1-SLICE01",
+        "P1-PACK01",
+        "P1-LIC01",
+        "P1-TOOL-RELEASE01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "7-counter-verify",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "dist/local/**",
+        "evidence/P1-LOCALWHEEL01/**",
+        "evidence/P1-LOCALWHEEL01/**"
+      ],
+      "produces": [
+        "dist/local/**",
+        "evidence/P1-LOCALWHEEL01/wheel-sha256.txt",
+        "evidence/P1-LOCALWHEEL01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 -m maturin build --locked --interpreter python3 --out dist/local exits zero",
+        "python3 tools/release/audit_artifacts.py --stage local --artifacts dist/local/** exits zero",
+        "sha256sum dist/local/*.whl > evidence/P1-LOCALWHEEL01/wheel-sha256.txt exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-LOCALWHEEL01/README.md"
       ]
     },
     {
       "id": "P1-TST01",
       "title": "Independently verify Counter behavior, typing and snapshot properties",
       "owner_role": "Test-Engineer",
-      "deps": ["P1-SLICE01"],
+      "deps": [
+        "P1-SLICE01",
+        "P1-LOCALWHEEL01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "7a",
-      "write_scope": ["tests/e2e/**", "tests/property/**", "tests/typing/**", "evidence/P1-TST01/**"],
+      "dispatch_wave": "7-counter-verify",
+      "workflow": "verification",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-TST01/**",
+        "evidence/P1-TST01/**"
+      ],
+      "produces": [
+        "evidence/P1-TST01/**",
+        "evidence/P1-TST01/**"
+      ],
       "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR02-G1", "AR03-G1", "AR03-G2", "AR03-G3", "AR07-G3"],
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR02-G1",
+        "AR03-G1",
+        "AR03-G2",
+        "AR03-G3",
+        "AR07-G3"
+      ],
       "acceptance_criteria": [
-        "pytest tests/e2e/test_counter.py tests/property/test_snapshot_identity.py tests/typing/test_public_api.py exits zero in a clean local installed-wheel environment",
-        "mypy --strict --disallow-any-explicit --python-version 3.11 examples/counter.py and stubtest pygpui --allowlist tests/typing/stubtest-allowlist.txt each exit zero",
-        "Model-based property tests cover snapshot identity, reorder/insert/remove, duplicate keys, rejected rollback, stale handles, weak lifetime and teardown without use-after-free",
-        "Counter E2E tests prove click and key each update state exactly once, build runs once per accepted semantic change, close invalidates handles before another event and no Python entry occurs between snapshot submission and presentation"
+        "python3 -m pytest tests/e2e/test_counter.py tests/property/test_snapshot_identity.py tests/typing/test_public_api.py exits zero against the wheel hash in evidence/P1-LOCALWHEEL01/wheel-sha256.txt",
+        "python3 -m mypy --strict --disallow-any-explicit --python-version 3.11 examples/counter.py exits zero",
+        "python3 -m stubtest pygpui --allowlist tests/typing/stubtest-allowlist.txt exits zero",
+        "Tests prove one update per click/key, one build per accepted semantic change, clean close and no Python entry between submission and presentation"
       ],
       "evidence_links": [
-        "tests/property/test_snapshot_identity.py",
-        "tests/e2e/test_counter.py",
-        "evidence/P1-TST01/independent-tests.txt"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-TST01/README.md",
+        "evidence/P1-TST01/gate-results.json"
+      ],
+      "gate_evidence": "evidence/P1-TST01/gate-results.json"
+    },
+    {
+      "id": "P1-REV01",
+      "title": "Independently review Counter correctness and unsafe/GIL/lifetime safety",
+      "owner_role": "Independent-Reviewer",
+      "deps": [
+        "P1-SLICE01",
+        "P1-TST01",
+        "P1-LOCALWHEEL01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "7-counter-verify",
+      "workflow": "verification",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        ".harness/REVIEWS/phase-1-counter-safety.md",
+        "evidence/P1-REV01/**",
+        "evidence/P1-REV01/**"
+      ],
+      "produces": [
+        ".harness/REVIEWS/phase-1-counter-safety.md",
+        "evidence/P1-REV01/**",
+        "evidence/P1-REV01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR01-G2",
+        "AR03-G4"
+      ],
+      "acceptance_criteria": [
+        "cargo fmt --all -- --check exits zero",
+        "cargo clippy --workspace --all-targets -- -D warnings exits zero",
+        "cargo test --workspace --locked exits zero",
+        "python3 tools/audit/frame_closure.py --workspace . exits zero and rejects Python entry, attach, object access or finalizer paths reachable from a frame",
+        "The review records zero blocking unsafe, GIL, Py<T>, Send, handle or teardown findings"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-REV01/README.md",
+        "evidence/P1-REV01/gate-results.json"
+      ],
+      "gate_evidence": "evidence/P1-REV01/gate-results.json"
+    },
+    {
+      "id": "P1-INT01",
+      "title": "Integrator-only merge of the verified Counter PR",
+      "owner_role": "Integrator",
+      "deps": [
+        "P1-REV01",
+        "P1-TST01",
+        "P1-TOOL-BRANCH01",
+        "P1-LIC01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "7-counter-verify",
+      "workflow": "merge",
+      "completion_state": "merged",
+      "write_scope": [
+        "evidence/P1-INT01/**",
+        "evidence/P1-INT01/**"
+      ],
+      "produces": [
+        "evidence/P1-INT01/merge.json",
+        "evidence/P1-INT01/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        1,
+        2
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 tools/ci/branch_gate.py verify --task P1-SLICE01 --state merged --evidence evidence/P1-INT01/merge.json exits zero",
+        "python3 tools/ci/run_local_gate.py --mode full exits zero on main and origin/main",
+        "python3 tools/ci/rollback_drill.py --fixture /tmp/opencode/counter-rollback --tag phase1/counter-premerge exits zero without modifying production origin/main"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-INT01/README.md",
+        "evidence/P1-INT01/merge.json"
+      ],
+      "merge_evidence": "evidence/P1-INT01/merge.json"
+    },
+    {
+      "id": "P1-PERF01",
+      "title": "Prove callback-free windows and separate-interpreter diagnostics",
+      "owner_role": "Perf-Engineer",
+      "deps": [
+        "P1-INT01",
+        "P1-BENCHCLI01",
+        "P1-READY-BENCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "8-evidence",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-PERF01/**",
+        "evidence/P1-PERF01/**"
+      ],
+      "produces": [
+        "evidence/P1-PERF01/**",
+        "evidence/P1-PERF01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR01-G3",
+        "AR02-G4",
+        "AR08-G3"
+      ],
+      "acceptance_criteria": [
+        "python3 -m pygpui_bench boundary verify --suite V01 --output evidence/P1-PERF01/v01.json exits zero only when every callback/frame/GIL/attachment/finalizer counter is zero and both sentinels are exactly one; disabled, missing or inconclusive evidence exits nonzero",
+        "python3 tools/bench/interpreter_matrix.py --manifest evidence/P1-READY-BENCH01/readiness.json --output evidence/P1-PERF01/interpreters.json exits zero only for separately installed GIL-enabled and free-threaded interpreters",
+        "Python 3.11 sys.setprofile plus native counters and Python 3.12+ threading.setprofile_all_threads corroboration are archived"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-PERF01/README.md",
+        "evidence/P1-PERF01/gate-results.json"
+      ],
+      "gate_evidence": "evidence/P1-PERF01/gate-results.json"
     },
     {
       "id": "P1-PLAT01",
       "title": "Run Linux headless and native common-runtime smoke gates",
       "owner_role": "Platform-Test-Engineer",
-      "deps": ["P1-SLICE01"],
+      "deps": [
+        "P1-INT01",
+        "P1-LOCALWHEEL01",
+        "P1-TOOL-PLATFORM01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "7a",
-      "write_scope": ["tests/platform/**", "evidence/P1-PLAT01/**"],
+      "dispatch_wave": "8-evidence",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-PLAT01/**",
+        "evidence/P1-PLAT01/**"
+      ],
+      "produces": [
+        "evidence/P1-PLAT01/**",
+        "evidence/P1-PLAT01/**"
+      ],
       "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR05-G2"],
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR05-G2"
+      ],
       "acceptance_criteria": [
-        "python3 .harness/scripts/platform_gate.py --candidate linux-local --suite T02-T12 exits zero on an installed local wheel",
-        "The run records explicit Vulkan selection, first presented frame, actionable failure output, surface statuses, exact physical resize, DPI/hit tests, lifecycle, input continuity, idle/responsiveness, SDR color and device-loss handling",
-        "Headless results are archived separately and are not counted as presented-frame evidence"
+        "python3 tools/platform/platform_gate.py --candidate linux-local --suite T02-T12 --wheel-hash evidence/P1-LOCALWHEEL01/wheel-sha256.txt --output evidence/P1-PLAT01/runtime.json exits zero only with installed-wheel physical evidence; missing or headless-only evidence exits nonzero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0005-platform-window-and-render-backend-baseline.md",
-        "evidence/P1-PLAT01/linux-local-runtime.txt"
-      ]
-    },
-    {
-      "id": "P1-REV01",
-      "title": "Perform independent correctness and unsafe/GIL/lifetime review",
-      "owner_role": "Independent-Reviewer",
-      "deps": ["P1-SLICE01", "P1-TST01"],
-      "status": "blocked",
-      "attempt_count": 0,
-      "max_attempts": 4,
-      "dispatch_wave": "7b",
-      "write_scope": [".harness/REVIEWS/phase-1-counter-safety.md", "tools/audit/frame_closure.py"],
-      "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR01-G2", "AR03-G4"],
-      "acceptance_criteria": [
-        "cargo fmt --all -- --check, cargo clippy --workspace --all-targets -- -D warnings and cargo test --workspace --locked each exit zero",
-        "python3 tools/audit/frame_closure.py exits zero and proves only pygpui-python imports PyO3 and the frame closure has no Python entry, attach, object-access or finalizer path",
-        "The review records zero blocking findings for unsafe blocks, GIL attach/detach and panic unwind, Py<T> lifetime, non-Send UI state, Send-only results, handle/window/display lifetime and teardown order",
-        "No Python reference exists in WindowSnapshot, scene nodes or frame caches"
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-PLAT01/README.md",
+        "evidence/P1-PLAT01/gate-results.json"
       ],
-      "evidence_links": [
-        ".harness/REVIEWS/phase-1-counter-safety.md",
-        "evidence/P1-REV01/frame-closure-audit.txt"
-      ]
+      "gate_evidence": "evidence/P1-PLAT01/gate-results.json"
     },
     {
-      "id": "P1-INT01",
-      "title": "Merge the reviewed Counter slice and rehearse rollback",
+      "id": "P1-A11Y-MANIFEST01",
+      "title": "Add exact AccessKit dependencies and refresh lock under Integrator ownership",
       "owner_role": "Integrator",
-      "deps": ["P1-REV01", "P1-CI01", "P1-LIC01"],
+      "deps": [
+        "P1-INT01",
+        "P1-PR-AUDIT01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "7c",
-      "write_scope": ["Integrator-only merge of reviewed PRs into main", "evidence/P1-INT01/**"],
+      "dispatch_wave": "8-evidence",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "Cargo.toml",
+        "Cargo.lock",
+        "crates/pygpui-platform/Cargo.toml",
+        "crates/pygpui-scene/Cargo.toml",
+        "evidence/P1-A11Y-MANIFEST01/**"
+      ],
+      "produces": [
+        "Cargo.toml",
+        "Cargo.lock",
+        "crates/pygpui-platform/Cargo.toml",
+        "crates/pygpui-scene/Cargo.toml",
+        "evidence/P1-A11Y-MANIFEST01/**"
+      ],
       "size": "S",
-      "estimate_range_days": [1, 2],
+      "estimate_range_days": [
+        1,
+        2
+      ],
       "gates": [],
       "acceptance_criteria": [
-        "The reviewed Counter PR is merged into main only by the Integrator, with the PR URL, merge commit and diff recorded; no direct push or force-push is used",
-        "python3 tools/ci/run_local_gate.py --mode full exits zero on main and origin/main",
-        "python3 tools/ci/rollback_drill.py --tag phase1/counter-premerge exits zero by opening a revert PR, rerunning the gate and restoring the reviewed merge through the Integrator",
-        "The premerge tag, PR URL, merge hash, diff and restored green origin/main hash are archived"
+        "cargo test -p pygpui-core --test crate_graph exits zero",
+        "cargo check --locked --all-targets exits zero",
+        "python3 tools/audit/slotmap_policy.py --manifest Cargo.toml --lock Cargo.lock exits zero for AccessKit 0.25.2, accesskit_winit 0.34.2 and disabled optional pyo3 feature",
+        "python3 tools/ci/branch_gate.py verify --task P1-A11Y-MANIFEST01 --state merged --evidence evidence/P1-A11Y-MANIFEST01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        "evidence/P1-INT01/merge-and-rollback.txt",
-        ".harness/PLANS/phase-1-vertical-slice.md"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-A11Y-MANIFEST01/README.md",
+        "evidence/P1-A11Y-MANIFEST01/review.json",
+        "evidence/P1-A11Y-MANIFEST01/independent-test.json",
+        "evidence/P1-A11Y-MANIFEST01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-A11Y-MANIFEST01-add-exact-accesskit-dependencies-and-refresh-loc",
+      "review_evidence": "evidence/P1-A11Y-MANIFEST01/review.json",
+      "test_evidence": "evidence/P1-A11Y-MANIFEST01/independent-test.json",
+      "merge_evidence": "evidence/P1-A11Y-MANIFEST01/merge.json"
     },
     {
-      "id": "P1-PERF01",
-      "title": "Prove callback-free frame windows with native counters and sentinels",
-      "owner_role": "Perf-Engineer",
-      "deps": ["P1-SLICE01", "P1-REV01"],
+      "id": "P1-DOC01",
+      "title": "Write initial Counter documentation and claim-evidence policy",
+      "owner_role": "Technical-Writer",
+      "deps": [
+        "P1-API01",
+        "P1-INT01",
+        "P1-TOOL-DOC01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "later",
-      "write_scope": ["benches/boundary/**", "tests/perf/**", "evidence/P1-PERF01/**"],
-      "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR01-G3", "AR02-G4", "AR06-G5", "AR08-G3"],
+      "dispatch_wave": "9-closure",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "README.md",
+        "docs/**",
+        "evidence/P1-DOC01/**"
+      ],
+      "produces": [
+        "README.md",
+        "docs/**",
+        "evidence/P1-DOC01/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        2,
+        3
+      ],
+      "gates": [],
       "acceptance_criteria": [
-        "python -m pygpui_bench boundary verify --suite V01 --output evidence/P1-PERF01/v01.json exits zero",
-        "Every marked static, native-animation, native-scroll and input frame window reports zero rust_to_python_callbacks, python_to_rust_frame_entries, render_thread_gil_acquires, attachments and Python finalizers",
-        "Deliberate callback and frame-entry sentinels each increment exactly once before warmup; failed or disabled counters make the run inconclusive",
-        "The Python 3.11 sys.setprofile plus native-counter fallback and Python 3.12+ threading.setprofile_all_threads corroboration are exercised without replacing native counters"
+        "make -C docs html exits zero",
+        "python3 tools/docs/audit_claims.py --docs docs --allow-unverified --output evidence/P1-DOC01/claims.json exits zero and marks all not-yet-produced evidence as unverified or blocked",
+        "python3 tools/ci/branch_gate.py verify --task P1-DOC01 --state merged --evidence evidence/P1-DOC01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0008-benchmark-certification-and-regression-gates.md",
-        "evidence/P1-PERF01/v01.json"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-DOC01/README.md",
+        "evidence/P1-DOC01/review.json",
+        "evidence/P1-DOC01/independent-test.json",
+        "evidence/P1-DOC01/merge.json"
+      ],
+      "branch_prefix": "feat/P1-DOC01-write-initial-counter-documentation-and-claim-ev",
+      "review_evidence": "evidence/P1-DOC01/review.json",
+      "test_evidence": "evidence/P1-DOC01/independent-test.json",
+      "merge_evidence": "evidence/P1-DOC01/merge.json"
+    },
+    {
+      "id": "P1-BENCH01",
+      "title": "Implement deterministic scenes, qualify collectors and capture immutable baseline",
+      "owner_role": "Perf-Engineer",
+      "deps": [
+        "P1-INT01",
+        "P1-PERF01",
+        "P1-BENCHCLI01",
+        "P1-PLAT01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "8-evidence",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "BENCH/scenes/**",
+        "BENCH/baselines/**",
+        "benches/scenes/**",
+        "evidence/P1-BENCH01/**"
+      ],
+      "produces": [
+        "BENCH/scenes/**",
+        "BENCH/baselines/**",
+        "benches/scenes/**",
+        "evidence/P1-BENCH01/**"
+      ],
+      "size": "L",
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [
+        "AR08-G1",
+        "AR08-G2"
+      ],
+      "acceptance_criteria": [
+        "python3 -m pygpui_bench scene verify BENCH/scenes/e1000.json BENCH/scenes/l10000.json exits zero and asserts at most 51 mounted rows, contiguous visible IDs and no offscreen Python row provider",
+        "python3 tools/bench/collector_qualify.py --scenes BENCH/scenes/e1000.json,BENCH/scenes/l10000.json --output evidence/P1-BENCH01/collector.json exits zero only with endpoint, clock-domain, sentinel and raw-hash evidence",
+        "python3 -m pygpui_bench baseline create --runs-per-scenario 10 --output BENCH/baselines/local/baseline-001 exits zero with ten valid fresh processes per scenario",
+        "python3 tools/ci/branch_gate.py verify --task P1-BENCH01 --state merged --evidence evidence/P1-BENCH01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-BENCH01/README.md",
+        "evidence/P1-BENCH01/gate-results.json",
+        "evidence/P1-BENCH01/review.json",
+        "evidence/P1-BENCH01/independent-test.json",
+        "evidence/P1-BENCH01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-BENCH01/gate-results.json",
+      "branch_prefix": "feat/P1-BENCH01-implement-deterministic-scenes,-qualify-collecto",
+      "review_evidence": "evidence/P1-BENCH01/review.json",
+      "test_evidence": "evidence/P1-BENCH01/independent-test.json",
+      "merge_evidence": "evidence/P1-BENCH01/merge.json"
     },
     {
       "id": "P1-A11Y01",
-      "title": "Add the Rust semantic mirror and AccessKit adapter after Counter merge",
+      "title": "Implement Rust semantic mirror, AccessKit adapter and window lifecycle wiring",
       "owner_role": "Rust-Accessibility-Engineer",
-      "deps": ["P1-INT01", "P1-INPUT01"],
+      "deps": [
+        "P1-A11Y-MANIFEST01",
+        "P1-PLATFORM01",
+        "P1-INPUT01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "later",
-      "write_scope": ["crates/pygpui-scene/src/a11y/**", "crates/pygpui-platform/src/a11y/**", "tests/a11y/**"],
+      "dispatch_wave": "8-evidence",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-scene/src/a11y/**",
+        "crates/pygpui-platform/src/a11y/**",
+        "crates/pygpui-platform/src/window/**",
+        "crates/pygpui-scene/tests/a11y_tree.rs",
+        "tests/a11y/**",
+        "evidence/P1-A11Y01/**"
+      ],
+      "produces": [
+        "crates/pygpui-scene/src/a11y/**",
+        "crates/pygpui-platform/src/a11y/**",
+        "crates/pygpui-platform/src/window/**",
+        "crates/pygpui-scene/tests/a11y_tree.rs",
+        "tests/a11y/**",
+        "evidence/P1-A11Y01/**"
+      ],
       "size": "L",
-      "estimate_range_days": [6, 8],
-      "gates": ["AR06-G3", "AR06-G5"],
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [
+        "AR06-G3"
+      ],
       "acceptance_criteria": [
-        "cargo test -p pygpui-scene --test a11y_tree -p pygpui-platform --test a11y_adapter exits zero for stable NodeIds, full/incremental updates, focus removal/restoration, unchanged properties and exactly-once main-loop action routing",
-        "A source/config audit exits zero for AccessKit 0.25.2 plus accesskit_winit 0.34.2, disabled optional pyo3 feature and no Python call from adapter threads",
-        "Native counters/sentinels prove no Python call during a11y-only updates and enabling AT does not regress ADR 0008 frame/idle gates",
-        "The window sequence is create invisible, attach adapter, then show; no pre-show first-frame claim is made"
+        "cargo test -p pygpui-scene --test a11y_tree -p pygpui-platform --test a11y_adapter exits zero",
+        "Tests prove stable NodeIds, full/incremental updates, focus restoration, exactly-once main-loop actions and create-invisible then attach-adapter then show ordering",
+        "python3 tools/audit/frame_closure.py --crate crates/pygpui-platform exits zero and rejects Python calls from adapter threads",
+        "python3 tools/ci/branch_gate.py verify --task P1-A11Y01 --state merged --evidence evidence/P1-A11Y01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0006-input-ime-focus-and-accessibility-ownership.md",
-        "evidence/P1-A11Y01/consumer-tests.txt"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-A11Y01/README.md",
+        "evidence/P1-A11Y01/gate-results.json",
+        "evidence/P1-A11Y01/review.json",
+        "evidence/P1-A11Y01/independent-test.json",
+        "evidence/P1-A11Y01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-A11Y01/gate-results.json",
+      "branch_prefix": "feat/P1-A11Y01-implement-rust-semantic-mirror,-accesskit-adapte",
+      "review_evidence": "evidence/P1-A11Y01/review.json",
+      "test_evidence": "evidence/P1-A11Y01/independent-test.json",
+      "merge_evidence": "evidence/P1-A11Y01/merge.json"
     },
     {
       "id": "P1-REL01",
       "title": "Build and audit native candidate wheels and sdist",
       "owner_role": "Release-CI-Engineer",
-      "deps": ["P1-INT01", "P1-LIC01", "P1-CI01"],
+      "deps": [
+        "P1-INT01",
+        "P1-A11Y01",
+        "P1-LIC01",
+        "P1-READY-RELEASE01",
+        "P1-TOOL-RELEASE01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "later",
-      "write_scope": ["packaging/**", "tools/release/**", "dist/**", "evidence/P1-REL01/**"],
+      "dispatch_wave": "8-evidence",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "dist/release/**",
+        "evidence/P1-REL01/**",
+        "evidence/P1-REL01/**"
+      ],
+      "produces": [
+        "dist/release/**",
+        "evidence/P1-REL01/artifact-manifest.json",
+        "evidence/P1-REL01/**"
+      ],
       "size": "L",
-      "estimate_range_days": [6, 8],
-      "gates": ["AR05-G1", "AR07-G1", "AR10-G1"],
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [
+        "AR05-G1",
+        "AR07-G1",
+        "AR10-G1"
+      ],
       "acceptance_criteria": [
-        "Pinned maturin 1.16.0 native-lane commands build cp311-abi3-manylinux_2_28_x86_64, cp311-abi3-win_amd64, cp311-abi3-macosx_26_0_arm64 and one rebuildable sdist; each command exits zero",
-        "python3 tools/release/audit_artifacts.py --stage build exits zero for tag/suffix inspection, abi3audit, repair reports, native dependency audit, py.typed, stubs, license files and PEP 639 metadata",
-        "Artifact hashes, target, enabled features, lockfile hash and Rust 1.100.0 toolchain are recorded; cross-compilation alone does not pass",
-        "No free-threaded, abi3t or macOS universal2 artifact is present"
+        "python3 -m maturin build --locked --target x86_64-unknown-linux-gnu --out dist/release exits zero in the native Linux lane",
+        "python3 -m maturin build --locked --target x86_64-pc-windows-msvc --out dist/release exits zero in the native Windows lane",
+        "python3 -m maturin build --locked --target aarch64-apple-darwin --out dist/release exits zero in the native macOS lane",
+        "python3 -m maturin sdist --out dist/release exits zero",
+        "python3 tools/release/audit_artifacts.py --stage release --artifacts dist/release/** --output evidence/P1-REL01/artifact-manifest.json exits zero for tags, abi3audit, repair, licenses and SHA-256; cross-compilation alone exits nonzero",
+        "python3 tools/ci/branch_gate.py verify --task P1-REL01 --state merged --evidence evidence/P1-REL01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0005-platform-window-and-render-backend-baseline.md",
-        ".harness/DECISIONS/0007-abi3-strict-typing-wheel-and-release-evidence.md",
-        "evidence/P1-REL01/artifact-manifest.json"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-REL01/README.md",
+        "evidence/P1-REL01/gate-results.json",
+        "evidence/P1-REL01/review.json",
+        "evidence/P1-REL01/independent-test.json",
+        "evidence/P1-REL01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-REL01/gate-results.json",
+      "branch_prefix": "feat/P1-REL01-build-and-audit-native-candidate-wheels-and-sdis",
+      "review_evidence": "evidence/P1-REL01/review.json",
+      "test_evidence": "evidence/P1-REL01/independent-test.json",
+      "merge_evidence": "evidence/P1-REL01/merge.json"
+    },
+    {
+      "id": "P1-A11Y-LIST01",
+      "title": "Implement and unit-test the accessible 10,000-row representation",
+      "owner_role": "Rust-Accessibility-Engineer",
+      "deps": [
+        "P1-A11Y01",
+        "P1-BENCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "8-evidence",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "crates/pygpui-scene/src/a11y/list/**",
+        "crates/pygpui-scene/tests/accessible_virtualized_list.rs",
+        "evidence/P1-A11Y-LIST01/**"
+      ],
+      "produces": [
+        "crates/pygpui-scene/src/a11y/list/**",
+        "crates/pygpui-scene/tests/accessible_virtualized_list.rs",
+        "evidence/P1-A11Y-LIST01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR06-G6"
+      ],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-scene --test accessible_virtualized_list exits zero for 10,000 model rows, at most 51 mounted row nodes, visible-range plus total-row/scroll semantics and an archived AccessKit #871 disposition",
+        "python3 tools/ci/branch_gate.py verify --task P1-A11Y-LIST01 --state merged --evidence evidence/P1-A11Y-LIST01/branch-evidence.json exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-A11Y-LIST01/README.md",
+        "evidence/P1-A11Y-LIST01/gate-results.json",
+        "evidence/P1-A11Y-LIST01/review.json",
+        "evidence/P1-A11Y-LIST01/independent-test.json",
+        "evidence/P1-A11Y-LIST01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-A11Y-LIST01/gate-results.json",
+      "branch_prefix": "feat/P1-A11Y-LIST01-implement-and-unit-test-the-accessible-10,000-ro",
+      "review_evidence": "evidence/P1-A11Y-LIST01/review.json",
+      "test_evidence": "evidence/P1-A11Y-LIST01/independent-test.json",
+      "merge_evidence": "evidence/P1-A11Y-LIST01/merge.json"
     },
     {
       "id": "P1-PLAT02",
-      "title": "Close the candidate platform certification and support-manifest gates",
+      "title": "Close candidate platform certification and support-manifest gates",
       "owner_role": "Platform-Test-Engineer",
-      "deps": ["P1-REL01", "P1-PLAT01", "P1-A11Y01"],
+      "deps": [
+        "P1-REL01",
+        "P1-PLAT01",
+        "P1-A11Y01",
+        "P1-READY-PLATFORM01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "later",
-      "write_scope": ["tests/platform/candidates/**", "evidence/P1-PLAT02/**"],
+      "dispatch_wave": "8-evidence",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-PLAT02/**",
+        "evidence/P1-PLAT02/**"
+      ],
+      "produces": [
+        "evidence/P1-PLAT02/**",
+        "evidence/P1-PLAT02/**"
+      ],
       "size": "L",
-      "estimate_range_days": [6, 8],
-      "gates": ["AR01-G1", "AR02-G2", "AR05-G2", "AR05-G3", "AR05-G4", "AR05-G5", "AR05-G6", "AR07-G4"],
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [
+        "AR01-G1",
+        "AR02-G2",
+        "AR05-G2",
+        "AR05-G3",
+        "AR05-G4",
+        "AR05-G5",
+        "AR05-G6",
+        "AR07-G4"
+      ],
       "acceptance_criteria": [
-        "python3 .harness/scripts/platform_gate.py --suite AR05-G2-G6 exits zero only with installed-wheel physical evidence for Ubuntu 24.04/GNOME Wayland and Xorg, Windows 11 25H2+ x64 DX12 and physical macOS 26 Apple silicon Metal",
-        "Linux L01-L08 include Mesa AMD/Intel and NVIDIA Vulkan, fractional scale, withheld callbacks, present pairing and a 30-minute resize/idle soak",
-        "Windows W01-W07 include PMv2 mixed DPI, sustained input/redraw, lifecycle/TDR and a recorded FXC/static-DXC/dynamic-DXC strategy",
-        "macOS M01-M08 include the invisible/adapter/show/present sequence, cold/occluded first frame, quick app switching, Retina/mixed displays, live resize and pre-close IME disable",
-        "The Counter installed-wheel smoke reports a presented response frame and click/key update exactly once on each candidate; the support-manifest generator exits zero and omits any platform with missing evidence"
+        "python3 tools/platform/platform_gate.py --suite AR05-G2-G6 --artifacts evidence/P1-REL01/artifact-manifest.json --readiness evidence/P1-READY-PLATFORM01/readiness.json --output evidence/P1-PLAT02/platform.json exits zero only with physical installed-wheel T/L/W/M evidence",
+        "python3 tools/platform/support_manifest.py --gates evidence/P1-PLAT02/platform.json --output evidence/P1-PLAT02/support-manifest.json exits zero and omits every platform with missing evidence",
+        "Linux includes Wayland/Xorg GPU matrix and 30-minute soak; Windows includes compiler strategy and TDR; macOS includes invisible/adapter/show/present, cold/occluded launch and IME teardown"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0005-platform-window-and-render-backend-baseline.md",
-        "evidence/P1-PLAT02/support-manifest.json"
-      ]
-    },
-    {
-      "id": "P1-BENCH01",
-      "title": "Implement deterministic scenes, qualify the harness and capture an immutable baseline",
-      "owner_role": "Perf-Engineer",
-      "deps": ["P1-INT01", "P1-BENCH00", "P1-PLAT01", "P1-PERF01"],
-      "status": "blocked",
-      "attempt_count": 0,
-      "max_attempts": 4,
-      "dispatch_wave": "later",
-      "write_scope": ["pygpui_bench/**", "benches/scenes/**", "BENCH/baselines/**"],
-      "size": "L",
-      "estimate_range_days": [6, 8],
-      "gates": ["AR08-G1", "AR08-G2"],
-      "acceptance_criteria": [
-        "python -m pygpui_bench scene verify BENCH/scenes/e1000.json BENCH/scenes/l10000.json exits zero",
-        "The l10000 verifier asserts 10,000 model rows, at most 51 mounted row nodes per frame, unique contiguous visible IDs and no offscreen Python row provider",
-        "Collector qualification exits zero for sentinel counters, clock-domain checks and raw-artifact hashing before any performance claim",
-        "python -m pygpui_bench baseline create --runs-per-scenario 10 --output BENCH/baselines/local/<baseline_id>/ exits zero with ten valid fresh processes per scenario, complete environment fields and immutable SHA-256 index"
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-PLAT02/README.md",
+        "evidence/P1-PLAT02/gate-results.json"
       ],
-      "evidence_links": [
-        ".harness/DECISIONS/0008-benchmark-certification-and-regression-gates.md",
-        "BENCH/baselines/local/<baseline_id>/manifest.json"
-      ]
-    },
-    {
-      "id": "P1-PERF02",
-      "title": "Qualify presented/input metrics, ABBA regression and the scaling decision",
-      "owner_role": "Perf-Engineer",
-      "deps": ["P1-BENCH01", "P1-PLAT02"],
-      "status": "blocked",
-      "attempt_count": 0,
-      "max_attempts": 4,
-      "dispatch_wave": "later",
-      "write_scope": ["pygpui_bench/analysis/**", "tests/bench/**", "evidence/P1-PERF02/**"],
-      "size": "L",
-      "estimate_range_days": [6, 8],
-      "gates": ["AR02-G5", "AR08-G4", "AR08-G5", "AR08-G6"],
-      "acceptance_criteria": [
-        "python -m pygpui_bench compare --help and pytest tests/bench/test_abba_regression.py exit zero; tests verify five ABBA blocks, 20 process runs, ten pairs, >10.0% rejection, exactly 10.0% acceptance, zero-baseline tolerance and paired-bootstrap rules",
-        "python -m pygpui_bench input qualify --endpoint os-input-to-first-presented-response exits zero or records inconclusive; click and key are separate, 50 ms is a failed trial and submission/injector timestamps never substitute",
-        "python -m pygpui_bench report --scenes e1000,l10000 --allow-uncertified exits zero and records whether full rebuild is the blocker before any incremental design is proposed",
-        "A pass report requires OQ-02 approval and literal thresholds of at least 120.0 presented fps on a qualified 120 Hz path, p95 below 8.000000 ms and below 1% of one CPU core over 60 seconds with zero application submissions/presentations; otherwise status is not_certified, not_measured, fail or inconclusive"
-      ],
-      "evidence_links": [
-        ".harness/DECISIONS/0002-snapshot-first-full-window-rebuild.md",
-        ".harness/DECISIONS/0008-benchmark-certification-and-regression-gates.md",
-        "evidence/P1-PERF02/target-report.json"
-      ]
-    },
-    {
-      "id": "P1-IME01",
-      "title": "Run the physical IME matrix and cited platform defect exercises",
-      "owner_role": "Platform-Test-Engineer",
-      "deps": ["P1-PLAT02"],
-      "status": "blocked",
-      "attempt_count": 0,
-      "max_attempts": 4,
-      "dispatch_wave": "later",
-      "write_scope": ["tests/platform/ime/**", "evidence/P1-IME01/**"],
-      "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR06-G2"],
-      "acceptance_criteria": [
-        "python3 .harness/scripts/ime_gate.py --matrix ja,zh,ko,dead-keys --candidates linux-wayland,linux-xorg,windows,macos exits zero with logged physical evidence",
-        "Windows #4508, macOS #4807/#4626 and X11 #4839 are explicitly exercised with no duplicate text, stuck key or shortcut activation",
-        "Focus transfer and pre-close macOS set_ime_allowed(false) are verified while the window is alive"
-      ],
-      "evidence_links": [
-        ".harness/DECISIONS/0006-input-ime-focus-and-accessibility-ownership.md",
-        "evidence/P1-IME01/physical-matrix.json"
-      ]
-    },
-    {
-      "id": "P1-A11Y02",
-      "title": "Close physical assistive-technology and virtualized-list accessibility gates",
-      "owner_role": "Accessibility-Test-Engineer",
-      "deps": ["P1-A11Y01", "P1-PLAT02", "P1-BENCH01", "P1-PERF02"],
-      "status": "blocked",
-      "attempt_count": 0,
-      "max_attempts": 4,
-      "dispatch_wave": "later",
-      "write_scope": ["tests/a11y/physical/**", "crates/pygpui-scene/src/a11y/list/**", "evidence/P1-A11Y02/**"],
-      "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR06-G4", "AR06-G6"],
-      "acceptance_criteria": [
-        "python3 .harness/scripts/at_gate.py --matrix voiceover,narrator,orca exits zero for keyboard-only operation, navigation, action invocation, text input with IME and dynamic updates; inspector-only evidence fails",
-        "cargo test -p pygpui-scene --test accessible_virtualized_list exits zero for 10,000 model rows, at most 51 mounted row nodes, visible-range plus total-row/scroll semantics and an archived AccessKit #871 disposition",
-        "No WCAG, complete-IME or list-accessibility claim is emitted unless the corresponding evidence passes"
-      ],
-      "evidence_links": [
-        ".harness/DECISIONS/0006-input-ime-focus-and-accessibility-ownership.md",
-        "evidence/P1-A11Y02/at-and-list-gates.json"
-      ]
+      "gate_evidence": "evidence/P1-PLAT02/gate-results.json"
     },
     {
       "id": "P1-LIC02",
       "title": "Close artifact license, SBOM, notice and Wayland distribution gates",
       "owner_role": "License-Compliance-Reviewer",
-      "deps": ["P1-REL01", "P1-LIC01"],
+      "deps": [
+        "P1-REL01",
+        "P1-LIC01",
+        "P1-READY-RELEASE01",
+        "P1-TOOL-RELEASE01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "later",
-      "write_scope": ["THIRD_PARTY_NOTICES", "provenance/**", "tools/license/**", "evidence/P1-LIC02/**"],
+      "dispatch_wave": "8-evidence",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-LIC02/**",
+        "evidence/P1-LIC02/**"
+      ],
+      "produces": [
+        "evidence/P1-LIC02/**",
+        "evidence/P1-LIC02/**"
+      ],
       "size": "M",
-      "estimate_range_days": [3, 5],
-      "gates": ["AR09-G2", "AR09-G3", "AR09-G4", "AR10-G1", "AR10-G2", "AR10-G4"],
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR09-G2",
+        "AR09-G3",
+        "AR09-G4",
+        "AR10-G2"
+      ],
       "acceptance_criteria": [
-        "python3 tools/license/audit_artifacts.py --lock Cargo.lock --artifacts dist/** exits zero using a pinned license/advisory scanner and artifact SBOM generator with no unreviewed exception for each target/feature build",
-        "Wheel and sdist content audits exit zero for required license/copyright texts, THIRD_PARTY_NOTICES, font/asset licenses, PEP 639 metadata and consistency with the SBOM; no third-party file is relicensed",
-        "The official LICENSE hash and owner-supplied copyright notice match the packaged artifacts; a missing notice keeps distribution blocked",
-        "Wayland publication remains blocked unless upstream clarification or qualified-counsel review plus AR09-G2/G3 evidence is archived; an X11-only preview is not labelled general Linux support"
+        "python3 tools/release/audit_artifacts.py --lock Cargo.lock --artifacts dist/release/** --sbom evidence/P1-LIC02/sbom.json --output evidence/P1-LIC02/audit.json exits zero with no unreviewed license, source or advisory exception",
+        "python3 tools/license/provenance_audit.py --mode artifact --artifacts dist/release/** --ledger provenance/ledger.json exits zero and matches license/copyright/NOTICE/font/asset contents to the SBOM",
+        "Wayland publication remains blocked unless evidence/P1-READY-RELEASE01/readiness.json contains upstream clarification or qualified-counsel disposition; otherwise the command exits nonzero for a Wayland distribution claim"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0009-clean-room-license-and-provenance-policy.md",
-        ".harness/DECISIONS/0010-license-pygpui-under-apache-2-0.md",
-        "evidence/P1-LIC02/artifact-audit.json"
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-LIC02/README.md",
+        "evidence/P1-LIC02/gate-results.json"
+      ],
+      "gate_evidence": "evidence/P1-LIC02/gate-results.json"
+    },
+    {
+      "id": "P1-PERF02",
+      "title": "Qualify presented/input metrics, execute ABBA compare gate and decide scaling",
+      "owner_role": "Perf-Engineer",
+      "deps": [
+        "P1-BENCH01",
+        "P1-PLAT02",
+        "P1-READY-BENCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "8-evidence",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-PERF02/**",
+        "evidence/P1-PERF02/**"
+      ],
+      "produces": [
+        "evidence/P1-PERF02/**",
+        "evidence/P1-PERF02/**"
+      ],
+      "size": "L",
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [
+        "AR02-G5",
+        "AR08-G4",
+        "AR08-G5",
+        "AR08-G6"
+      ],
+      "acceptance_criteria": [
+        "python3 -m pygpui_bench input qualify --endpoint os-input-to-first-presented-response --output evidence/P1-PERF02/input.json exits zero only with qualified collectors and click/key trials; 50 ms is a failed trial and inconclusive exits nonzero for a pass claim",
+        "python3 -m pygpui_bench compare BENCH/baselines/local/baseline-001 evidence/P1-PERF02/candidate --threshold-percent 10 --require-diagnosis-on-regression exits nonzero for the greater-than-10-percent fixture until profiling and diagnosis are linked",
+        "python3 -m pygpui_bench compare BENCH/baselines/local/baseline-001 evidence/P1-PERF02/accepted --threshold-percent 10 --diagnosis evidence/P1-PERF02/diagnosis.md exits zero with five ABBA blocks, 20 runs and ten pairs",
+        "python3 -m pygpui_bench report --scenes e1000,l10000 --require-certification --output evidence/P1-PERF02/target-report.json exits zero only with OQ-02, zero counters, raw artifacts and literal thresholds; otherwise it exits nonzero and records not_certified or inconclusive"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-PERF02/README.md",
+        "evidence/P1-PERF02/gate-results.json"
+      ],
+      "gate_evidence": "evidence/P1-PERF02/gate-results.json"
+    },
+    {
+      "id": "P1-IME01",
+      "title": "Run physical IME matrix and cited platform defect exercises",
+      "owner_role": "Platform-Test-Engineer",
+      "deps": [
+        "P1-PLAT02",
+        "P1-READY-PLATFORM01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "8-evidence",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-IME01/**",
+        "evidence/P1-IME01/**"
+      ],
+      "produces": [
+        "evidence/P1-IME01/**",
+        "evidence/P1-IME01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR06-G2"
+      ],
+      "acceptance_criteria": [
+        "python3 tools/platform/ime_gate.py --matrix ja,zh,ko,dead-keys --candidates linux-wayland,linux-xorg,windows,macos --artifacts evidence/P1-REL01/artifact-manifest.json --output evidence/P1-IME01/physical.json exits zero only with physical logs exercising Windows #4508, macOS #4807/#4626 and X11 #4839 without duplicate text, stuck keys or shortcut activation"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-IME01/README.md",
+        "evidence/P1-IME01/gate-results.json"
+      ],
+      "gate_evidence": "evidence/P1-IME01/gate-results.json"
+    },
+    {
+      "id": "P1-LICENSE-CLOSE01",
+      "title": "Close AR10-G1 with the owner notice and exact artifact metadata",
+      "owner_role": "License-Compliance-Reviewer",
+      "deps": [
+        "P1-LIC02",
+        "P1-REL01",
+        "P1-READY-RELEASE01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "8-evidence",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-LICENSE-CLOSE01/**",
+        "evidence/P1-LICENSE-CLOSE01/**"
+      ],
+      "produces": [
+        "evidence/P1-LICENSE-CLOSE01/**",
+        "evidence/P1-LICENSE-CLOSE01/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        1,
+        2
+      ],
+      "gates": [
+        "AR10-G1"
+      ],
+      "acceptance_criteria": [
+        "cargo metadata --no-deps --format-version 1 exits zero",
+        "python3 tools/release/audit_artifacts.py --stage license --artifacts dist/release/** --notice evidence/P1-READY-RELEASE01/readiness.json --output evidence/P1-LICENSE-CLOSE01/license.json exits zero only with the official Apache-2.0 text, owner-supplied copyright notice, License-Expression and License-File in every artifact; missing notice exits nonzero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-LICENSE-CLOSE01/README.md",
+        "evidence/P1-LICENSE-CLOSE01/gate-results.json"
+      ],
+      "gate_evidence": "evidence/P1-LICENSE-CLOSE01/gate-results.json"
+    },
+    {
+      "id": "P1-A11Y-AT01",
+      "title": "Certify physical AT workflows after IME evidence",
+      "owner_role": "Accessibility-Test-Engineer",
+      "deps": [
+        "P1-IME01",
+        "P1-A11Y-LIST01",
+        "P1-PLAT02",
+        "P1-READY-PLATFORM01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "8-evidence",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-A11Y-AT01/**",
+        "evidence/P1-A11Y-AT01/**"
+      ],
+      "produces": [
+        "evidence/P1-A11Y-AT01/**",
+        "evidence/P1-A11Y-AT01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR06-G4"
+      ],
+      "acceptance_criteria": [
+        "python3 tools/platform/at_gate.py --matrix voiceover,narrator,orca --ime-evidence evidence/P1-IME01/physical.json --artifacts evidence/P1-REL01/artifact-manifest.json --output evidence/P1-A11Y-AT01/at.json exits zero only with keyboard navigation, action invocation, IME text input and dynamic updates; inspector-only or missing IME evidence exits nonzero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-A11Y-AT01/README.md",
+        "evidence/P1-A11Y-AT01/gate-results.json"
+      ],
+      "gate_evidence": "evidence/P1-A11Y-AT01/gate-results.json"
+    },
+    {
+      "id": "P1-A11Y-BENCH01",
+      "title": "Prove AT-on frame, idle and callback gates after benchmark qualification",
+      "owner_role": "Perf-Engineer",
+      "deps": [
+        "P1-A11Y01",
+        "P1-BENCH01",
+        "P1-PERF02"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "8-evidence",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-A11Y-BENCH01/**",
+        "evidence/P1-A11Y-BENCH01/**"
+      ],
+      "produces": [
+        "evidence/P1-A11Y-BENCH01/**",
+        "evidence/P1-A11Y-BENCH01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR06-G5"
+      ],
+      "acceptance_criteria": [
+        "python3 -m pygpui_bench boundary verify --suite V01 --a11y on --baseline evidence/P1-PERF01/v01.json --output evidence/P1-A11Y-BENCH01/v01-a11y.json exits zero only with zero Python-boundary counters and no frame/idle regression greater than 10 percent; missing or inconclusive evidence exits nonzero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-A11Y-BENCH01/README.md",
+        "evidence/P1-A11Y-BENCH01/gate-results.json"
+      ],
+      "gate_evidence": "evidence/P1-A11Y-BENCH01/gate-results.json"
+    },
+    {
+      "id": "P1-WHEEL-CALLBACK01",
+      "title": "Rerun callback and AT-on proof on the exact release wheel hashes",
+      "owner_role": "Perf-Engineer",
+      "deps": [
+        "P1-REL01",
+        "P1-PERF01",
+        "P1-BENCHCLI01",
+        "P1-A11Y-BENCH01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "8-evidence",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-WHEEL-CALLBACK01/**",
+        "evidence/P1-WHEEL-CALLBACK01/**"
+      ],
+      "produces": [
+        "evidence/P1-WHEEL-CALLBACK01/**",
+        "evidence/P1-WHEEL-CALLBACK01/**"
+      ],
+      "size": "M",
+      "estimate_range_days": [
+        3,
+        5
+      ],
+      "gates": [
+        "AR07-G4"
+      ],
+      "acceptance_criteria": [
+        "python3 -m pygpui_bench boundary verify --wheel-hashes evidence/P1-REL01/artifact-manifest.json --suite V01 --a11y off,on --output evidence/P1-WHEEL-CALLBACK01/wheel-v01.json exits zero only when the installed wheel hashes match the manifest and every counter is zero; pre-wheel evidence or hash mismatch exits nonzero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-WHEEL-CALLBACK01/README.md",
+        "evidence/P1-WHEEL-CALLBACK01/gate-results.json"
+      ],
+      "gate_evidence": "evidence/P1-WHEEL-CALLBACK01/gate-results.json"
+    },
+    {
+      "id": "P1-ARTIFACT-GATE01",
+      "title": "Verify current artifact hashes and invalidate stale downstream evidence",
+      "owner_role": "Release-CI-Engineer",
+      "deps": [
+        "P1-REL01",
+        "P1-PLAT02",
+        "P1-PERF02",
+        "P1-IME01",
+        "P1-A11Y-AT01",
+        "P1-A11Y-BENCH01",
+        "P1-WHEEL-CALLBACK01",
+        "P1-LIC02",
+        "P1-LICENSE-CLOSE01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "9-closure",
+      "workflow": "proof",
+      "completion_state": "independently_verified",
+      "write_scope": [
+        "evidence/P1-ARTIFACT-GATE01/**",
+        "evidence/P1-ARTIFACT-GATE01/**"
+      ],
+      "produces": [
+        "evidence/P1-ARTIFACT-GATE01/**",
+        "evidence/P1-ARTIFACT-GATE01/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        1,
+        2
+      ],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 tools/release/artifact_gate.py --manifest evidence/P1-REL01/artifact-manifest.json --evidence evidence/P1-PLAT02,evidence/P1-PERF02,evidence/P1-IME01,evidence/P1-A11Y-AT01,evidence/P1-A11Y-BENCH01,evidence/P1-WHEEL-CALLBACK01,evidence/P1-LIC02,evidence/P1-LICENSE-CLOSE01 --output evidence/P1-ARTIFACT-GATE01/result.json exits zero only when every evidence record references the current immutable artifact hashes; mismatch exits nonzero and reopens the affected task"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-ARTIFACT-GATE01/README.md"
       ]
     },
     {
-      "id": "P1-DOC01",
-      "title": "Write Counter documentation and the evidence-backed claim register",
+      "id": "P1-DOC-FINAL01",
+      "title": "Close final documentation and claim register against current evidence hashes",
       "owner_role": "Technical-Writer",
-      "deps": ["P1-API01", "P1-INT01"],
+      "deps": [
+        "P1-DOC01",
+        "P1-PERF02",
+        "P1-IME01",
+        "P1-A11Y-AT01",
+        "P1-A11Y-BENCH01",
+        "P1-LICENSE-CLOSE01",
+        "P1-ARTIFACT-GATE01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "later",
-      "write_scope": ["README.md", "docs/**"],
-      "size": "S-M",
-      "estimate_range_days": [2, 3],
-      "gates": ["AR10-G4"],
+      "dispatch_wave": "9-closure",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "docs/claim-register.md",
+        "evidence/P1-DOC-FINAL01/**",
+        "evidence/P1-DOC-FINAL01/**"
+      ],
+      "produces": [
+        "docs/claim-register.md",
+        "evidence/P1-DOC-FINAL01/**",
+        "evidence/P1-DOC-FINAL01/**"
+      ],
+      "size": "S",
+      "estimate_range_days": [
+        1,
+        2
+      ],
+      "gates": [
+        "AR10-G4"
+      ],
       "acceptance_criteria": [
-        "The documentation build command recorded in docs/Makefile exits zero and the Counter quickstart runs unchanged",
-        "python3 tools/docs/audit_claims.py exits zero and every performance, platform, IME, accessibility, license or signing claim links to passing evidence or is explicitly unverified/blocked",
-        "Public docs expose only the documented API, keep _native private and make no patent-clearance, trademark, worldwide-clean-room or permissive-only Wayland claim"
+        "make -C docs html exits zero",
+        "python3 tools/docs/audit_claims.py --docs docs --evidence evidence/P1-ARTIFACT-GATE01/result.json --require-hashes --output evidence/P1-DOC-FINAL01/claims.json exits zero only when every performance, platform, IME, accessibility, license and signing claim links to current passing evidence or is explicitly blocked",
+        "python3 tools/ci/branch_gate.py verify --task P1-DOC-FINAL01 --state merged --evidence evidence/P1-DOC-FINAL01/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        "docs/index.md",
-        "docs/claim-register.md",
-        "evidence/P1-DOC01/docs-and-claims.txt"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-DOC-FINAL01/README.md",
+        "evidence/P1-DOC-FINAL01/gate-results.json",
+        "evidence/P1-DOC-FINAL01/review.json",
+        "evidence/P1-DOC-FINAL01/independent-test.json",
+        "evidence/P1-DOC-FINAL01/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-DOC-FINAL01/gate-results.json",
+      "branch_prefix": "feat/P1-DOC-FINAL01-close-final-documentation-and-claim-register-aga",
+      "review_evidence": "evidence/P1-DOC-FINAL01/review.json",
+      "test_evidence": "evidence/P1-DOC-FINAL01/independent-test.json",
+      "merge_evidence": "evidence/P1-DOC-FINAL01/merge.json"
     },
     {
       "id": "P1-REL02",
-      "title": "Verify same-wheel clean installs and assemble the release evidence bundle",
+      "title": "Verify same-wheel clean installs and assemble the final reproducible release bundle",
       "owner_role": "Release-CI-Engineer",
-      "deps": ["P1-REL01", "P1-PLAT02", "P1-PERF02", "P1-IME01", "P1-A11Y02", "P1-LIC02", "P1-DOC01"],
+      "deps": [
+        "P1-REL01",
+        "P1-PLAT02",
+        "P1-PERF02",
+        "P1-IME01",
+        "P1-A11Y-AT01",
+        "P1-A11Y-BENCH01",
+        "P1-WHEEL-CALLBACK01",
+        "P1-LIC02",
+        "P1-LICENSE-CLOSE01",
+        "P1-ARTIFACT-GATE01",
+        "P1-DOC-FINAL01",
+        "P1-READY-RELEASE01"
+      ],
       "status": "blocked",
       "attempt_count": 0,
       "max_attempts": 4,
-      "dispatch_wave": "later",
-      "write_scope": ["tools/release/**", "evidence/P1-REL02/**"],
+      "dispatch_wave": "9-closure",
+      "workflow": "build",
+      "completion_state": "merged",
+      "write_scope": [
+        "evidence/P1-REL02/**",
+        "evidence/P1-REL02/**"
+      ],
+      "produces": [
+        "evidence/P1-REL02/**",
+        "evidence/P1-REL02/**"
+      ],
       "size": "L",
-      "estimate_range_days": [6, 8],
-      "gates": ["AR04-G6", "AR05-G6", "AR07-G2", "AR07-G4", "AR07-G5", "AR10-G4"],
+      "estimate_range_days": [
+        6,
+        8
+      ],
+      "gates": [
+        "AR04-G6",
+        "AR05-G6",
+        "AR07-G2",
+        "AR07-G4",
+        "AR07-G5",
+        "AR10-G4"
+      ],
       "acceptance_criteria": [
-        "python3 tools/release/clean_install_matrix.py --python 3.11,3.12,3.13,3.14,3.15 --gil-only --candidates linux,windows,macos exits zero using the same wheels from P1-REL01 and running the Counter smoke on each",
-        "python3 tools/release/verify_bundle.py --require-platform-gates --require-callback-gates exits zero and archives toolchain/lockfile hashes, commands/logs, wheel/sdist SHA-256, abi3audit/repair reports, SBOM, notices and test reports",
-        "A reproducibility check exits zero and the support manifest includes only platforms with complete passing evidence",
-        "Release metadata states only pinned Rust 1.100.0 unless a clean exact-compiler MSRV run is archived; no upload, Developer ID/notarization, Authenticode, store or publishing command is run, and public signing/publishing remains blocked pending User channel and credential owners"
+        "python3 tools/release/clean_install_matrix.py --python 3.11,3.12,3.13,3.14,3.15 --gil-only --candidates linux,windows,macos --artifacts evidence/P1-REL01/artifact-manifest.json --output evidence/P1-REL02/installs.json exits zero using the same release wheels",
+        "python3 tools/release/verify_bundle.py --manifest evidence/P1-REL01/artifact-manifest.json --gates evidence/P1-ARTIFACT-GATE01/result.json --docs evidence/P1-DOC-FINAL01/claims.json --output evidence/P1-REL02/bundle.json exits zero for byte-identical rebuild hashes and complete logs/SBOM/notices/test reports",
+        "Release metadata states only pinned Rust 1.100.0 unless an exact-compiler MSRV run is archived",
+        "No upload, Developer ID/notarization, Authenticode, store or publishing command is run; public signing/publishing remains blocked pending User authorization",
+        "python3 tools/ci/branch_gate.py verify --task P1-REL02 --state merged --evidence evidence/P1-REL02/branch-evidence.json exits zero"
       ],
       "evidence_links": [
-        ".harness/DECISIONS/0007-abi3-strict-typing-wheel-and-release-evidence.md",
-        "evidence/P1-REL02/release-bundle-manifest.json"
-      ]
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P1-REL02/README.md",
+        "evidence/P1-REL02/gate-results.json",
+        "evidence/P1-REL02/review.json",
+        "evidence/P1-REL02/independent-test.json",
+        "evidence/P1-REL02/merge.json"
+      ],
+      "gate_evidence": "evidence/P1-REL02/gate-results.json",
+      "branch_prefix": "feat/P1-REL02-verify-same-wheel-clean-installs-and-assemble-th",
+      "review_evidence": "evidence/P1-REL02/review.json",
+      "test_evidence": "evidence/P1-REL02/independent-test.json",
+      "merge_evidence": "evidence/P1-REL02/merge.json"
     }
-  ]
+  ],
+  "red_team_blocker_baseline": "c5ed5f3",
+  "dependency_satisfaction": {
+    "implemented": "Implementation and author-run unit tests exist on the task branch; dependents may consume branch artifacts but may not merge.",
+    "independently_verified": "A different reviewer session and tester session accepted the same commit with command logs; dependents may use the evidence.",
+    "merged": "The Integrator accepted the branch evidence, merged the PR into green main and recorded the merge SHA; dependents branch from this merged main.",
+    "recorded": "A control/readiness task archived its structured result; it makes no code-merge claim."
+  },
+  "gate_policy": "A task may be done only when every listed ARxx-Gn has a passing structured gate result. Missing, disabled, stale or inconclusive evidence exits nonzero and keeps the task partial/blocked/failed even when implementation is complete.",
+  "artifact_policy": "Artifacts are immutable by SHA-256. Any repair creates a new artifact ID and invalidates downstream platform, callback, benchmark, IME, AT, license and docs evidence until P1-ARTIFACT-GATE01 reruns them.",
+  "review_model": {
+    "identity_constraint": "One GitHub identity is available; role separation is proved by distinct agent session IDs and signed/harness review records, not GitHub approval metadata.",
+    "required_roles": [
+      "implementer",
+      "independent-reviewer",
+      "independent-tester",
+      "integrator"
+    ],
+    "evidence": "evidence/<task-id>/branch-evidence.json records branch, commit, role/session IDs, command logs, review findings, test results and Integrator merge SHA.",
+    "enforcement": "tools/ci/branch_gate.py exits nonzero unless all required roles and same-commit evidence exist; main is merged only by the Integrator."
+  },
+  "baseline_producers": {
+    ".harness/scripts/validate_phase1_graph.py": "P0-PL01",
+    ".harness/scripts/tests/test_validate_phase1_graph.py": "P0-PL01"
+  }
 }

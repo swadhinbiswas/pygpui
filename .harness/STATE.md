@@ -30,10 +30,11 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - Accepted P0-AR01: ten immutable ADRs define the runtime, snapshot-first Counter slice, API/crate boundaries, exact pins, platform gates, input/a11y ownership, abi3/typing/release policy, benchmark gates, clean-room policy and Apache-2.0 project license.
 - Accepted P0-PL01 after independent validation: 32 blocked Phase 1 tasks, 89 resolving dependency edges, all 52 ADR gates mapped, required PR workflow and a thin Counter-first critical path.
 - Red-Team attempt 1 completed with changes requested: 11 blocking findings (B-01–B-11) and 4 nonblocking findings. The graph is structurally valid but not execution-ready.
+- Planner attempt 2 completed with 56 Phase 1 tasks, 202 resolving dependencies, 52 ADR gates, a committed graph validator and 13 passing negative tests. Orchestrator independently reran validation and added a gate-level deadlock precheck for Red-Team adjudication.
 
 ## Active work
 
-Planner attempt 2 is revising the Phase 1 plan and task graph to resolve B-01 through B-11. Red-Team attempt 2 is blocked behind that revision. `P0-AP01` remains blocked; no feature implementation has started.
+Red-Team attempt 2 is reviewing the revised graph, B-01 through B-11, N-01 through N-04, and the 20 multi-stage gate relationships identified by the Orchestrator precheck. `P0-AP01` remains blocked; no feature implementation has started.
 
 - RQ-01: prior-art architecture and clean-room boundaries.
 - RQ-02: Rust/Python dependency, version, license, and maintenance selection.
@@ -50,8 +51,8 @@ All eight researchers are Round 1 and may run concurrently. Their permitted writ
 
 ## Next 3 actions
 
-1. Planner attempt 2 resolves B-01 through B-11 and regenerates reproducible validation evidence.
-2. Red-Team attempt 2 rechecks the revised committed graph and gate semantics.
+1. Red-Team attempt 2 rechecks the revised graph, all prior findings and gate-level completion semantics.
+2. Resolve any remaining blockers with Planner; regenerate reproducible evidence.
 3. Orchestrator approves `P0-AP01` only at zero blocking findings, then authorizes the first Counter-slice build wave.
 
 ## Phase 0 exit gate

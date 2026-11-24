@@ -1,0 +1,31 @@
+JSON_PARSE=PASS
+UNIQUE_IDS=PASS total=70 unique=70
+DEPS_RESOLVE=PASS checked=202
+CYCLES=PASS count=0
+TOPOLOGICAL_ORDER=PASS pass
+PHASE1_FIELDS=PASS tasks=56
+PHASE1_INITIAL_STATE=PASS blocked/attempt0/max4
+PHASE1_AP01_GATE=PASS checked=56
+PLAN_TASK_ORDER=PASS plan=56 json=56
+PLAN_JSON_METADATA=PASS checked=56
+ADR_GATE_COVERAGE=PASS adr=52 plan=52 task_mappings=52
+ADR_GATE_MAPPINGS=PASS total=71
+PHASE0_HISTORY=PASS compared=11
+COMMAND_PRODUCERS=PASS criteria=190
+REMOTE_WORKFLOW=PASS stale=0
+SELF_TEST_PASS duplicate-id
+SELF_TEST_PASS missing-dependency
+SELF_TEST_PASS cycle
+SELF_TEST_PASS phase1-active
+SELF_TEST_PASS missing-gate
+SELF_TEST_PASS unowned-command
+SELF_TEST_PASS scope-mismatch
+SELF_TEST_PASS missing-review-evidence
+SELF_TEST_PASS stale-remote
+SELF_TEST_PASS plan-json-mismatch
+SELF_TEST_PASS title-mismatch
+SELF_TEST_PASS gate-mapping-mismatch
+SELF_TEST_PASS baseline-done-mutation
+VALIDATION=PASS
+HANDOFF_FIELDS=PASS fields=13/13 files=7
+HEAD_UNCHANGED=PASS c5ed5f3

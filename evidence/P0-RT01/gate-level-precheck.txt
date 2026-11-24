@@ -1,0 +1,31 @@
+P0-RT01 attempt-2 precheck
+Baseline: Planner attempt 2 working tree (HEAD c5ed5f3)
+Method: for each task T and gate G on T, find every other task U mapped to G where U transitively depends on T.
+Interpretation: not automatically a defect if gates explicitly support partial upstream evidence; a blocking deadlock if the plan requires the entire gate to pass before T can be done.
+
+gate-level downstream relationships: 20
+P1-ARCH01 AR03-G5 P1-CONREV01
+P1-PROTO01 AR02-G1 P1-SCENE01
+P1-PROTO01 AR02-G1 P1-TST01
+P1-API01 AR03-G1 P1-TST01
+P1-API01 AR07-G3 P1-TST01
+P1-BENCH00 AR08-G1 P1-BENCH01
+P1-CORE02 AR03-G2 P1-TST01
+P1-SCENE01 AR02-G1 P1-TST01
+P1-RENDER01 AR05-G2 P1-PLAT01
+P1-RENDER01 AR05-G2 P1-PLAT02
+P1-PLATFORM01 AR01-G1 P1-PLAT02
+P1-PY01 AR03-G3 P1-TST01
+P1-SLICE01 AR02-G2 P1-PLAT02
+P1-PLAT01 AR05-G2 P1-PLAT02
+P1-REL01 AR10-G1 P1-LICENSE-CLOSE01
+P1-PLAT02 AR05-G6 P1-REL02
+P1-PLAT02 AR07-G4 P1-WHEEL-CALLBACK01
+P1-PLAT02 AR07-G4 P1-REL02
+P1-WHEEL-CALLBACK01 AR07-G4 P1-REL02
+P1-DOC-FINAL01 AR10-G4 P1-REL02
+
+Required Red-Team decision:
+- Define whether gate status is atomic or staged per task.
+- If staged, require explicit sub-gate/evidence fields and prove upstream completion does not consume downstream evidence.
+- If atomic, remove downstream-only gate mappings from upstream tasks or reorder dependencies to eliminate cycles.

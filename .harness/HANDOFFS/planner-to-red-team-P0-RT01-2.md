@@ -1,0 +1,28 @@
+FROM: Planner
+TO: Red-Team-Planner
+TASK-ID: P0-PL01
+ATTEMPT #: 2
+STATUS: done
+
+WHAT I WAS ASKED: Resolve every blocking finding B-01 through B-11 and address N-01 through N-04 where practical; make the Phase 1 graph execution-ready with owned tools, internal contracts, packaging, local wheel production, instrumentation, review/merge states, fail-closed evidence and artifact invalidation; preserve all 52 ADR obligations; create a reproducible graph validator with negative tests; keep `P0-AP01` and all Phase 1 tasks blocked at attempt zero; and write the revised plan, task graph, validation evidence and this handoff without editing ADRs, research, reviews, `STATE.md` or feature code and without committing.
+
+WHAT I DID: Read the assigned State, Orchestrator handoff and Red-Team review at blocker baseline `c5ed5f3`. Replaced the Phase 1 graph with 56 dependency-ordered tasks and 202 resolving dependency edges. Added seven owned gate-tool tasks, three fail-closed readiness tasks, root packaging and local-wheel tasks, an internal Rust contract/freeze task, production instrumentation, complete benchmark CLI ownership, AccessKit manifest/lifecycle ownership, per-PR provenance/authored-scope enforcement, explicit implemented/independently-verified/merged/recorded semantics, per-branch role/session evidence for the single GitHub identity, isolated fixture-only red-main/rollback drills, IME-before-AT ordering, split accessible-list implementation from physical AT certification, AT-on and exact-wheel callback reruns, separate-interpreter diagnostics, real compare-gate integration, final documentation closure and immutable artifact-hash invalidation. Created `.harness/scripts/validate_phase1_graph.py` and `.harness/scripts/tests/test_validate_phase1_graph.py` with 14 negative tests. The validator checks JSON, unique IDs, dependency resolution, cycles, topological order, required fields/initial state, transitive `P0-AP01` gating, plan/JSON title/owner/dependency/size/range agreement, all 52 ADR gates and their exact task mappings, immutability of every baseline-`done` task while allowing active/completed review lifecycle changes such as `P0-RT01`, every local command path's producer/write scope, remote workflow and branch-evidence fields. Rewrote `.harness/PLANS/phase-1-vertical-slice.md` with a blocker-resolution map, state/review model, dispatch waves, ownership, critical path, fail-closed semantics, rollback safety, risks and complete gate traceability. Validation passed before `P0-PL01` was marked done at attempt 2.
+
+EVIDENCE: `.harness/PLANS/phase-1-vertical-slice.md`; `.harness/TASKS.json`; `.harness/scripts/validate_phase1_graph.py`; `.harness/scripts/validate_handoff.py`; `.harness/scripts/tests/test_validate_phase1_graph.py`; `evidence/P0-PL01/validation-attempt-2.txt`; `.harness/REVIEWS/phase-0-plan-red-team.md`; `.harness/HANDOFFS/orchestrator-to-planner-P0-PL01-2.md`; `.harness/DECISIONS/README.md`; all ten accepted ADRs at `5ce026d`; Red-Team blocker baseline `c5ed5f3`.
+
+WHAT I DID NOT DO / SKIPPED, AND WHY: I did not edit accepted ADRs, research, reviews, `STATE.md`, `PROCESS.md` or feature code, and I did not commit, push or open a PR. I did not implement the future gate scripts, runtime, wheel, benchmark or physical tests; those are owned Phase 1 tasks and remain blocked. I did not claim performance, platform, IME, accessibility, license closure, MSRV or signing success.
+
+OPEN RISKS & SURPRISES: Physical Ubuntu/Windows/macOS GPU runners, IME/AT hardware, benchmark collectors, CPython 3.11–3.15 environments, the owner copyright notice, Wayland disposition and release credentials remain unconfirmed and are explicit readiness blockers. Only one GitHub identity exists and `main` has no branch protection, so role separation depends on distinct session evidence and Integrator enforcement. The Counter boundary, first real presentation and all performance targets remain unverified. The graph is intentionally larger than attempt 1 because missing producers, review states and invalidation edges are now explicit; Red-Team should challenge whether any task still hides implementation inside a proof bundle or whether any command can pass without its claimed evidence.
+
+EXACT NEXT STEP: Red-Team-Planner: read `.harness/STATE.md`, this handoff, `.harness/PLANS/phase-1-vertical-slice.md`, `.harness/TASKS.json`, `.harness/scripts/validate_phase1_graph.py`, `.harness/scripts/tests/test_validate_phase1_graph.py`, `evidence/P0-PL01/validation-attempt-2.txt`, `.harness/REVIEWS/phase-0-plan-red-team.md`, `.harness/DECISIONS/README.md`, all ten accepted ADRs and `.harness/PROCESS.md`; independently rerun the validator and negative tests, recheck B-01 through B-11 and N-01 through N-04, and write `.harness/REVIEWS/phase-0-plan-red-team-attempt-2.md` plus `.harness/HANDOFFS/red-team-planner-to-orchestrator-P0-RT01-2.md` without editing the plan or task graph.
+
+FILES THE RECEIVER MUST READ (ordered, max 7):
+1. `.harness/STATE.md`
+2. `.harness/HANDOFFS/planner-to-red-team-P0-RT01-2.md`
+3. `.harness/PLANS/phase-1-vertical-slice.md`
+4. `.harness/TASKS.json`
+5. `.harness/scripts/validate_phase1_graph.py`
+6. `.harness/scripts/tests/test_validate_phase1_graph.py`
+7. `evidence/P0-PL01/validation-attempt-2.txt`
+
+CONTEXT I WISH I HAD HAD: Confirmed physical platform/IME/AT runners, certified benchmark hardware/collectors, CPython 3.11–3.15 environments, distinct reviewer/tester identities or branch protection, the project copyright holder notice, Wayland counsel/upstream disposition and release credential owners. The graph keeps each missing input as an explicit blocked precondition rather than an optimistic estimate.
