@@ -32,10 +32,11 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - Red-Team attempt 1 completed with changes requested: 11 blocking findings (B-01–B-11) and 4 nonblocking findings. The graph is structurally valid but not execution-ready.
 - Planner attempt 2 completed with 56 Phase 1 tasks, 202 resolving dependencies, 52 ADR gates, a committed graph validator and 14 passing negative tests. Orchestrator independently reran validation and added a gate-level deadlock precheck for Red-Team adjudication.
 - Red-Team attempt 2 completed with changes requested: seven blocking findings (RT2-B01–RT2-B07) and four nonblocking findings. It adjudicated 14 gate deadlocks, one ambiguity and five safe relationships.
+- Planner attempt 3 completed with 64 Phase 1 tasks, 308 resolving dependencies, 52 final gate aggregators, 26 staged sub-gates, durable draft-release artifacts, trusted pre/post-merge evidence and 25 passing tests plus 15 subtests. Orchestrator independently reran all validators.
 
 ## Active work
 
-Planner attempt 3—the final planned revision round—is resolving RT2-B01 through RT2-B07. Red-Team attempt 3 is blocked behind that revision. `P0-AP01` remains blocked; no feature implementation has started.
+Red-Team attempt 3—the final planned review—is checking closure of RT2-B01 through RT2-B07 and all prior findings. `P0-AP01` remains blocked; no feature implementation has started.
 
 ## Blocked
 
@@ -45,9 +46,9 @@ Planner attempt 3—the final planned revision round—is resolving RT2-B01 thro
 
 ## Next 3 actions
 
-1. Planner attempt 3 resolves RT2-B01 through RT2-B07 and regenerates semantic validation evidence.
-2. Red-Team attempt 3 performs the final planned review; any residual blocker requires an explicit Orchestrator escalation/bounded exception.
-3. Orchestrator approves `P0-AP01` only when blockers are resolved or explicitly excepted, then authorizes the first Counter-slice build wave.
+1. Red-Team attempt 3 performs the final planned review of the staged-gate, artifact, review/merge and readiness model.
+2. Resolve any residual blocker or record an explicit Orchestrator escalation/bounded exception.
+3. Orchestrator approves `P0-AP01`, then authorizes and dispatches the first Counter-slice build wave.
 
 ## Phase 0 exit gate
 

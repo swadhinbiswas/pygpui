@@ -30,8 +30,9 @@ def main() -> int:
     parser.add_argument(
         "path",
         nargs="?",
-        default=".harness/HANDOFFS/planner-to-red-team-P0-RT01-2.md",
+        default=".harness/HANDOFFS/planner-to-red-team-P0-RT01-3.md",
     )
+    parser.add_argument("--attempt", type=int, default=3)
     args = parser.parse_args()
     text = Path(args.path).read_text(encoding="utf-8")
     missing = [field for field in FIELDS if field not in text]
@@ -42,7 +43,7 @@ def main() -> int:
         "FROM: Planner",
         "TO: Red-Team-Planner",
         "TASK-ID: P0-PL01",
-        "ATTEMPT #: 2",
+        f"ATTEMPT #: {args.attempt}",
         "STATUS: done",
     ):
         if expected not in text:
