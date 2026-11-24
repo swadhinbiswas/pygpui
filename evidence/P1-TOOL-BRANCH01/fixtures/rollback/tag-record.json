@@ -1,0 +1,9 @@
+{
+  "annotated": true,
+  "commit": "6ebc96c9f5075c5fb2177ec0f1bf5a108f6a8b8c",
+  "record_path": "evidence/tag-record.json",
+  "ref": "refs/tags/phase1/contracts-premerge",
+  "schema_version": 1,
+  "tag": "phase1/contracts-premerge",
+  "tag_object_sha": "f9d1585532bee9827c9868c795d6338d6c64279b"
+}

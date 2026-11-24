@@ -1,0 +1,233 @@
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git rev-parse --show-toplevel
+exit=0
+/tmp/opencode/pygpui-P1-TOOL-BRANCH01
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git remote -v
+exit=0
+origin	https://github.com/swadhinbiswas/pygpui.git (fetch)
+origin	https://github.com/swadhinbiswas/pygpui.git (push)
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git for-each-ref '--format=%(refname) %(objectname)' refs/remotes/
+exit=0
+refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git rev-parse HEAD
+exit=0
+15d29b32a066eeab7f4fdcc9b8a02456c4c0434f
+
+
+$ (cwd=/tmp/opencode/rollback-fixture) git init --bare --initial-branch=main /tmp/opencode/rollback-fixture/origin.git
+exit=0
+Initialized empty Git repository in /tmp/opencode/rollback-fixture/origin.git/
+
+
+$ (cwd=/tmp/opencode/rollback-fixture) git init -b main /tmp/opencode/rollback-fixture/work
+exit=0
+Initialized empty Git repository in /tmp/opencode/rollback-fixture/work/.git/
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git config user.name 'Disposable Fixture'
+exit=0
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git config user.email fixture@example.invalid
+exit=0
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git remote add origin /tmp/opencode/rollback-fixture/origin.git
+exit=0
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git add .
+exit=0
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git commit -m 'test: disposable green baseline'
+exit=0
+[main (root-commit) 6ebc96c] test: disposable green baseline
+ 3 files changed, 8 insertions(+)
+ create mode 100644 baseline.txt
+ create mode 100755 full-gate.sh
+ create mode 100644 state.txt
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git rev-parse HEAD
+exit=0
+6ebc96c9f5075c5fb2177ec0f1bf5a108f6a8b8c
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git push -u origin main
+exit=0
+branch 'main' set up to track 'origin/main'.
+
+To /tmp/opencode/rollback-fixture/origin.git
+ * [new branch]      main -> main
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git switch -c fixture/contracts
+exit=0
+
+Switched to a new branch 'fixture/contracts'
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git add contract.txt
+exit=0
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git commit -m 'test: add fixture contract'
+exit=0
+[fixture/contracts e949b66] test: add fixture contract
+ 1 file changed, 1 insertion(+)
+ create mode 100644 contract.txt
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git switch main
+exit=0
+Your branch is up to date with 'origin/main'.
+
+Switched to branch 'main'
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git merge --no-ff fixture/contracts -m 'test: simulated reviewed contract merge'
+exit=0
+Merge made by the 'ort' strategy.
+ contract.txt | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 contract.txt
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git rev-parse HEAD
+exit=0
+b59b937269789b6b604989dc72a3cc7bc4ca4c01
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) ./full-gate.sh
+exit=0
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git commit -am 'test: inject fixture failure'
+exit=0
+[main 25eecc6] test: inject fixture failure
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git rev-parse HEAD
+exit=0
+25eecc6d4d361ec12b2a373e3e11ecfabd6924ab
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) ./full-gate.sh
+exit=1
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git revert --no-edit 25eecc6d4d361ec12b2a373e3e11ecfabd6924ab
+exit=0
+[main 8405be0] Revert "test: inject fixture failure"
+ Date: Tue Nov 24 11:52:42 2026 +0000
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git rev-parse HEAD
+exit=0
+8405be01ef2d2b2f561fd61253876f32f95a445e
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) ./full-gate.sh
+exit=0
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git revert --no-edit 8405be01ef2d2b2f561fd61253876f32f95a445e
+exit=0
+[main 194b9c1] Reapply "test: inject fixture failure"
+ Date: Tue Nov 24 11:52:42 2026 +0000
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git rev-parse HEAD
+exit=0
+194b9c18646678563853215618684918aa5c4c19
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) ./full-gate.sh
+exit=1
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git switch -c fixture/remerge-green
+exit=0
+
+Switched to a new branch 'fixture/remerge-green'
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git commit -am 'test: re-merge fixture restoration'
+exit=0
+[fixture/remerge-green 7b59788] test: re-merge fixture restoration
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git rev-parse HEAD
+exit=0
+7b59788cb8e30864122d53cf6cfbab40c6ae6528
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git switch main
+exit=0
+Your branch is ahead of 'origin/main' by 5 commits.
+  (use "git push" to publish your local commits)
+
+Switched to branch 'main'
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git merge --no-ff fixture/remerge-green -m 'test: simulated reviewed re-merge'
+exit=0
+Merge made by the 'ort' strategy.
+ state.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git rev-parse HEAD
+exit=0
+42c88e5d637c16f230d0b78f46285c66fbbefe05
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) ./full-gate.sh
+exit=0
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git rev-parse HEAD
+exit=0
+42c88e5d637c16f230d0b78f46285c66fbbefe05
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git push origin main
+exit=0
+
+To /tmp/opencode/rollback-fixture/origin.git
+   6ebc96c..42c88e5  main -> main
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git rev-parse origin/main
+exit=0
+42c88e5d637c16f230d0b78f46285c66fbbefe05
+
+
+$ (cwd=/tmp/opencode/rollback-fixture/work) git tag --list
+exit=0
+phase1/contracts-premerge
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git rev-parse --show-toplevel
+exit=0
+/tmp/opencode/pygpui-P1-TOOL-BRANCH01
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git remote -v
+exit=0
+origin	https://github.com/swadhinbiswas/pygpui.git (fetch)
+origin	https://github.com/swadhinbiswas/pygpui.git (push)
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git for-each-ref '--format=%(refname) %(objectname)' refs/remotes/
+exit=0
+refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git rev-parse HEAD
+exit=0
+15d29b32a066eeab7f4fdcc9b8a02456c4c0434f

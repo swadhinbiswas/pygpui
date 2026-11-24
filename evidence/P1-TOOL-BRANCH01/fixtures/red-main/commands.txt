@@ -1,0 +1,175 @@
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git rev-parse --show-toplevel
+exit=0
+/tmp/opencode/pygpui-P1-TOOL-BRANCH01
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git remote -v
+exit=0
+origin	https://github.com/swadhinbiswas/pygpui.git (fetch)
+origin	https://github.com/swadhinbiswas/pygpui.git (push)
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git for-each-ref '--format=%(refname) %(objectname)' refs/remotes/
+exit=0
+refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git rev-parse HEAD
+exit=0
+15d29b32a066eeab7f4fdcc9b8a02456c4c0434f
+
+
+$ (cwd=/tmp/opencode/red-main-fixture) git init --bare --initial-branch=main /tmp/opencode/red-main-fixture/origin.git
+exit=0
+Initialized empty Git repository in /tmp/opencode/red-main-fixture/origin.git/
+
+
+$ (cwd=/tmp/opencode/red-main-fixture) git init -b main /tmp/opencode/red-main-fixture/work
+exit=0
+Initialized empty Git repository in /tmp/opencode/red-main-fixture/work/.git/
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git config user.name 'Disposable Fixture'
+exit=0
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git config user.email fixture@example.invalid
+exit=0
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git remote add origin /tmp/opencode/red-main-fixture/origin.git
+exit=0
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git add .
+exit=0
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git commit -m 'test: disposable green baseline'
+exit=0
+[main (root-commit) 6ebc96c] test: disposable green baseline
+ 3 files changed, 8 insertions(+)
+ create mode 100644 baseline.txt
+ create mode 100755 full-gate.sh
+ create mode 100644 state.txt
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse HEAD
+exit=0
+6ebc96c9f5075c5fb2177ec0f1bf5a108f6a8b8c
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git push -u origin main
+exit=0
+branch 'main' set up to track 'origin/main'.
+
+To /tmp/opencode/red-main-fixture/origin.git
+ * [new branch]      main -> main
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git switch -c fixture/red-main
+exit=0
+
+Switched to a new branch 'fixture/red-main'
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git commit -am 'test: inject fixture red main'
+exit=0
+[fixture/red-main 939f07c] test: inject fixture red main
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse HEAD
+exit=0
+939f07cc530c17ca60e93786d70afb134cfe82a4
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git switch main
+exit=0
+Your branch is up to date with 'origin/main'.
+
+Switched to branch 'main'
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git merge --no-ff fixture/red-main -m 'test: simulated reviewed red merge'
+exit=0
+Merge made by the 'ort' strategy.
+ state.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse HEAD
+exit=0
+cf4669c26aa48f2fe704e504194de2ffc5549ca9
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) ./full-gate.sh
+exit=1
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git switch -c fixture/restore-main
+exit=0
+
+Switched to a new branch 'fixture/restore-main'
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git commit -am 'test: restore fixture green main'
+exit=0
+[fixture/restore-main 65ba10a] test: restore fixture green main
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse HEAD
+exit=0
+65ba10a96b74566f80325fc5c6fe04ebfe8f6130
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git switch main
+exit=0
+Your branch is ahead of 'origin/main' by 2 commits.
+  (use "git push" to publish your local commits)
+
+Switched to branch 'main'
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git merge --no-ff fixture/restore-main -m 'test: simulated reviewed restoration'
+exit=0
+Merge made by the 'ort' strategy.
+ state.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse HEAD
+exit=0
+a4bcc15133a833f4b34bbcaf69a70d51fda7aa50
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) ./full-gate.sh
+exit=0
+
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git push origin main
+exit=0
+
+To /tmp/opencode/red-main-fixture/origin.git
+   6ebc96c..a4bcc15  main -> main
+
+$ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse origin/main
+exit=0
+a4bcc15133a833f4b34bbcaf69a70d51fda7aa50
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git rev-parse --show-toplevel
+exit=0
+/tmp/opencode/pygpui-P1-TOOL-BRANCH01
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git remote -v
+exit=0
+origin	https://github.com/swadhinbiswas/pygpui.git (fetch)
+origin	https://github.com/swadhinbiswas/pygpui.git (push)
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git for-each-ref '--format=%(refname) %(objectname)' refs/remotes/
+exit=0
+refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f
+
+
+$ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git rev-parse HEAD
+exit=0
+15d29b32a066eeab7f4fdcc9b8a02456c4c0434f
