@@ -472,7 +472,7 @@
       "deps": [
         "P0-REM08"
       ],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 2,
       "acceptance_criteria": [
         "A different Red-Team session verifies direct D11-D17 closure and authoritative P1 gates",
@@ -480,7 +480,9 @@
       ],
       "evidence_links": [
         ".harness/REVIEWS/phase-0-remediation-red-team.md",
-        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-REM03-1.md"
+        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-REM03-1.md",
+        ".harness/REVIEWS/phase-0-remediation-red-team-attempt-2.md",
+        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-REM03-2.md"
       ]
     },
     {
@@ -491,14 +493,19 @@
         "P0-RT01",
         "P0-REM03"
       ],
-      "status": "blocked",
-      "attempt_count": 0,
+      "status": "done",
+      "attempt_count": 1,
       "acceptance_criteria": [
         "STATE.md records gate evidence and approved next phase",
         "Every blocking red-team finding is resolved or has an explicit bounded exception",
         "No Phase 1 build task starts before this task is marked done"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/REVIEWS/phase-0-remediation-red-team-attempt-2.md",
+        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-REM03-2.md",
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        "evidence/P0-REM08/validation.txt"
+      ]
     },
     {
       "id": "P1-GOV01",

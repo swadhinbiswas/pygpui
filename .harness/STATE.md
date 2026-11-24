@@ -2,13 +2,13 @@
 
 Last updated: 2026-11-24
 Owner: Orchestrator
-Phase: 0 — Discovery & Decisions
-Active loop: Loop B — ADRs and Plan
-Repository status: Git `main` tracks `origin` at `https://github.com/swadhinbiswas/pygpui.git`; architecture baseline `5ce026d` is pushed. No feature code exists. Local toolchain observed: Python 3.14.10, rustc 1.100.0, cargo 1.100.0.
+Phase: 1 — Foundational tooling
+Active loop: Loop C — Build
+Repository status: Git `main` tracks `origin` at `https://github.com/swadhinbiswas/pygpui.git`; gate baseline `68907f8` is pushed. No UI feature code exists. Local toolchain observed: Python 3.14.10, rustc 1.100.0, cargo 1.100.0.
 
 ## Current objective
 
-Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI framework using evidence, not assertions. Produce verified research, adversarial review, accepted ADRs, and a machine-checkable Phase 1 task graph before implementation starts.
+Begin Wave 0/1 foundational implementation: governance records, trusted registry seed, branch/merge tooling, gate/session/artifact/audit tools. Keep all UI feature tasks blocked until their dependent foundational tools and contract gates are independently verified and merged.
 
 ## Completed
 
@@ -43,22 +43,24 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - `P0-REM07` final retest confirmed direct D1–D10 closures but found seven implementation-level defect groups (D11–D17) in future tools.
 - `P0-REM03` rejected the bounded-exception proposal because the restrictions were not encoded in authoritative Phase 1 tasks.
 - `P0-REM08` directly closed D11–D17 and encoded adversarial gates in all owning tasks. Root pytest passes 86 tests plus 18 subtests; the independent attack suite passes 41 tests; seed self-test passes.
+- `P0-REM03` attempt 2 reported zero blockers and recommended `P0-AP01` approval for Wave 0/1 only.
+- `P0-AP01` is approved at attempt 1 with Red-Team evidence. Phase 1 is authorized for foundational tooling only; no D11–D17 exception is required.
 
 ## Active work
 
-`P0-REM03` attempt 2 is performing the final narrow Red-Team verification and gate recommendation. `P0-AP01` remains blocked pending that result.
+Wave 0 governance (`P1-GOV01`) is next. After it is recorded, Wave 1 starts with `P1-SESSION-SEED01`, then `P1-TOOL-BRANCH01`, then the remaining independent foundational tools.
 
 ## Blocked
 
-- Red-Team attempt 3 waits for Planner attempt 3 and regenerated semantic validation evidence.
-- Feature implementation waits for Phase 0 approval after the final review or an explicit Orchestrator exception.
+- UI feature crates, Python API, renderer, window and wheel work remain blocked until their dependent foundational tools and contract gates are independently verified and merged.
+- Physical/native/collector infrastructure and user approvals remain explicit readiness blockers for later claims.
 - Remote workflow is available: `origin` is configured and `main` tracks `origin/main`. Do not force-push or rewrite published history.
 
 ## Next 3 actions
 
-1. `P0-REM03` attempt 2 verifies direct D11–D17 closure and authoritative Phase 1 gates.
-2. Orchestrator records the final `P0-AP01` decision.
-3. If approved, dispatch Wave 0/1 foundational tool builds; UI feature work remains gated by dependent tool closure.
+1. Execute and record `P1-GOV01`: environment, remote/auth, graph validation, wave and escalation policy.
+2. Complete `P1-SESSION-SEED01` using the validated seed contract, then dispatch `P1-TOOL-BRANCH01`.
+3. After branch tooling merges, dispatch the remaining independent Wave 1 tool tasks in parallel; keep UI feature tasks blocked.
 
 ## Phase 0 exit gate
 

@@ -49,6 +49,12 @@ class GraphValidatorSemanticTests(unittest.TestCase):
     def test_cycle_is_rejected(self) -> None:
         self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P0-AP01")["deps"].append("P1-GOV01"))
 
+    def test_gate_approval_without_attempt_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P0-AP01").update(status="done", attempt_count=0))
+
+    def test_gate_approval_without_evidence_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P0-AP01").update(status="done", attempt_count=1, evidence_links=[]))
+
     def test_active_phase1_task_is_rejected(self) -> None:
         self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-GOV01").update(status="done"))
 

@@ -346,8 +346,15 @@ def validate(
         errors.extend(field_errors)
 
     if "P0-AP01" in by_id:
-        if by_id["P0-AP01"].get("status") != "blocked" or by_id["P0-AP01"].get("attempt_count") != 0:
-            errors.append("P0-AP01 must remain blocked at attempt zero")
+        ap01 = by_id["P0-AP01"]
+        pre_approval = ap01.get("status") == "blocked" and ap01.get("attempt_count") == 0
+        approved = (
+            ap01.get("status") == "done"
+            and ap01.get("attempt_count") == 1
+            and bool(ap01.get("evidence_links"))
+        )
+        if not (pre_approval or approved):
+            errors.append("P0-AP01 must be blocked at attempt zero or approved at attempt one with evidence")
     else:
         errors.append("P0-AP01 is missing")
     not_gated = [t["id"] for t in phase1 if not _reachable(t["id"], by_id, "P0-AP01")]
