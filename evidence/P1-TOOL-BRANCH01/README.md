@@ -12,10 +12,11 @@ Status: **partial** — implementation and author-run verification are complete;
 | Dispatch baseline | `15d29b32a066eeab7f4fdcc9b8a02456c4c0434f` |
 | Initial implementation commit | `cebbb44c29336e0b74aa0acc75686c136bb8e10d` |
 | Bound source commit | `4b120d7460627ee18873cd1bc8882038eb22677c` |
+| PR opened from commit | `bdf0e39d2d2f474ae273f0efb6728a150a188442` |
 | Bound source tree | `15dad9dd5bf8442c98251e8238c4b91bb959b550` |
 | Branch artifact | `P1-TOOL-BRANCH01-branch` |
 | Artifact SHA-256 | `505ca6e3add4f31e0fb90ba52eeaafa99850e93ef0e651269b5c67562b920657` |
-| PR URL | Pending `gh pr create`; this line is updated before final handoff. |
+| PR URL | https://github.com/swadhinbiswas/pygpui/pull/1 |
 
 Only `tools/ci/**`, `tools/session/verify_roles.py`, and `evidence/P1-TOOL-BRANCH01/**` were changed. No production `main` push, force-push, self-merge, harness-state edit, ADR edit, or UI feature edit was performed.
 
