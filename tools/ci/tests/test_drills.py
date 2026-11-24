@@ -35,6 +35,16 @@ def test_red_main_drill_restores_fixture_green_and_archives_hashes() -> None:
     assert result["fixture"] is True
     assert result["red_main_sha"] != result["restored_green_sha"]
     assert result["gate_after_fix"]["status"] == "pass"
+    assert result["fixture_red_origin_main"] == result["red_main_sha"]
+    assert result["gate_on_remote_red"]["status"] == "fail"
+    assert result["gate_on_remote_green"]["status"] == "pass"
+    commands = (fixture / "commands.txt").read_text(encoding="utf-8")
+    pushes = [
+        line
+        for line in commands.splitlines()
+        if line.startswith("$ ") and "git push" in line
+    ]
+    assert len(pushes) == 3
     assert result["production_before"]["main_refs"] == [
         f"refs/remotes/origin/main {origin_main}"
     ]
@@ -60,6 +70,18 @@ def test_red_main_drill_rejects_nonempty_fixture() -> None:
     assert (fixture / "unrelated.txt").read_text(
         encoding="utf-8"
     ) == "do not overwrite\n"
+
+
+def test_red_main_drill_accepts_existing_empty_fixture() -> None:
+    fixture = fixture_directory() / "red-main"
+    fixture.mkdir()
+    production = fixture_directory() / "production"
+    make_repository(production)
+
+    result = run_red_main_drill(fixture, production_root=production)
+
+    assert result["gate_on_remote_red"]["status"] == "fail"
+    assert result["gate_on_remote_green"]["status"] == "pass"
 
 
 def test_rollback_drill_archives_exact_sequence_and_restores_green() -> None:

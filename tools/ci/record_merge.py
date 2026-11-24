@@ -20,6 +20,7 @@ from tools.ci.common import (
     canonical_branch_evidence,
     canonical_json_bytes,
     canonical_repo_path,
+    git_output,
     is_ancestor,
     load_json,
     load_task,
@@ -32,9 +33,47 @@ from tools.ci.common import (
     verify_session_role,
     write_json,
 )
-from tools.ci.evidence import VerifiedBranch, verify_premerge
+from tools.ci.evidence import (
+    VerifiedBranch,
+    verify_premerge,
+    verify_reviewed_head_delta,
+)
 
-PR_URL_RE = re.compile(r"^https://github\.com/[^/\s]+/[^/\s]+/pull/[1-9][0-9]*$")
+PR_URL_RE = re.compile(
+    r"^https://github\.com/(?P<owner>[^/\s]+)/(?P<repo>[^/\s]+)/pull/[1-9][0-9]*$"
+)
+ORIGIN_RE = re.compile(
+    r"^(?:https://github\.com/|ssh://git@github\.com/|git@github\.com:)"
+    r"(?P<owner>[^/\s]+)/(?P<repo>[^/\s]+?)(?:\.git)?/?$"
+)
+
+
+def _origin_repo(root: Path) -> tuple[str, str]:
+    try:
+        url = git_output(root, "remote", "get-url", "origin")
+    except GateError as error:
+        raise GateError(
+            "pr", f"canonical GitHub origin is required: {error.message}"
+        ) from error
+    match = ORIGIN_RE.fullmatch(url)
+    if not match:
+        raise GateError("pr", f"origin is not a canonical GitHub repository: {url}")
+    return match.group("owner"), match.group("repo")
+
+
+def _validate_pr_selector(root: Path, pr: str) -> str:
+    if not isinstance(pr, str) or not pr or pr.startswith("-"):
+        raise GateError("pr", "PR selector must be a canonical GitHub URL")
+    match = PR_URL_RE.fullmatch(pr)
+    if not match:
+        raise GateError("pr", "PR selector must be a canonical GitHub URL")
+    owner, repo = _origin_repo(root)
+    if (match.group("owner").lower(), match.group("repo").lower()) != (
+        owner.lower(),
+        repo.lower(),
+    ):
+        raise GateError("pr", "PR repository does not match canonical origin")
+    return pr
 
 
 def _record_owner(
@@ -78,9 +117,10 @@ def _validate_pr_metadata(
     if not isinstance(metadata, dict):
         raise GateError("pr", "gh pr view did not return an object")
     url = metadata.get("url")
-    if not isinstance(url, str) or not PR_URL_RE.fullmatch(url):
+    if not isinstance(url, str):
         raise GateError("pr", "gh pr view returned a non-canonical GitHub PR URL")
-    if pr.startswith("https://") and pr != url:
+    _validate_pr_selector(root, url)
+    if pr != url:
         raise GateError("pr", "requested PR URL does not match gh pr view")
     if metadata.get("state") != "MERGED" or metadata.get("baseRefName") != "main":
         raise GateError("pr", "PR must be merged into main")
@@ -90,10 +130,11 @@ def _validate_pr_metadata(
     if not isinstance(merge_commit, dict) or merge_commit.get("oid") != merge_sha:
         raise GateError("merge", "merge SHA does not match gh pr view mergeCommit.oid")
     head_oid = require_commit(root, metadata.get("headRefOid"), "PR head commit")
-    if not is_ancestor(root, verified.source_commit, head_oid):
+    if not is_ancestor(root, head_oid, merge_sha):
         raise GateError(
-            "commit", "reviewed source commit is not an ancestor of the PR head"
+            "merge", "PR head commit is not an ancestor of the merge commit"
         )
+    verify_reviewed_head_delta(root, verified, head_oid)
     if metadata.get("headRefName") != verified.evidence.get("branch"):
         raise GateError("pr", "PR head branch does not match the reviewed branch")
     number = metadata.get("number")
@@ -117,6 +158,7 @@ def _validate_pr_metadata(
 
 
 def fetch_pr_metadata(root: Path, pr: str) -> dict[str, Any]:
+    pr = _validate_pr_selector(root, pr)
     fields = "author,baseRefName,headRefName,headRefOid,mergeCommit,mergedAt,number,state,url"
     try:
         result = subprocess.run(
@@ -299,8 +341,19 @@ def verify_merge_record(
     if record.get("integrator_role") != "integrator":
         raise GateError("role", "merge record does not identify the Integrator role")
     merge_sha = require_commit(root, record.get("merge_sha"), "merge_sha")
-    if expected_sha is not None and merge_sha != expected_sha:
+    if not isinstance(expected_sha, str) or not expected_sha:
+        raise GateError(
+            "merge", "an expected merge SHA is required for merged verification"
+        )
+    if merge_sha != expected_sha:
         raise GateError("merge", "merge SHA does not match --expected-sha")
+    if not (
+        is_ancestor(root, merge_sha, "main")
+        or is_ancestor(root, merge_sha, "origin/main")
+    ):
+        raise GateError(
+            "merge", "merge commit is not reachable from main or origin/main"
+        )
     if not is_ancestor(root, verified.source_commit, merge_sha):
         raise GateError(
             "merge", "merge commit does not contain the reviewed source commit"
@@ -308,8 +361,9 @@ def verify_merge_record(
     if record.get("merge_tree") != source_tree(root, merge_sha):
         raise GateError("merge", "merge record tree hash is stale")
     pr_url = record.get("pr_url")
-    if not isinstance(pr_url, str) or not PR_URL_RE.fullmatch(pr_url):
+    if not isinstance(pr_url, str):
         raise GateError("pr", "merge record PR URL is not canonical")
+    _validate_pr_selector(root, pr_url)
     number = record.get("number")
     if (
         not isinstance(number, int)
@@ -327,17 +381,18 @@ def verify_merge_record(
     if not isinstance(record.get("merged_at"), str) or not record["merged_at"]:
         raise GateError("pr", "merge record lacks a merge timestamp")
     head_oid = require_commit(root, record.get("head_oid"), "recorded PR head commit")
-    if not is_ancestor(root, verified.source_commit, head_oid):
+    if not is_ancestor(root, head_oid, merge_sha):
         raise GateError(
-            "commit", "recorded PR head does not contain the reviewed source commit"
+            "merge", "recorded PR head is not an ancestor of the merge commit"
         )
-    if pr_metadata is not None:
-        expected_fields = _validate_pr_metadata(
-            root, verified, str(record.get("pr_url")), merge_sha, pr_metadata
-        )
-        for key, value in expected_fields.items():
-            if record.get(key) != value:
-                raise GateError("pr", f"merge record PR field is stale: {key}")
+    verify_reviewed_head_delta(root, verified, head_oid)
+    metadata = (
+        pr_metadata if pr_metadata is not None else fetch_pr_metadata(root, pr_url)
+    )
+    expected_fields = _validate_pr_metadata(root, verified, pr_url, merge_sha, metadata)
+    for key, value in expected_fields.items():
+        if record.get(key) != value:
+            raise GateError("pr", f"merge record PR field is stale: {key}")
     return record
 
 
@@ -368,7 +423,7 @@ def self_test() -> None:
         prefix="record-merge-self-test-", dir="/tmp/opencode"
     ) as directory:
         root = Path(directory)
-        base, source = make_repository(root)
+        base, source = make_repository(root, with_origin=True)
         evidence = write_bundle(root, base, source)
         git(root, "switch", "main")
         git(
@@ -381,6 +436,8 @@ def self_test() -> None:
         )
         merge_sha = git(root, "rev-parse", "HEAD")
         metadata = merge_metadata(root, source, merge_sha)
+        evidence["merge_sha"] = merge_sha
+        write_json(root / BRANCH_EVIDENCE, evidence)
         evidence_bytes = (root / BRANCH_EVIDENCE).read_bytes()
         (root / BRANCH_EVIDENCE).unlink()
         _expect_rejection(
@@ -478,7 +535,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--offline",
         action="store_true",
-        help="verify local bindings without querying GitHub",
+        help="deprecated; offline merged verification is prohibited",
     )
     args = parser.parse_args(argv)
     if args.self_test:
@@ -488,27 +545,24 @@ def main(argv: list[str] | None = None) -> int:
     root = Path(args.repository).resolve()
     try:
         if args.command == "verify":
-            missing = [name for name in ("task", "record") if not getattr(args, name)]
+            missing = [
+                name
+                for name in ("task", "record", "expected_sha")
+                if not getattr(args, name)
+            ]
             if missing:
                 raise GateError(
-                    "usage", f"verify requires --task and --record; missing {missing}"
+                    "usage",
+                    f"verify requires --task, --record and --expected-sha; missing {missing}",
                 )
+            if args.offline:
+                raise GateError("pr", "offline merged verification is prohibited")
             record = verify_merge_record(
                 root, args.task, args.record, args.expected_sha
             )
-            if not args.offline:
-                metadata = fetch_pr_metadata(root, str(record["pr_url"]))
-                record = verify_merge_record(
-                    root,
-                    args.task,
-                    args.record,
-                    args.expected_sha,
-                    pr_metadata=metadata,
-                )
-            mode = "offline" if args.offline else "github"
             print(
                 "RECORD_MERGE_VERIFY=PASS "
-                f"task={args.task} record={args.record} merge_sha={record['merge_sha']} mode={mode}"
+                f"task={args.task} record={args.record} merge_sha={record['merge_sha']} mode=github"
             )
             return 0
         missing = [

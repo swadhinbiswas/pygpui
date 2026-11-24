@@ -16,7 +16,9 @@ from tools.ci.common import GateError
 from tools.ci.fixture_git import (
     archive,
     assert_production_unchanged,
+    clone_fixture_gate,
     fixture_gate,
+    fixture_origin_main,
     git,
     initialize_fixture,
     snapshot_production,
@@ -51,6 +53,13 @@ def run_red_main_drill(
     gate_on_red = fixture_gate(work, log)
     if gate_on_red["status"] != "fail":
         raise GateError("fixture", "red-main fixture gate unexpectedly passed")
+    git(work, "push", "origin", "main", log=log)
+    fixture_red_origin_main = fixture_origin_main(work, log)
+    if fixture_red_origin_main != red_main_sha:
+        raise GateError("fixture", "fixture origin/main was not pushed to red")
+    gate_on_remote_red = clone_fixture_gate(remote, fixture / "remote-red-check", log)
+    if gate_on_remote_red["status"] != "fail":
+        raise GateError("fixture", "fixture remote red clone gate unexpectedly passed")
 
     git(work, "switch", "-c", "fixture/restore-main", log=log)
     (work / "state.txt").write_text("green\n", encoding="utf-8")
@@ -71,11 +80,16 @@ def run_red_main_drill(
     if gate_after_fix["status"] != "pass":
         raise GateError("fixture", "restored fixture gate did not pass")
     git(work, "push", "origin", "main", log=log)
-    fixture_origin_main = git(work, "rev-parse", "origin/main", log=log)
-    if fixture_origin_main != restored_green_sha:
+    restored_fixture_origin_main = fixture_origin_main(work, log)
+    if restored_fixture_origin_main != restored_green_sha:
         raise GateError(
             "fixture", "fixture origin/main does not point at restored green"
         )
+    gate_on_remote_green = clone_fixture_gate(
+        remote, fixture / "remote-green-check", log
+    )
+    if gate_on_remote_green["status"] != "pass":
+        raise GateError("fixture", "fixture remote green clone gate did not pass")
 
     after = snapshot_production(production_root, log)
     assert_production_unchanged(before, after)
@@ -89,9 +103,12 @@ def run_red_main_drill(
         "red_main_sha": red_main_sha,
         "restore_commit": restore_commit,
         "restored_green_sha": restored_green_sha,
-        "fixture_origin_main": fixture_origin_main,
+        "fixture_red_origin_main": fixture_red_origin_main,
+        "fixture_origin_main": restored_fixture_origin_main,
         "gate_on_red": gate_on_red,
+        "gate_on_remote_red": gate_on_remote_red,
         "gate_after_fix": gate_after_fix,
+        "gate_on_remote_green": gate_on_remote_green,
         "pause_unrelated_merges": True,
         "production_before": before,
         "production_after": after,
@@ -127,6 +144,8 @@ def self_test() -> None:
         result = run_red_main_drill(root / "red-main", production_root=production)
         if (
             result["gate_after_fix"]["status"] != "pass"
+            or result["gate_on_remote_red"]["status"] != "fail"
+            or result["gate_on_remote_green"]["status"] != "pass"
             or not result["production_unchanged"]
         ):
             raise AssertionError("red-main self-test did not restore green safely")

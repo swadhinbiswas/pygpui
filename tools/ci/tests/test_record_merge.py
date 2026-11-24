@@ -13,7 +13,11 @@ from tools.ci.common import (
     sha256_bytes,
     write_json,
 )
-from tools.ci.record_merge import create_merge_record, verify_merge_record
+from tools.ci.record_merge import (
+    create_merge_record,
+    fetch_pr_metadata,
+    verify_merge_record,
+)
 from tools.ci.tests.helpers import (
     BRANCH_EVIDENCE,
     INTEGRATOR_EVIDENCE,
@@ -31,8 +35,8 @@ SCRIPT = ROOT / "tools/ci/record_merge.py"
 
 
 def make_merged_repository(root: Path) -> tuple[str, str, dict[str, object]]:
-    base, source = make_repository(root)
-    write_bundle(root, base, source)
+    base, source = make_repository(root, with_origin=True)
+    evidence = write_bundle(root, base, source)
     git(root, "switch", "main")
     git(
         root,
@@ -43,6 +47,8 @@ def make_merged_repository(root: Path) -> tuple[str, str, dict[str, object]]:
         "test: reviewed fixture merge",
     )
     merge_sha = git(root, "rev-parse", "HEAD")
+    evidence["merge_sha"] = merge_sha
+    write_json(root / BRANCH_EVIDENCE, evidence)
     return source, merge_sha, merge_metadata(root, source, merge_sha)
 
 
@@ -57,7 +63,9 @@ def test_record_merge_creates_canonical_bound_record(tmp_path: Path) -> None:
         MERGE_EVIDENCE,
         metadata,
     )
-    verified = verify_merge_record(tmp_path, TASK_ID, MERGE_EVIDENCE, merge_sha)
+    verified = verify_merge_record(
+        tmp_path, TASK_ID, MERGE_EVIDENCE, merge_sha, pr_metadata=metadata
+    )
 
     assert record["task_id"] == TASK_ID
     assert record["record_owner_task_id"] == TASK_ID
@@ -79,7 +87,9 @@ def test_record_merge_supports_integrator_owned_output_for_source_task(
         INTEGRATOR_EVIDENCE,
         metadata,
     )
-    verified = verify_merge_record(tmp_path, TASK_ID, INTEGRATOR_EVIDENCE, merge_sha)
+    verified = verify_merge_record(
+        tmp_path, TASK_ID, INTEGRATOR_EVIDENCE, merge_sha, pr_metadata=metadata
+    )
 
     assert record["task_id"] == TASK_ID
     assert record["record_owner_task_id"] == MERGE_TASK_ID
@@ -104,7 +114,7 @@ def test_record_merge_rejects_missing_premerge_evidence(tmp_path: Path) -> None:
 
 
 def test_record_merge_rejects_non_integrator_session(tmp_path: Path) -> None:
-    base, source = make_repository(tmp_path)
+    base, source = make_repository(tmp_path, with_origin=True)
     evidence = write_bundle(tmp_path, base, source)
     evidence["integrator_session_id"] = "reviewer-1"
     write_json(tmp_path / BRANCH_EVIDENCE, evidence)
@@ -153,7 +163,7 @@ def test_record_merge_rejects_merge_sha_mismatch(tmp_path: Path) -> None:
 def test_record_merge_rejects_merge_commit_without_reviewed_source(
     tmp_path: Path,
 ) -> None:
-    base, source = make_repository(tmp_path)
+    base, source = make_repository(tmp_path, with_origin=True)
     write_bundle(tmp_path, base, source)
     metadata = merge_metadata(tmp_path, source, base)
 
@@ -308,6 +318,198 @@ def test_record_merge_does_not_overwrite_existing_record(tmp_path: Path) -> None
         )
 
     assert caught.value.code == "record"
+
+
+def test_record_merge_rejects_unreviewed_implementation_descendant(
+    tmp_path: Path,
+) -> None:
+    base, source = make_repository(tmp_path, with_origin=True)
+    write_bundle(tmp_path, base, source)
+    git(tmp_path, "add", f"evidence/{TASK_ID}")
+    git(tmp_path, "commit", "-m", "test: evidence after review")
+    (tmp_path / "fixture.txt").write_text("unreviewed code\n", encoding="utf-8")
+    git(tmp_path, "add", "fixture.txt")
+    git(tmp_path, "commit", "-m", "feat: unreviewed code")
+    head = git(tmp_path, "rev-parse", "HEAD")
+    git(tmp_path, "switch", "main")
+    git(tmp_path, "merge", "--no-ff", f"feat/{TASK_ID}-tooling", "-m", "test: merge")
+    merge_sha = git(tmp_path, "rev-parse", "HEAD")
+    metadata = merge_metadata(tmp_path, head, merge_sha)
+
+    with pytest.raises(GateError) as caught:
+        create_merge_record(
+            tmp_path,
+            TASK_ID,
+            str(metadata["url"]),
+            merge_sha,
+            MERGE_EVIDENCE,
+            metadata,
+        )
+
+    assert caught.value.code == "identity"
+
+
+def test_record_merge_rejects_pr_head_not_contained_by_merge(tmp_path: Path) -> None:
+    base, source = make_repository(tmp_path, with_origin=True)
+    write_bundle(tmp_path, base, source)
+    git(tmp_path, "switch", "-c", "fixture/side")
+    (tmp_path / "side.txt").write_text("side\n", encoding="utf-8")
+    git(tmp_path, "add", "side.txt")
+    git(tmp_path, "commit", "-m", "test: side branch")
+    side_head = git(tmp_path, "rev-parse", "HEAD")
+    git(tmp_path, "switch", "main")
+    git(tmp_path, "merge", "--no-ff", f"feat/{TASK_ID}-tooling", "-m", "test: merge")
+    merge_sha = git(tmp_path, "rev-parse", "HEAD")
+    metadata = merge_metadata(tmp_path, side_head, merge_sha)
+
+    with pytest.raises(GateError) as caught:
+        create_merge_record(
+            tmp_path,
+            TASK_ID,
+            str(metadata["url"]),
+            merge_sha,
+            MERGE_EVIDENCE,
+            metadata,
+        )
+
+    assert caught.value.code == "merge"
+
+
+def test_record_merge_rejects_wrong_repository_pr_before_writing(
+    tmp_path: Path,
+) -> None:
+    _, merge_sha, metadata = make_merged_repository(tmp_path)
+    metadata["url"] = "https://github.com/attacker/pygpui/pull/1"
+
+    with pytest.raises(GateError) as caught:
+        create_merge_record(
+            tmp_path,
+            TASK_ID,
+            str(metadata["url"]),
+            merge_sha,
+            MERGE_EVIDENCE,
+            metadata,
+        )
+
+    assert caught.value.code == "pr"
+    assert not (tmp_path / MERGE_EVIDENCE).exists()
+
+
+@pytest.mark.parametrize("selector", ["--help", "1", "owner/repo#1"])
+def test_fetch_pr_metadata_rejects_noncanonical_selector_before_gh(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, selector: str
+) -> None:
+    def unexpected(*args: object, **kwargs: object) -> subprocess.CompletedProcess:
+        raise AssertionError("gh must not run for an option-like selector")
+
+    monkeypatch.setattr("tools.ci.record_merge.subprocess.run", unexpected)
+    with pytest.raises(GateError) as caught:
+        fetch_pr_metadata(tmp_path, selector)
+    assert caught.value.code == "pr"
+
+
+def test_verify_merge_record_fetches_live_metadata_by_default(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _, merge_sha, metadata = make_merged_repository(tmp_path)
+    create_merge_record(
+        tmp_path,
+        TASK_ID,
+        str(metadata["url"]),
+        merge_sha,
+        MERGE_EVIDENCE,
+        metadata,
+    )
+    calls: list[str] = []
+
+    def fake_fetch(root: Path, pr: str) -> dict[str, object]:
+        calls.append(pr)
+        return metadata
+
+    monkeypatch.setattr("tools.ci.record_merge.fetch_pr_metadata", fake_fetch)
+    record = verify_merge_record(tmp_path, TASK_ID, MERGE_EVIDENCE, merge_sha)
+
+    assert record["merge_sha"] == merge_sha
+    assert calls == [str(metadata["url"])]
+
+
+def test_verify_merge_record_requires_expected_merge_sha(tmp_path: Path) -> None:
+    _, merge_sha, metadata = make_merged_repository(tmp_path)
+    create_merge_record(
+        tmp_path,
+        TASK_ID,
+        str(metadata["url"]),
+        merge_sha,
+        MERGE_EVIDENCE,
+        metadata,
+    )
+
+    with pytest.raises(GateError) as caught:
+        verify_merge_record(
+            tmp_path, TASK_ID, MERGE_EVIDENCE, None, pr_metadata=metadata
+        )
+
+    assert caught.value.code == "merge"
+
+
+def test_verify_merge_record_rejects_merge_not_reachable_from_main(
+    tmp_path: Path,
+) -> None:
+    base, merge_sha, metadata = make_merged_repository(tmp_path)
+    create_merge_record(
+        tmp_path,
+        TASK_ID,
+        str(metadata["url"]),
+        merge_sha,
+        MERGE_EVIDENCE,
+        metadata,
+    )
+    git(tmp_path, "switch", f"feat/{TASK_ID}-tooling")
+    git(tmp_path, "branch", "-f", "main", base)
+
+    with pytest.raises(GateError) as caught:
+        verify_merge_record(
+            tmp_path, TASK_ID, MERGE_EVIDENCE, merge_sha, pr_metadata=metadata
+        )
+
+    assert caught.value.code == "merge"
+
+
+def test_record_merge_cli_offline_cannot_return_merged_pass(tmp_path: Path) -> None:
+    _, merge_sha, metadata = make_merged_repository(tmp_path)
+    create_merge_record(
+        tmp_path,
+        TASK_ID,
+        str(metadata["url"]),
+        merge_sha,
+        MERGE_EVIDENCE,
+        metadata,
+    )
+
+    result = subprocess.run(
+        [
+            python_executable(),
+            str(SCRIPT),
+            "verify",
+            "--repository",
+            str(tmp_path),
+            "--task",
+            TASK_ID,
+            "--record",
+            MERGE_EVIDENCE,
+            "--expected-sha",
+            merge_sha,
+            "--offline",
+        ],
+        cwd=ROOT,
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+
+    assert result.returncode != 0
+    assert "RECORD_MERGE_VERIFY=PASS" not in result.stdout
+    assert "offline" in result.stderr.lower()
 
 
 def test_record_merge_cli_self_test_exits_zero() -> None:

@@ -46,7 +46,7 @@ def self_test() -> None:
         prefix="branch-gate-self-test-", dir="/tmp/opencode"
     ) as directory:
         root = Path(directory)
-        base, source = make_repository(root)
+        base, source = make_repository(root, with_origin=True)
         evidence = write_bundle(root, base, source)
         original = (root / BRANCH_EVIDENCE).read_bytes()
         verify_branch(root, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
@@ -99,7 +99,7 @@ def self_test() -> None:
             code="commit",
         )
         # Rebuild the bundle so referenced hashes are exact before testing merged state.
-        write_bundle(root, base, source)
+        evidence = write_bundle(root, base, source)
         _expect_rejection(
             verify_branch,
             root,
@@ -119,6 +119,8 @@ def self_test() -> None:
         )
         merge_sha = git(root, "rev-parse", "HEAD")
         metadata = merge_metadata(root, source, merge_sha)
+        evidence["merge_sha"] = merge_sha
+        write_json(root / BRANCH_EVIDENCE, evidence)
         create_merge_record(
             root,
             TASK_ID,
@@ -127,7 +129,13 @@ def self_test() -> None:
             MERGE_EVIDENCE,
             metadata,
         )
-        verify_branch(root, TASK_ID, BRANCH_EVIDENCE, "merged")
+        verify_branch(
+            root,
+            TASK_ID,
+            BRANCH_EVIDENCE,
+            "merged",
+            pr_metadata=metadata,
+        )
 
 
 def main(argv: list[str] | None = None) -> int:

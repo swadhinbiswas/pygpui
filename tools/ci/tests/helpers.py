@@ -48,11 +48,13 @@ def sha256_file(path: Path) -> str:
     return sha256_bytes(path.read_bytes())
 
 
-def make_repository(root: Path) -> tuple[str, str]:
+def make_repository(root: Path, *, with_origin: bool = False) -> tuple[str, str]:
     root.mkdir(parents=True, exist_ok=True)
     git(root, "init", "-b", "main")
     git(root, "config", "user.name", "Fixture Author")
     git(root, "config", "user.email", "fixture@example.invalid")
+    if with_origin:
+        git(root, "remote", "add", "origin", "https://github.com/example/pygpui.git")
     task = {
         "id": TASK_ID,
         "title": "Fixture branch tooling",
@@ -236,12 +238,16 @@ def write_bundle(
         **common,
         "decision": "pass",
         "record_path": REVIEW_EVIDENCE,
+        "reviewed_head_commit": source_commit,
+        "reviewed_head_tree": artifact["source_tree"],
+        "role": "independent-reviewer",
         "session_id": roles["reviewer_session_id"],
     }
     test = {
         **common,
         "decision": "pass",
         "record_path": TEST_EVIDENCE,
+        "role": "test-engineer",
         "session_id": roles["tester_session_id"],
     }
     write_json(root / REVIEW_EVIDENCE, review)
@@ -260,7 +266,10 @@ def write_bundle(
         **roles,
         "base_commit": base_commit,
         "branch": branch,
+        "independent_evidence": True,
         "record_path": BRANCH_EVIDENCE,
+        "reviewed_head_commit": source_commit,
+        "reviewed_head_tree": artifact["source_tree"],
         "registry": {"path": REGISTRY_PATH, "sha256": registry_digest},
         "review": {
             "path": REVIEW_EVIDENCE,

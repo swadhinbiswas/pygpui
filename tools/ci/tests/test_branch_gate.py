@@ -35,6 +35,133 @@ def test_branch_gate_accepts_bound_independent_evidence(tmp_path: Path) -> None:
     assert result.source_commit == source
 
 
+@pytest.mark.parametrize("value", [False, None, "true", 1])
+def test_branch_gate_requires_boolean_true_independent_evidence(
+    tmp_path: Path, value: object
+) -> None:
+    base, source = make_repository(tmp_path)
+    evidence = write_bundle(tmp_path, base, source)
+    evidence["independent_evidence"] = value
+    write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+    with pytest.raises(GateError) as caught:
+        verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
+
+    assert caught.value.code == "state"
+
+
+def test_branch_gate_rejects_missing_independent_evidence(tmp_path: Path) -> None:
+    base, source = make_repository(tmp_path)
+    evidence = write_bundle(tmp_path, base, source)
+    evidence.pop("independent_evidence")
+    write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+    with pytest.raises(GateError) as caught:
+        verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
+
+    assert caught.value.code == "state"
+
+
+def test_branch_gate_accepts_evidence_only_descendant_of_reviewed_head(
+    tmp_path: Path,
+) -> None:
+    base, source = make_repository(tmp_path)
+    write_bundle(tmp_path, base, source)
+    git(tmp_path, "add", f"evidence/{TASK_ID}")
+    git(tmp_path, "commit", "-m", "test: canonical evidence after review")
+
+    result = verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
+
+    assert result.source_commit == source
+
+
+def test_branch_gate_rejects_implementation_change_after_reviewed_head(
+    tmp_path: Path,
+) -> None:
+    base, source = make_repository(tmp_path)
+    write_bundle(tmp_path, base, source)
+    git(tmp_path, "add", f"evidence/{TASK_ID}")
+    git(tmp_path, "commit", "-m", "test: canonical evidence after review")
+    (tmp_path / "fixture.txt").write_text(
+        "unreviewed implementation change\n", encoding="utf-8"
+    )
+    git(tmp_path, "add", "fixture.txt")
+    git(tmp_path, "commit", "-m", "feat: unreviewed implementation change")
+
+    with pytest.raises(GateError) as caught:
+        verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
+
+    assert caught.value.code == "identity"
+
+
+@pytest.mark.parametrize("field", ["reviewed_head_commit", "reviewed_head_tree"])
+def test_branch_gate_rejects_missing_reviewed_head_identity(
+    tmp_path: Path, field: str
+) -> None:
+    base, source = make_repository(tmp_path)
+    evidence = write_bundle(tmp_path, base, source)
+    evidence.pop(field)
+    write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+    with pytest.raises(GateError) as caught:
+        verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
+
+    assert caught.value.code in {"commit", "artifact"}
+
+
+def test_branch_gate_rejects_reviewed_head_tree_mismatch(tmp_path: Path) -> None:
+    base, source = make_repository(tmp_path)
+    evidence = write_bundle(tmp_path, base, source)
+    evidence["reviewed_head_tree"] = "0" * 40
+    write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+    with pytest.raises(GateError) as caught:
+        verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
+
+    assert caught.value.code == "artifact"
+
+
+def test_branch_gate_rejects_review_record_without_matching_reviewed_head(
+    tmp_path: Path,
+) -> None:
+    base, source = make_repository(tmp_path)
+    evidence = write_bundle(tmp_path, base, source)
+    review = load_json(tmp_path / REVIEW_EVIDENCE)
+    review["reviewed_head_commit"] = base
+    write_json(tmp_path / REVIEW_EVIDENCE, review)
+    refresh_reference(tmp_path, evidence, "review")
+    write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+    with pytest.raises(GateError) as caught:
+        verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
+
+    assert caught.value.code == "commit"
+
+
+@pytest.mark.parametrize(
+    ("key", "path", "wrong_role"),
+    [
+        ("review", REVIEW_EVIDENCE, "implementer"),
+        ("test", TEST_EVIDENCE, "reviewer"),
+    ],
+)
+def test_branch_gate_rejects_contradictory_record_roles(
+    tmp_path: Path, key: str, path: str, wrong_role: str
+) -> None:
+    base, source = make_repository(tmp_path)
+    evidence = write_bundle(tmp_path, base, source)
+    record = load_json(tmp_path / path)
+    record["role"] = wrong_role
+    write_json(tmp_path / path, record)
+    refresh_reference(tmp_path, evidence, key)
+    write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+    with pytest.raises(GateError) as caught:
+        verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
+
+    assert caught.value.code == "role"
+
+
 def test_branch_gate_rejects_missing_named_branch_ref(tmp_path: Path) -> None:
     base, source = make_repository(tmp_path)
     write_bundle(tmp_path, base, source)
@@ -180,8 +307,8 @@ def test_branch_gate_merged_state_requires_integrator_record(tmp_path: Path) -> 
 def test_branch_gate_merged_state_accepts_bound_integrator_record(
     tmp_path: Path,
 ) -> None:
-    base, source = make_repository(tmp_path)
-    write_bundle(tmp_path, base, source)
+    base, source = make_repository(tmp_path, with_origin=True)
+    evidence = write_bundle(tmp_path, base, source)
     git(tmp_path, "switch", "main")
     git(
         tmp_path,
@@ -193,6 +320,8 @@ def test_branch_gate_merged_state_accepts_bound_integrator_record(
     )
     merge_sha = git(tmp_path, "rev-parse", "HEAD")
     metadata = merge_metadata(tmp_path, source, merge_sha)
+    evidence["merge_sha"] = merge_sha
+    write_json(tmp_path / BRANCH_EVIDENCE, evidence)
     create_merge_record(
         tmp_path,
         TASK_ID,
@@ -202,9 +331,48 @@ def test_branch_gate_merged_state_accepts_bound_integrator_record(
         metadata,
     )
 
+    result = verify_branch(
+        tmp_path,
+        TASK_ID,
+        BRANCH_EVIDENCE,
+        "merged",
+        pr_metadata=metadata,
+    )
+
+    assert result.merge_record["merge_sha"] == merge_sha
+
+
+def test_branch_gate_merged_fetches_live_metadata_by_default(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    base, source = make_repository(tmp_path, with_origin=True)
+    evidence = write_bundle(tmp_path, base, source)
+    git(tmp_path, "switch", "main")
+    git(tmp_path, "merge", "--no-ff", f"feat/{TASK_ID}-tooling", "-m", "test: merge")
+    merge_sha = git(tmp_path, "rev-parse", "HEAD")
+    metadata = merge_metadata(tmp_path, source, merge_sha)
+    evidence["merge_sha"] = merge_sha
+    write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+    create_merge_record(
+        tmp_path,
+        TASK_ID,
+        str(metadata["url"]),
+        merge_sha,
+        MERGE_EVIDENCE,
+        metadata,
+    )
+    calls: list[str] = []
+
+    def fake_fetch(root: Path, pr: str) -> dict[str, object]:
+        calls.append(pr)
+        return metadata
+
+    monkeypatch.setattr("tools.ci.record_merge.fetch_pr_metadata", fake_fetch)
+
     result = verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "merged")
 
     assert result.merge_record["merge_sha"] == merge_sha
+    assert calls == [str(metadata["url"])]
 
 
 def test_branch_gate_rejects_unsupported_state(tmp_path: Path) -> None:

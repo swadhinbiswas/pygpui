@@ -210,6 +210,19 @@ def is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
     )
 
 
+def changed_paths(root: Path, before: str, after: str) -> list[str]:
+    result = run_git(
+        root,
+        "diff",
+        "--name-only",
+        "--no-renames",
+        "-z",
+        before,
+        after,
+    )
+    return [path for path in result.stdout.split("\0") if path]
+
+
 def branch_tip(root: Path, branch: str) -> str:
     if (
         not isinstance(branch, str)

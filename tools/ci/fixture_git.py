@@ -63,7 +63,7 @@ def git(root: Path, *args: str, log: list[dict[str, Any]], check: bool = True) -
 def initialize_fixture(
     fixture: Path, tool: str, log: list[dict[str, Any]]
 ) -> tuple[Path, Path, str]:
-    fixture.mkdir(parents=True)
+    fixture.mkdir(parents=True, exist_ok=True)
     write_json(
         fixture / ".pygpui-fixture.json",
         {
@@ -138,6 +138,27 @@ def assert_production_unchanged(before: dict[str, Any], after: dict[str, Any]) -
             "production",
             "production repository refs or remotes changed during the fixture drill",
         )
+
+
+def fixture_origin_main(work: Path, log: list[dict[str, Any]]) -> str:
+    result = run_command(
+        ["git", "ls-remote", "--exit-code", "origin", "refs/heads/main"],
+        work,
+        log,
+    )
+    fields = result.stdout.split()
+    if len(fields) != 2 or fields[1] != "refs/heads/main":
+        raise GateError("fixture", "fixture origin/main remote ref is invalid")
+    return fields[0]
+
+
+def clone_fixture_gate(
+    remote: Path, destination: Path, log: list[dict[str, Any]]
+) -> dict[str, Any]:
+    run_command(
+        ["git", "clone", str(remote), str(destination)], destination.parent, log
+    )
+    return fixture_gate(destination, log)
 
 
 def fixture_gate(work: Path, log: list[dict[str, Any]]) -> dict[str, Any]:

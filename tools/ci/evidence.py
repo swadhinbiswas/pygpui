@@ -12,6 +12,7 @@ from tools.ci.common import (
     branch_tip,
     canonical_branch_evidence,
     canonical_repo_path,
+    changed_paths,
     is_ancestor,
     load_json,
     load_task,
@@ -19,6 +20,7 @@ from tools.ci.common import (
     require_commit,
     require_sha256,
     sha256_file,
+    source_tree,
     task_path,
     validate_registry,
     verify_session_role,
@@ -117,6 +119,53 @@ def _validate_bound_record(
         )
 
 
+def verify_reviewed_head_delta(
+    root: Path,
+    verified: VerifiedBranch,
+    head_commit: str,
+) -> dict[str, object]:
+    evidence = verified.evidence
+    review = verified.review
+    reviewed_head = require_commit(
+        root, evidence.get("reviewed_head_commit"), "reviewed_head_commit"
+    )
+    reviewed_tree = source_tree(root, reviewed_head)
+    if (
+        evidence.get("reviewed_head_tree") != reviewed_tree
+        or review.get("reviewed_head_tree") != reviewed_tree
+    ):
+        raise GateError(
+            "artifact", "reviewed head tree does not match reviewer-attested identity"
+        )
+    if review.get("reviewed_head_commit") != reviewed_head:
+        raise GateError(
+            "commit", "review record does not attest the branch reviewed head"
+        )
+    if not is_ancestor(root, verified.source_commit, reviewed_head):
+        raise GateError(
+            "commit", "reviewed head does not contain the bound source commit"
+        )
+    head_commit = require_commit(root, head_commit, "branch or PR head commit")
+    if not is_ancestor(root, reviewed_head, head_commit):
+        raise GateError(
+            "commit", "reviewed head is not an ancestor of the final branch or PR head"
+        )
+    paths = changed_paths(root, reviewed_head, head_commit)
+    evidence_prefix = f"evidence/{verified.task['id']}/"
+    invalid = [path for path in paths if not path.startswith(evidence_prefix)]
+    if invalid:
+        raise GateError(
+            "identity",
+            f"post-review implementation changes are forbidden: {invalid}",
+        )
+    return {
+        "evidence_paths": paths,
+        "head_commit": head_commit,
+        "reviewed_head_commit": reviewed_head,
+        "reviewed_head_tree": reviewed_tree,
+    }
+
+
 def verify_premerge(
     root: Path,
     task_id: str,
@@ -144,6 +193,10 @@ def verify_premerge(
         )
     if evidence.get("state") != "independently_verified":
         raise GateError("state", "branch evidence is not independently_verified")
+    if evidence.get("independent_evidence") is not True:
+        raise GateError(
+            "state", "branch evidence independent_evidence must be boolean true"
+        )
     branch = evidence.get("branch")
     if (
         not isinstance(branch, str)
@@ -248,6 +301,10 @@ def verify_premerge(
         if session_roles.get(key) != session_id:
             raise GateError("role", f"session role record mismatches {key}")
         role_values[key] = session_id
+    if normalized_role(review.get("role")) not in reviewer_roles:
+        raise GateError("role", "review record role is not an independent reviewer")
+    if normalized_role(test.get("role")) not in tester_roles:
+        raise GateError("role", "independent test record role is not a tester")
     if review.get("session_id") != role_values["reviewer_session_id"]:
         raise GateError("role", "review session does not match the assigned reviewer")
     if test.get("session_id") != role_values["tester_session_id"]:
@@ -275,7 +332,7 @@ def verify_premerge(
     elif "integrator_session_id" in session_roles:
         raise GateError("role", "session role record contains an unbound Integrator")
 
-    return VerifiedBranch(
+    verified = VerifiedBranch(
         task=task,
         evidence=evidence,
         review=review,
@@ -284,6 +341,8 @@ def verify_premerge(
         registry_digest=registry_digest,
         source_commit=source_commit,
     )
+    verify_reviewed_head_delta(root, verified, tip)
+    return verified
 
 
 def verify_branch(
@@ -293,6 +352,7 @@ def verify_branch(
     state: str,
     *,
     record_path: str | None = None,
+    pr_metadata: dict[str, Any] | None = None,
 ) -> VerifiedBranch:
     if state not in {"independently_verified", "merged"}:
         raise GateError("state", f"unsupported branch state: {state}")
@@ -313,13 +373,15 @@ def verify_branch(
     )
     from tools.ci.record_merge import verify_merge_record
 
+    expected_sha = verified.evidence.get("merge_sha")
+    if not isinstance(expected_sha, str):
+        raise GateError("merge", "merged state requires an expected merge SHA")
     verified.merge_record = verify_merge_record(
         root.resolve(),
         task_id,
         expected,
-        verified.evidence.get("merge_sha")
-        if isinstance(verified.evidence.get("merge_sha"), str)
-        else None,
+        expected_sha,
         premerge=verified,
+        pr_metadata=pr_metadata,
     )
     return verified
