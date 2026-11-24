@@ -271,7 +271,7 @@
       "deps": [
         "P0-PL01"
       ],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 3,
       "acceptance_criteria": [
         "REVIEWS/phase-0-plan-red-team.md checks dependencies, hidden coupling, estimates, rollback and acceptance-criteria quality",
@@ -282,7 +282,65 @@
         ".harness/REVIEWS/phase-0-plan-red-team.md",
         ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-RT01-1.md",
         ".harness/REVIEWS/phase-0-plan-red-team-attempt-2.md",
-        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-RT01-2.md"
+        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-RT01-2.md",
+        ".harness/REVIEWS/phase-0-plan-red-team-attempt-3.md",
+        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-RT01-3.md"
+      ]
+    },
+    {
+      "id": "P0-REM01",
+      "title": "Remediate final Red-Team execution blockers",
+      "owner_role": "Planner",
+      "deps": [
+        "P0-RT01"
+      ],
+      "status": "in_progress",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "RT3-B01 through RT3-B05 have exact task, schema, command and validator closure",
+        "The graph validator, handoff validator and full explicit pytest suite exit zero with new negative tests for runtime aggregation, merged dependencies, atomic evidence, artifact fetch and claim separation",
+        "evidence/P0-REM01/validation.txt contains exact reproducible output",
+        "No accepted ADR, research, review or feature implementation file is edited"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-0-targeted-remediation.md",
+        ".harness/REVIEWS/phase-0-plan-red-team-attempt-3.md",
+        "evidence/P0-REM01/validation.txt"
+      ]
+    },
+    {
+      "id": "P0-REM02",
+      "title": "Independently verify targeted remediation",
+      "owner_role": "Test-Engineer",
+      "deps": [
+        "P0-REM01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "acceptance_criteria": [
+        "A different session reruns the graph validator, handoff validator and full explicit pytest suite with exact archived output",
+        "Falsification tests reject missing aggregate commands, pre-merge consumers, proof self-certification, missing artifact fetch, unsupported atomic gate evidence and unrelated claim dependencies",
+        "The independent report finds zero unresolved remediation defects"
+      ],
+      "evidence_links": [
+        "evidence/P0-REM02/independent-verification.txt"
+      ]
+    },
+    {
+      "id": "P0-REM03",
+      "title": "Red-Team verify remediation and recommend gate decision",
+      "owner_role": "Red-Team-Planner",
+      "deps": [
+        "P0-REM02"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "acceptance_criteria": [
+        "A different Red-Team session verifies RT3-B01 through RT3-B05 closure and issues a final zero/nonzero blocking count",
+        "The report either recommends P0-AP01 approval or identifies a new explicit Orchestrator decision"
+      ],
+      "evidence_links": [
+        ".harness/REVIEWS/phase-0-remediation-red-team.md"
       ]
     },
     {
@@ -290,7 +348,8 @@
       "title": "Approve Phase 0 gate and authorize Phase 1",
       "owner_role": "Orchestrator",
       "deps": [
-        "P0-RT01"
+        "P0-RT01",
+        "P0-REM03"
       ],
       "status": "blocked",
       "attempt_count": 0,

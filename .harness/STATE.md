@@ -33,10 +33,12 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - Planner attempt 2 completed with 56 Phase 1 tasks, 202 resolving dependencies, 52 ADR gates, a committed graph validator and 14 passing negative tests. Orchestrator independently reran validation and added a gate-level deadlock precheck for Red-Team adjudication.
 - Red-Team attempt 2 completed with changes requested: seven blocking findings (RT2-B01–RT2-B07) and four nonblocking findings. It adjudicated 14 gate deadlocks, one ambiguity and five safe relationships.
 - Planner attempt 3 completed with 64 Phase 1 tasks, 308 resolving dependencies, 52 final gate aggregators, 26 staged sub-gates, durable draft-release artifacts, trusted pre/post-merge evidence and 25 passing tests plus 15 subtests. Orchestrator independently reran all validators.
+- Red-Team attempt 3 completed with changes requested: five blocking findings (RT3-B01–RT3-B05) and five nonblocking findings. The three planned review rounds are exhausted.
+- Orchestrator authorized targeted remediation only: no UI feature code until `P0-AP01` opens after independent remediation verification.
 
 ## Active work
 
-Red-Team attempt 3—the final planned review—is checking closure of RT2-B01 through RT2-B07 and all prior findings. `P0-AP01` remains blocked; no feature implementation has started.
+`P0-REM01` is implementing the five exact remediation fixes. `P0-REM02` independent testing and `P0-REM03` Red-Team verification are blocked behind it. `P0-AP01` remains blocked.
 
 ## Blocked
 
@@ -46,9 +48,9 @@ Red-Team attempt 3—the final planned review—is checking closure of RT2-B01 t
 
 ## Next 3 actions
 
-1. Red-Team attempt 3 performs the final planned review of the staged-gate, artifact, review/merge and readiness model.
-2. Resolve any residual blocker or record an explicit Orchestrator escalation/bounded exception.
-3. Orchestrator approves `P0-AP01`, then authorizes and dispatches the first Counter-slice build wave.
+1. `P0-REM01` closes RT3-B01 through RT3-B05 in the plan, graph, schema and validators.
+2. `P0-REM02` independently tests the remediation; `P0-REM03` performs final Red-Team verification.
+3. Orchestrator approves `P0-AP01` only after remediation verification, then authorizes and dispatches the first Counter-slice build wave.
 
 ## Phase 0 exit gate
 
