@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 
@@ -90,6 +91,31 @@ def test_run_local_gate_missing_ruff_fails_closed(
     with pytest.raises(GateError) as caught:
         run_local_gate(tmp_path, ruff=None, command_runner=lambda command, cwd: None)
     assert caught.value.code == "dependency"
+
+
+def test_configured_missing_ruff_returns_dependency_exit_69(tmp_path: Path) -> None:
+    env = dict(os.environ)
+    env["PYGPUI_RUFF"] = "/tmp/opencode/definitely-missing-ruff-attempt-2"
+
+    result = subprocess.run(
+        [
+            python_executable(),
+            str(SCRIPT),
+            "--repository",
+            str(tmp_path),
+            "--mode",
+            "full",
+        ],
+        cwd=ROOT,
+        env=env,
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+
+    assert result.returncode == 69
+    assert "LOCAL_GATE_REJECT code=dependency" in result.stderr
+    assert "Traceback" not in result.stderr
 
 
 def test_run_local_gate_cli_self_test_exits_zero() -> None:

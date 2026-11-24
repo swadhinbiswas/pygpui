@@ -12,7 +12,9 @@ from tools.ci.tests.helpers import (
     BRANCH_EVIDENCE,
     MERGE_EVIDENCE,
     REVIEW_EVIDENCE,
+    ROLES_EVIDENCE,
     TASK_ID,
+    TEST_EVIDENCE,
     git,
     make_repository,
     merge_metadata,
@@ -31,6 +33,73 @@ def test_branch_gate_accepts_bound_independent_evidence(tmp_path: Path) -> None:
     result = verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
 
     assert result.source_commit == source
+
+
+def test_branch_gate_rejects_missing_named_branch_ref(tmp_path: Path) -> None:
+    base, source = make_repository(tmp_path)
+    write_bundle(tmp_path, base, source)
+    git(tmp_path, "branch", "-m", "feat/P1-TOOL-BRANCH01-renamed")
+
+    with pytest.raises(GateError) as caught:
+        verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
+
+    assert caught.value.code == "commit"
+
+
+def test_branch_gate_rejects_source_not_contained_by_named_branch(
+    tmp_path: Path,
+) -> None:
+    base, source = make_repository(tmp_path)
+    write_bundle(tmp_path, base, source)
+    git(tmp_path, "switch", "main")
+    git(tmp_path, "branch", "-f", f"feat/{TASK_ID}-tooling", base)
+
+    with pytest.raises(GateError) as caught:
+        verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
+
+    assert caught.value.code == "commit"
+
+
+@pytest.mark.parametrize(
+    ("key", "path"),
+    [
+        ("review", REVIEW_EVIDENCE),
+        ("test", TEST_EVIDENCE),
+        ("session_roles", ROLES_EVIDENCE),
+    ],
+)
+@pytest.mark.parametrize(
+    ("field", "value", "expected_code"),
+    [
+        ("source_tree", "0" * 40, "artifact"),
+        ("source_tree", None, "artifact"),
+        ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+        ("branch", None, "identity"),
+    ],
+)
+def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+    tmp_path: Path,
+    key: str,
+    path: str,
+    field: str,
+    value: str | None,
+    expected_code: str,
+) -> None:
+    base, source = make_repository(tmp_path)
+    evidence = write_bundle(tmp_path, base, source)
+    record = load_json(tmp_path / path)
+    if value is None:
+        record.pop(field, None)
+    else:
+        record[field] = value
+    write_json(tmp_path / path, record)
+    refresh_reference(tmp_path, evidence, key)
+    write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+    with pytest.raises(GateError) as caught:
+        verify_branch(tmp_path, TASK_ID, BRANCH_EVIDENCE, "independently_verified")
+
+    assert caught.value.code == expected_code
 
 
 def test_branch_gate_rejects_commit_mismatch_between_review_and_test(

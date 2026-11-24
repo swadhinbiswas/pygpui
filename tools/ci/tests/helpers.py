@@ -225,7 +225,9 @@ def write_bundle(
     common = {
         "schema_version": 1,
         "task_id": TASK_ID,
+        "branch": branch,
         "source_commit": source_commit,
+        "source_tree": artifact["source_tree"],
         "artifact_id": artifact["artifact_id"],
         "artifact_sha256": artifact["artifact_sha256"],
         "registry_sha256": registry_digest,

@@ -210,6 +210,23 @@ def is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
     )
 
 
+def branch_tip(root: Path, branch: str) -> str:
+    if (
+        not isinstance(branch, str)
+        or not branch
+        or any(character.isspace() for character in branch)
+    ):
+        raise GateError("identity", "branch name is invalid")
+    ref = f"refs/heads/{branch}"
+    if run_git(root, "check-ref-format", ref, check=False).returncode != 0:
+        raise GateError("identity", f"branch name is not a valid Git ref: {branch}")
+    result = run_git(root, "show-ref", "--verify", "--hash", ref, check=False)
+    tip = result.stdout.strip()
+    if result.returncode != 0 or not COMMIT_RE.fullmatch(tip):
+        raise GateError("commit", f"named branch ref does not exist: {ref}")
+    return tip
+
+
 def source_tree(root: Path, source_commit: str) -> str:
     require_commit(root, source_commit, "source_commit")
     return git_output(root, "rev-parse", f"{source_commit}^{{tree}}")
@@ -300,8 +317,9 @@ def verify_session_role(
     if normalized_role(record.get("role")) not in accepted_roles:
         raise GateError("role", f"{label} session has the wrong role: {session_id}")
     bound_task = record.get("task_id")
-    if bound_task is not None and bound_task != task_id:
+    if not isinstance(bound_task, str) or not bound_task or bound_task != task_id:
         raise GateError(
-            "role", f"{label} session is bound to a different task: {session_id}"
+            "role",
+            f"{label} session lacks an explicit matching task binding: {session_id}",
         )
     return session_id

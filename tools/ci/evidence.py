@@ -9,6 +9,7 @@ from typing import Any
 from tools.ci.common import (
     GateError,
     branch_artifact,
+    branch_tip,
     canonical_branch_evidence,
     canonical_repo_path,
     is_ancestor,
@@ -80,7 +81,9 @@ def _validate_bound_record(
     label: str,
     expected_path: str,
     task_id: str,
+    branch: str,
     source_commit: str,
+    source_tree: str,
     artifact_id: str,
     artifact_sha256: str,
     registry_digest: str,
@@ -93,6 +96,14 @@ def _validate_bound_record(
         )
     if record.get("source_commit") != source_commit:
         raise GateError("commit", f"{label} commit does not match the branch artifact")
+    if record.get("source_tree") != source_tree:
+        raise GateError(
+            "artifact", f"{label} source tree does not match the branch artifact"
+        )
+    if record.get("branch") != branch:
+        raise GateError(
+            "identity", f"{label} branch does not match the branch artifact"
+        )
     if (
         record.get("artifact_id") != artifact_id
         or record.get("artifact_sha256") != artifact_sha256
@@ -155,6 +166,11 @@ def verify_premerge(
         raise GateError(
             "commit", "base commit is not an ancestor of the reviewed source commit"
         )
+    tip = branch_tip(root, branch)
+    if not is_ancestor(root, source_commit, tip):
+        raise GateError(
+            "commit", "reviewed source commit is not contained by the named branch ref"
+        )
     artifact = branch_artifact(root, task_id, source_commit, branch)
     if (
         evidence.get("artifact_id") != artifact["artifact_id"]
@@ -197,7 +213,9 @@ def verify_premerge(
             label=label,
             expected_path=path,
             task_id=task_id,
+            branch=branch,
             source_commit=source_commit,
+            source_tree=artifact["source_tree"],
             artifact_id=artifact["artifact_id"],
             artifact_sha256=artifact["artifact_sha256"],
             registry_digest=registry_digest,

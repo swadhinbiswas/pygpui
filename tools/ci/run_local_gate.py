@@ -21,13 +21,18 @@ STEP_EXIT_CODES = {"fmt": 10, "lint": 11, "tests": 12, "graph": 13}
 
 
 def _default_runner(command: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        command,
-        cwd=cwd,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
+    try:
+        return subprocess.run(
+            command,
+            cwd=cwd,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+    except OSError as error:
+        raise GateError(
+            "dependency", f"cannot execute {command[0]}: {error}"
+        ) from error
 
 
 def _resolve_ruff(explicit: str | None) -> str:
@@ -125,6 +130,19 @@ def self_test() -> None:
         raise AssertionError(
             "local gate self-test did not fail fast with the fmt exit code"
         )
+
+    try:
+        run_local_gate(
+            Path.cwd(),
+            ruff="/tmp/opencode/definitely-missing-ruff-self-test",
+        )
+    except GateError as error:
+        if error.code != "dependency":
+            raise AssertionError(
+                f"expected dependency rejection, got {error.code}: {error.message}"
+            ) from error
+    else:
+        raise AssertionError("configured missing Ruff unexpectedly executed")
 
 
 def main(argv: list[str] | None = None) -> int:

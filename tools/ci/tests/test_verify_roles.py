@@ -5,7 +5,13 @@ from pathlib import Path
 
 import pytest
 
-from tools.ci.common import GateError, load_json, python_executable, write_json
+from tools.ci.common import (
+    GateError,
+    load_json,
+    python_executable,
+    verify_session_role,
+    write_json,
+)
 from tools.ci.evidence import verify_premerge
 from tools.ci.tests.helpers import (
     APPROVAL_PATH,
@@ -31,6 +37,39 @@ def test_verify_roles_accepts_distinct_trusted_sessions(tmp_path: Path) -> None:
 
     assert result.evidence["reviewer_session_id"] == "reviewer-1"
     assert result.evidence["tester_session_id"] == "tester-1"
+
+
+@pytest.mark.parametrize(
+    ("role", "accepted_roles"),
+    [
+        ("implementer", {"implementer"}),
+        ("reviewer", {"reviewer"}),
+        ("tester", {"tester"}),
+        ("integrator", {"integrator"}),
+    ],
+)
+def test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role(
+    role: str, accepted_roles: set[str]
+) -> None:
+    registry = {
+        "sessions": {
+            "unbound-session": {
+                "role": role,
+                "trusted": True,
+            }
+        }
+    }
+
+    with pytest.raises(GateError) as caught:
+        verify_session_role(
+            registry,
+            "unbound-session",
+            accepted_roles,
+            TASK_ID,
+            role,
+        )
+
+    assert caught.value.code == "role"
 
 
 def test_verify_roles_rejects_missing_reviewer(tmp_path: Path) -> None:
