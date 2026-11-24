@@ -1,0 +1,183 @@
+.........FFFFFFF                                                         [100%]
+=================================== FAILURES ===================================
+_ TestUnresolvedDefectAttacks.test_validator_rejects_a_wrong_gate_id_at_a_canonical_result_path _
+
+self = <test_p0_rem05_semantics.TestUnresolvedDefectAttacks object at 0x7fd0d5297890>
+
+    def test_validator_rejects_a_wrong_gate_id_at_a_canonical_result_path(self) -> None:
+        def mutate(data: dict) -> None:
+            owner = next(t for t in data["tasks"] if t["id"] == "P1-TST01")
+            index = next(
+                i
+                for i, criterion in enumerate(owner["acceptance_criteria"])
+                if "write_result.py" in criterion and "--gate AR02-G1.integrated-properties" in criterion
+            )
+            owner["acceptance_criteria"][index] = owner["acceptance_criteria"][index].replace(
+                "--gate AR02-G1.integrated-properties", "--gate AR02-G1.schema"
+            )
+    
+>       assert validate_mutation(mutate)
+E       assert []
+E        +  where [] = validate_mutation(<function TestUnresolvedDefectAttacks.test_validator_rejects_a_wrong_gate_id_at_a_canonical_result_path.<locals>.mutate at 0x7fd0d506a820>)
+
+evidence/P0-REM05/test_p0_rem05_semantics.py:190: AssertionError
+_ TestUnresolvedDefectAttacks.test_enforcement_evidence_is_derived_from_a_pr_not_a_committed_fixture _
+
+self = <test_p0_rem05_semantics.TestUnresolvedDefectAttacks object at 0x7fd0d51269e0>
+
+    def test_enforcement_evidence_is_derived_from_a_pr_not_a_committed_fixture(self) -> None:
+        commands = [
+            criterion
+            for criterion in BY_ID["P1-PR-AUDIT01"]["acceptance_criteria"]
+            if "pr_audit_gate.py" in criterion and "--gate AR" in criterion
+        ]
+        assert len(commands) == 2
+>       assert all("tools/ci/tests/fixtures/" not in command for command in commands)
+E       assert False
+E        +  where False = all(<generator object TestUnresolvedDefectAttacks.test_enforcement_evidence_is_derived_from_a_pr_not_a_committed_fixture.<locals>.<genexpr> at 0x7fd0d51a6260>)
+
+evidence/P0-REM05/test_p0_rem05_semantics.py:199: AssertionError
+_ TestUnresolvedDefectAttacks.test_validator_rejects_self_test_only_per_pr_enforcement _
+
+self = <test_p0_rem05_semantics.TestUnresolvedDefectAttacks object at 0x7fd0d5126b10>
+
+    def test_validator_rejects_self_test_only_per_pr_enforcement(self) -> None:
+        def mutate(data: dict) -> None:
+            owner = next(t for t in data["tasks"] if t["id"] == "P1-PR-AUDIT01")
+            for index, criterion in enumerate(owner["acceptance_criteria"]):
+                if "pr_audit_gate.py" in criterion and "--gate AR" in criterion:
+                    gate = "AR09-G1" if "AR09-G1" in criterion else "AR10-G3"
+                    owner["acceptance_criteria"][index] = (
+                        "python3 tools/ci/pr_audit_gate.py --policy tools/ci/pr_audit_policy.json "
+                        f"--self-test --gate {gate} --output evidence/P1-PR-AUDIT01/{gate}.pr-enforcement.json exits zero"
+                    )
+    
+>       assert validate_mutation(mutate)
+E       assert []
+E        +  where [] = validate_mutation(<function TestUnresolvedDefectAttacks.test_validator_rejects_self_test_only_per_pr_enforcement.<locals>.mutate at 0x7fd0d509f480>)
+
+evidence/P0-REM05/test_p0_rem05_semantics.py:216: AssertionError
+_ TestUnresolvedDefectAttacks.test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants[dist/./release/*.whl] _
+
+self = <test_p0_rem05_semantics.TestUnresolvedDefectAttacks object at 0x7fd0d512b410>
+variant = 'dist/./release/*.whl'
+
+    @pytest.mark.parametrize(
+        "variant",
+        ["dist/./release/*.whl", "dist/{release,local}/*.whl", "dist/*/*.whl"],
+    )
+    def test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants(self, variant: str) -> None:
+        def mutate(data: dict) -> None:
+            owner = next(t for t in data["tasks"] if t["id"] == "P1-LIC02")
+            owner.pop("consumes_artifacts", None)
+            owner["acceptance_criteria"] = [
+                criterion
+                for criterion in owner["acceptance_criteria"]
+                if "gh release download" not in criterion and "store.py verify" not in criterion
+            ]
+            owner["acceptance_criteria"] = [
+                criterion.replace("evidence/P1-LIC02/downloads/**", variant)
+                for criterion in owner["acceptance_criteria"]
+            ]
+            owner["write_scope"].append("dist/**")
+            owner["produces"].append("dist/**")
+    
+>       assert validate_mutation(mutate)
+E       assert []
+E        +  where [] = validate_mutation(<function TestUnresolvedDefectAttacks.test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants.<locals>.mutate at 0x7fd0d509ce00>)
+
+evidence/P0-REM05/test_p0_rem05_semantics.py:238: AssertionError
+_ TestUnresolvedDefectAttacks.test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants[dist/{release,local}/*.whl] _
+
+self = <test_p0_rem05_semantics.TestUnresolvedDefectAttacks object at 0x7fd0d4fe0e20>
+variant = 'dist/{release,local}/*.whl'
+
+    @pytest.mark.parametrize(
+        "variant",
+        ["dist/./release/*.whl", "dist/{release,local}/*.whl", "dist/*/*.whl"],
+    )
+    def test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants(self, variant: str) -> None:
+        def mutate(data: dict) -> None:
+            owner = next(t for t in data["tasks"] if t["id"] == "P1-LIC02")
+            owner.pop("consumes_artifacts", None)
+            owner["acceptance_criteria"] = [
+                criterion
+                for criterion in owner["acceptance_criteria"]
+                if "gh release download" not in criterion and "store.py verify" not in criterion
+            ]
+            owner["acceptance_criteria"] = [
+                criterion.replace("evidence/P1-LIC02/downloads/**", variant)
+                for criterion in owner["acceptance_criteria"]
+            ]
+            owner["write_scope"].append("dist/**")
+            owner["produces"].append("dist/**")
+    
+>       assert validate_mutation(mutate)
+E       assert []
+E        +  where [] = validate_mutation(<function TestUnresolvedDefectAttacks.test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants.<locals>.mutate at 0x7fd0d5097530>)
+
+evidence/P0-REM05/test_p0_rem05_semantics.py:238: AssertionError
+_ TestUnresolvedDefectAttacks.test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants[dist/*/*.whl] _
+
+self = <test_p0_rem05_semantics.TestUnresolvedDefectAttacks object at 0x7fd0d4fe0f30>
+variant = 'dist/*/*.whl'
+
+    @pytest.mark.parametrize(
+        "variant",
+        ["dist/./release/*.whl", "dist/{release,local}/*.whl", "dist/*/*.whl"],
+    )
+    def test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants(self, variant: str) -> None:
+        def mutate(data: dict) -> None:
+            owner = next(t for t in data["tasks"] if t["id"] == "P1-LIC02")
+            owner.pop("consumes_artifacts", None)
+            owner["acceptance_criteria"] = [
+                criterion
+                for criterion in owner["acceptance_criteria"]
+                if "gh release download" not in criterion and "store.py verify" not in criterion
+            ]
+            owner["acceptance_criteria"] = [
+                criterion.replace("evidence/P1-LIC02/downloads/**", variant)
+                for criterion in owner["acceptance_criteria"]
+            ]
+            owner["write_scope"].append("dist/**")
+            owner["produces"].append("dist/**")
+    
+>       assert validate_mutation(mutate)
+E       assert []
+E        +  where [] = validate_mutation(<function TestUnresolvedDefectAttacks.test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants.<locals>.mutate at 0x7fd0d50681a0>)
+
+evidence/P0-REM05/test_p0_rem05_semantics.py:238: AssertionError
+_ TestUnresolvedDefectAttacks.test_first_merged_tool_task_has_an_available_trusted_registry_producer _
+
+self = <test_p0_rem05_semantics.TestUnresolvedDefectAttacks object at 0x7fd0d4fb5950>
+
+    def test_first_merged_tool_task_has_an_available_trusted_registry_producer(self) -> None:
+        registry = ".harness/sessions/registry.json"
+        producers = [
+            owner["id"]
+            for owner in PHASE1
+            if any(VALIDATOR._matches(registry, pattern) for pattern in owner.get("produces", []))
+        ]
+        assert producers == ["P1-SESSION-REGISTRY01"]
+        assert not VALIDATOR._reachable("P1-TOOL-BRANCH01", BY_ID, "P1-SESSION-REGISTRY01")
+>       assert any(
+            VALIDATOR._matches(registry, pattern)
+            for pattern in BY_ID["P1-TOOL-BRANCH01"]["write_scope"]
+        ) or any(
+            VALIDATOR._reachable("P1-TOOL-BRANCH01", BY_ID, producer)
+            for producer in producers
+        )
+E       assert (False or False)
+E        +  where False = any(<generator object TestUnresolvedDefectAttacks.test_first_merged_tool_task_has_an_available_trusted_registry_producer.<locals>.<genexpr> at 0x7fd0d4fcfe20>)
+E        +  and   False = any(<generator object TestUnresolvedDefectAttacks.test_first_merged_tool_task_has_an_available_trusted_registry_producer.<locals>.<genexpr> at 0x7fd0d4fcff10>)
+
+evidence/P0-REM05/test_p0_rem05_semantics.py:249: AssertionError
+=========================== short test summary info ============================
+FAILED evidence/P0-REM05/test_p0_rem05_semantics.py::TestUnresolvedDefectAttacks::test_validator_rejects_a_wrong_gate_id_at_a_canonical_result_path
+FAILED evidence/P0-REM05/test_p0_rem05_semantics.py::TestUnresolvedDefectAttacks::test_enforcement_evidence_is_derived_from_a_pr_not_a_committed_fixture
+FAILED evidence/P0-REM05/test_p0_rem05_semantics.py::TestUnresolvedDefectAttacks::test_validator_rejects_self_test_only_per_pr_enforcement
+FAILED evidence/P0-REM05/test_p0_rem05_semantics.py::TestUnresolvedDefectAttacks::test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants[dist/./release/*.whl]
+FAILED evidence/P0-REM05/test_p0_rem05_semantics.py::TestUnresolvedDefectAttacks::test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants[dist/{release,local}/*.whl]
+FAILED evidence/P0-REM05/test_p0_rem05_semantics.py::TestUnresolvedDefectAttacks::test_validator_rejects_normalized_or_shell_expanded_ignored_dist_variants[dist/*/*.whl]
+FAILED evidence/P0-REM05/test_p0_rem05_semantics.py::TestUnresolvedDefectAttacks::test_first_merged_tool_task_has_an_available_trusted_registry_producer
+7 failed, 9 passed in 0.45s

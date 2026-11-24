@@ -1,0 +1,7 @@
+Command:
+  pytest -q
+
+Output:
+.........................................................                 [100%]
+57 passed, 15 subtests passed in 4.07s
+EXIT_CODE=0

@@ -1,0 +1,47 @@
+TASKS=84 PHASE1=65 EDGES=320
+GATES=52 SUB_GATES=26 STAGED_FULL_GATES=12
+BASE_GRAPH_ERRORS=0
+RESULT_PATHS=78 UNIQUE_RESULT_PATHS=78
+SHARED_RESULT_PATHS=0
+LIFECYCLE_ORDER_ERRORS=0
+AGGREGATE_SELF_OVERWRITES=0
+PR_AUDIT_FULL_OUTPUTS=['evidence/P1-PR-AUDIT01/AR09-G1.json', 'evidence/P1-PR-AUDIT01/AR10-G3.json'] DISTINCT=True
+D1_WRONG_GATE_CANONICAL_PATH_ACCEPTED=True ERRORS=[]
+BUILD_TASKS=38 MERGED_COMPLETION=38
+P1-SESSION-REGISTRY01_WORKFLOW=build COMPLETION=merged PREMERGE=independently_verified POSTMERGE=merged REVIEW=True TEST=True MERGE_RECORD=True
+P1-GATE-SCHEMA01_WORKFLOW=build COMPLETION=merged PREMERGE=independently_verified POSTMERGE=merged REVIEW=True TEST=True MERGE_RECORD=True
+REGISTRY_EXISTS_AT_BASELINE=False
+REGISTRY_PRODUCERS=['P1-SESSION-REGISTRY01']
+TOOL_BRANCH_DEPS=['P1-GOV01']
+TOOL_BRANCH_SCOPE_COVERS_REGISTRY=False
+TOOL_BRANCH_REACHES_REGISTRY_PRODUCER=False
+AR09-G1_REQUIRED=['AR09-G1.repository-evidence', 'AR09-G1.pr-enforcement']
+AR09-G1_INPUTS=evidence/P1-LIC01/AR09-G1.repository-evidence.json,evidence/P1-PR-AUDIT01/AR09-G1.pr-enforcement.json
+AR09-G1_CHANGED_FILES=tools/ci/tests/fixtures/changed-files.txt
+AR09-G1_COMMAND_IS_FIXTURE=True
+AR10-G3_REQUIRED=['AR10-G3.repository-evidence', 'AR10-G3.pr-enforcement']
+AR10-G3_INPUTS=evidence/P1-LIC01/AR10-G3.repository-evidence.json,evidence/P1-PR-AUDIT01/AR10-G3.pr-enforcement.json
+AR10-G3_CHANGED_FILES=tools/ci/tests/fixtures/changed-files.txt
+AR10-G3_COMMAND_IS_FIXTURE=True
+D3_SELFTEST_ONLY_ENFORCEMENT_ACCEPTED=True ERRORS=[]
+P1-LIC02_FETCH=0 VERIFY=1 AUDITS=[2, 3, 4] ORDER_OK=True DOWNLOAD_DIR=evidence/P1-LIC02/downloads AUDITS_USE_DOWNLOAD_DIR=True IGNORED_DIST_REFS=[]
+P1-LICENSE-CLOSE01_FETCH=0 VERIFY=1 AUDITS=[3] ORDER_OK=True DOWNLOAD_DIR=evidence/P1-LICENSE-CLOSE01/downloads AUDITS_USE_DOWNLOAD_DIR=True IGNORED_DIST_REFS=[]
+D5_VARIANT=dist/release/*.whl NORMALIZED=dist/release/*.whl DETECTED=True MUTATION_ACCEPTED=False ERRORS=["P1-LIC02 non-producer references ignored artifact paths: ['dist/release/*.whl', 'dist/release/*.whl', 'dist/release/*.whl']"]
+D5_VARIANT=dist/local/*.whl NORMALIZED=dist/local/*.whl DETECTED=True MUTATION_ACCEPTED=False ERRORS=["P1-LIC02 non-producer references ignored artifact paths: ['dist/local/*.whl', 'dist/local/*.whl', 'dist/local/*.whl']"]
+D5_VARIANT=dist/./release/*.whl NORMALIZED=dist/release/*.whl DETECTED=False MUTATION_ACCEPTED=True ERRORS=[]
+D5_VARIANT=dist/{release,local}/*.whl NORMALIZED=dist/{release,local}/*.whl DETECTED=False MUTATION_ACCEPTED=True ERRORS=[]
+D5_VARIANT=dist/*/*.whl NORMALIZED=dist/*/*.whl DETECTED=False MUTATION_ACCEPTED=True ERRORS=[]
+D6_BOUND_PRELOCK_APPROVAL_SCHEMA_VALID=True
+D6_MISSING_APPROVER_SESSION_ID_REJECTED=True
+D6_MISSING_APPROVAL_ARTIFACT_REJECTED=True
+D6_MISSING_APPROVAL_REGISTRY_REJECTED=True
+D6_MISSING_APPROVAL_SCOPE_REJECTED=True
+P1-READY-CERT01_WRITE=1 VALIDATE=2 VERIFY_APPROVAL=3 VERIFY_PROOF=4 ORDER_OK=True REACHES_LOCK_PRODUCER=False HAS_NOT_APPLICABLE=True
+P1-READY-CLAIM01_WRITE=1 VALIDATE=2 VERIFY_APPROVAL=3 VERIFY_PROOF=4 ORDER_OK=True REACHES_LOCK_PRODUCER=False HAS_NOT_APPLICABLE=True
+P0_AP01=blocked/attempt0
+UNRESOLVED_DEFECTS=4
+D7=D1 gate/task-to-canonical-path binding is not validator-enforced
+D8=D2 first merged tool task has no available trusted session registry
+D9=D3 enforcement evidence is fixture-based and self-test-only mutation is accepted
+D10=D5 normalized/shell-expanded ignored-dist variants bypass detection
+EXIT_CODE=0

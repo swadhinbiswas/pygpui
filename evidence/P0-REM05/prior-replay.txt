@@ -1,0 +1,33 @@
+Command:
+  python3 -m pytest -q evidence/P0-REM02/test_p0_rem02_semantics.py
+
+Output:
+FF.F...F.....FFFFF..FFFF..FF                                         [100%]
+15 failed, 13 passed in 0.40s
+EXIT_CODE=1
+
+Interpretation:
+The prior suite intentionally asserted the unsafe D1-D6 conditions and the old
+validator blind spots. Those assertions now fail against the revised semantics.
+Other failures include stale positive assertions that hard-code superseded
+counts/shapes (13 staged gates, 36 builds, 16 shared-file tasks, repository-only
+inputs, old approval fixture). The old suite is therefore replay evidence, not a
+current acceptance suite.
+
+Command:
+  python3 evidence/P0-REM02/semantic_audit.py
+
+Output (tail):
+AR09-G1_INPUTS=evidence/P1-LIC01/AR09-G1.repository-evidence.json,evidence/P1-PR-AUDIT01/AR09-G1.pr-enforcement.json REQUIRED=AR09-G1.repository-evidence,AR09-G1.pr-enforcement
+AR10-G3_INPUTS=evidence/P1-LIC01/AR10-G3.repository-evidence.json,evidence/P1-PR-AUDIT01/AR10-G3.pr-enforcement.json REQUIRED=AR10-G3.repository-evidence,AR10-G3.pr-enforcement
+AR04_G6_MSRV_AUDIT=True
+Traceback (most recent call last):
+  File "/home/swadhin/pygpui/evidence/P0-REM02/semantic_audit.py", line 112, in <module>
+    audit = next(i for i, c in enumerate(criteria) if "dist/release/**" in c)
+StopIteration
+EXIT_CODE=1
+
+Interpretation:
+The old audit stops because the unsafe dist/release audit it searches for no
+longer exists. Before that stop it reports 0 self-overwrites, distinct PR-AUDIT
+outputs, both enforcement inputs and 38/38 merged build tasks.

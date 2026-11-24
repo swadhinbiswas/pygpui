@@ -1,0 +1,6 @@
+Command:
+  python3 .harness/scripts/validate_handoff.py .harness/HANDOFFS/planner-to-test-engineer-P0-REM04-1.md --task-id P0-REM04 --to Test-Engineer --attempt 1
+
+Output:
+HANDOFF_FIELDS=PASS fields=13/13 files=7
+EXIT_CODE=0
