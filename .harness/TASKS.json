@@ -242,15 +242,14 @@
       "deps": [
         "P0-AR01"
       ],
-      "status": "done",
-      "attempt_count": 2,
+      "status": "in_progress",
+      "attempt_count": 3,
       "acceptance_criteria": [
         "python3 .harness/scripts/validate_phase1_graph.py --baseline 5ce026d --self-test exits zero",
-        "python3 .harness/scripts/validate_handoff.py .harness/HANDOFFS/planner-to-red-team-P0-RT01-2.md exits zero",
-        "Every Red-Team blocker B-01 through B-11 has an owned task, tool, contract, dependency or executable gate in the plan and graph",
-        "All 52 ARxx-Gn obligations retain executable semantics and fail-closed evidence rules",
+        "Every Red-Team attempt-2 blocker RT2-B01 through RT2-B07 has an owned task, schema, dependency or executable semantic check in the plan and graph",
+        "All 52 ARxx-Gn obligations retain executable staged or atomic semantics without completion deadlocks",
         "Every Phase 1 task has required fields, a producer/write-scope contract and remains blocked at attempt zero behind P0-AP01",
-        "evidence/P0-PL01/validation-attempt-2.txt contains the exact reproducible validator output"
+        "evidence/P0-PL01/validation-attempt-3.txt contains exact reproducible validator and negative-test output"
       ],
       "evidence_links": [
         ".harness/PLANS/phase-1-vertical-slice.md",
@@ -270,7 +269,7 @@
       "deps": [
         "P0-PL01"
       ],
-      "status": "in_progress",
+      "status": "blocked",
       "attempt_count": 2,
       "acceptance_criteria": [
         "REVIEWS/phase-0-plan-red-team.md checks dependencies, hidden coupling, estimates, rollback and acceptance-criteria quality",
@@ -279,7 +278,9 @@
       ],
       "evidence_links": [
         ".harness/REVIEWS/phase-0-plan-red-team.md",
-        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-RT01-1.md"
+        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-RT01-1.md",
+        ".harness/REVIEWS/phase-0-plan-red-team-attempt-2.md",
+        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-RT01-2.md"
       ]
     },
     {

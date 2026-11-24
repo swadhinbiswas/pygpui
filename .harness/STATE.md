@@ -30,30 +30,24 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - Accepted P0-AR01: ten immutable ADRs define the runtime, snapshot-first Counter slice, API/crate boundaries, exact pins, platform gates, input/a11y ownership, abi3/typing/release policy, benchmark gates, clean-room policy and Apache-2.0 project license.
 - Accepted P0-PL01 after independent validation: 32 blocked Phase 1 tasks, 89 resolving dependency edges, all 52 ADR gates mapped, required PR workflow and a thin Counter-first critical path.
 - Red-Team attempt 1 completed with changes requested: 11 blocking findings (B-01–B-11) and 4 nonblocking findings. The graph is structurally valid but not execution-ready.
-- Planner attempt 2 completed with 56 Phase 1 tasks, 202 resolving dependencies, 52 ADR gates, a committed graph validator and 13 passing negative tests. Orchestrator independently reran validation and added a gate-level deadlock precheck for Red-Team adjudication.
+- Planner attempt 2 completed with 56 Phase 1 tasks, 202 resolving dependencies, 52 ADR gates, a committed graph validator and 14 passing negative tests. Orchestrator independently reran validation and added a gate-level deadlock precheck for Red-Team adjudication.
+- Red-Team attempt 2 completed with changes requested: seven blocking findings (RT2-B01–RT2-B07) and four nonblocking findings. It adjudicated 14 gate deadlocks, one ambiguity and five safe relationships.
 
 ## Active work
 
-Red-Team attempt 2 is reviewing the revised graph, B-01 through B-11, N-01 through N-04, and the 20 multi-stage gate relationships identified by the Orchestrator precheck. `P0-AP01` remains blocked; no feature implementation has started.
-
-- RQ-01: prior-art architecture and clean-room boundaries.
-- RQ-02: Rust/Python dependency, version, license, and maintenance selection.
-- RQ-03: FFI/render-loop performance model and reproducible benchmark design.
-- RQ-04: platform windowing/input/IME/accessibility/HiDPI and abi3 distribution constraints.
-
-All eight researchers are Round 1 and may run concurrently. Their permitted writes are their assigned `RESEARCH/` file, an append-only action line in `LOG.md`, and their own handoff.
+Planner attempt 3—the final planned revision round—is resolving RT2-B01 through RT2-B07. Red-Team attempt 3 is blocked behind that revision. `P0-AP01` remains blocked; no feature implementation has started.
 
 ## Blocked
 
-- Red-Team-Planner waits for Planner's Phase 1 task graph and vertical-slice plan.
-- Feature implementation waits for Phase 0 approval after Red-Team review.
+- Red-Team attempt 3 waits for Planner attempt 3 and regenerated semantic validation evidence.
+- Feature implementation waits for Phase 0 approval after the final review or an explicit Orchestrator exception.
 - Remote workflow is available: `origin` is configured and `main` tracks `origin/main`. Do not force-push or rewrite published history.
 
 ## Next 3 actions
 
-1. Red-Team attempt 2 rechecks the revised graph, all prior findings and gate-level completion semantics.
-2. Resolve any remaining blockers with Planner; regenerate reproducible evidence.
-3. Orchestrator approves `P0-AP01` only at zero blocking findings, then authorizes the first Counter-slice build wave.
+1. Planner attempt 3 resolves RT2-B01 through RT2-B07 and regenerates semantic validation evidence.
+2. Red-Team attempt 3 performs the final planned review; any residual blocker requires an explicit Orchestrator escalation/bounded exception.
+3. Orchestrator approves `P0-AP01` only when blockers are resolved or explicitly excepted, then authorizes the first Counter-slice build wave.
 
 ## Phase 0 exit gate
 
