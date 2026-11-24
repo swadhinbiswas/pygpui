@@ -1,0 +1,45 @@
+FAIL named_branch_ref_must_exist_and_contain_source: verifier unexpectedly accepted the mutated evidence
+FAIL reviewer_role_must_have_explicit_task_binding: verifier unexpectedly accepted the mutated evidence
+FAIL review_record_tree_must_match_branch_artifact: verifier unexpectedly accepted the mutated evidence
+FAIL review_record_branch_must_match_branch_artifact: verifier unexpectedly accepted the mutated evidence
+MISSING_RUFF_STDOUT_BEGIN
+MISSING_RUFF_STDOUT_END
+MISSING_RUFF_STDERR_BEGIN
+Traceback (most recent call last):
+  File "/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/run_local_gate.py", line 152, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/run_local_gate.py", line 141, in main
+    code, _ = run_local_gate(Path(args.repository), mode=args.mode)
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/run_local_gate.py", line 75, in run_local_gate
+    result = runner(command, root)
+  File "/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/run_local_gate.py", line 24, in _default_runner
+    return subprocess.run(
+           ~~~~~~~~~~~~~~^
+        command,
+        ^^^^^^^^
+    ...<3 lines>...
+        check=False,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/lib/python3.14/subprocess.py", line 555, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 1039, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 1990, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: PosixPath('/tmp/opencode/independent-adversarial-yh8qi44v')
+MISSING_RUFF_STDERR_END
+FAIL configured_missing_ruff_must_return_dependency_exit_69: expected exit=69 actual exit=1
+ADVERSARIAL_SUMMARY={"checks": [{"detail": "verifier unexpectedly accepted the mutated evidence", "name": "named_branch_ref_must_exist_and_contain_source", "passed": false}, {"detail": "verifier unexpectedly accepted the mutated evidence", "name": "reviewer_role_must_have_explicit_task_binding", "passed": false}, {"detail": "verifier unexpectedly accepted the mutated evidence", "name": "review_record_tree_must_match_branch_artifact", "passed": false}, {"detail": "verifier unexpectedly accepted the mutated evidence", "name": "review_record_branch_must_match_branch_artifact", "passed": false}, {"detail": "expected exit=69 actual exit=1", "name": "configured_missing_ruff_must_return_dependency_exit_69", "passed": false}], "failed": ["named_branch_ref_must_exist_and_contain_source", "reviewer_role_must_have_explicit_task_binding", "review_record_tree_must_match_branch_artifact", "review_record_branch_must_match_branch_artifact", "configured_missing_ruff_must_return_dependency_exit_69"], "passed": false}

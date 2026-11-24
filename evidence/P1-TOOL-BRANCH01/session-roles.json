@@ -2,6 +2,11 @@
   "schema_version": 1,
   "task_id": "P1-TOOL-BRANCH01",
   "record_path": "evidence/P1-TOOL-BRANCH01/session-roles.json",
+  "branch": "feat/P1-TOOL-BRANCH01-tooling",
+  "source_commit": "031524fd65d14d5a5818e277ac1bfc28d6e0db5b",
+  "source_tree": "b6d70180cacfcaa8aa76a0e6d2a5aeae94cd7b6e",
+  "artifact_id": "P1-TOOL-BRANCH01-branch",
+  "artifact_sha256": "76d214d68d773084a3fa4e09422c2a19324beff9604d010b830d608aed514503",
   "registry_path": ".harness/sessions/registry.json",
   "registry_sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498",
   "status": "assigned",
@@ -11,5 +16,5 @@
   "reviewer_session_id": "ses_df27261c9ffcukQUulA8P0LN89",
   "tester_session_id": "ses_df27261c9ffdiy0RA5Ko2oSdxl",
   "integrator_session_id": "ses_df27261c8ffeJbVXcZMsund3Hf",
-  "blocked_reason": "Orchestrator registered distinct task-bound roles and the registry approval verifies. Independent review/test evidence and the Integrator merge record are intentionally absent; state remains implemented and independent_evidence remains false."
+  "blocked_reason": "Distinct task-bound roles remain registered and the registry approval verifies. Attempt-1 fail evidence is archived unchanged. Attempt-2 independent review/test evidence and the Integrator merge record are intentionally absent; state remains implemented and independent_evidence remains false."
 }
