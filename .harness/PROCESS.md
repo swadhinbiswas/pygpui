@@ -48,7 +48,9 @@ Use `HANDOFFS/<from>-to-<to>-<task-id>-<attempt>.md` and the exact Part 3 fields
 
 ## Git and integration
 
-- The initial repository has no remote. Record this rather than fabricating PR URLs.
+- `origin` is `https://github.com/swadhinbiswas/pygpui.git`; `main` tracks `origin/main`. The initial remote was empty and received the harness/ADR baseline without force.
+- Build agents use short-lived branches/worktrees and open PRs against `main`. Never force-push or rewrite published history.
+- `main` is currently unprotected on GitHub. Until stable CI check names exist, the Integrator enforces reviewed/green merges through the harness; branch protection is deferred under OQ-15.
 - Integrator merges only reviewed, green work in dependency order.
 - Red main is top priority: pause unrelated work until fixed or reverted.
 

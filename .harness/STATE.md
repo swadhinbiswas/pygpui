@@ -4,7 +4,7 @@ Last updated: 2026-11-24
 Owner: Orchestrator
 Phase: 0 — Discovery & Decisions
 Active loop: Loop B — ADRs and Plan
-Repository status: Empty workspace bootstrapped on Git `main`; no feature code exists. Local toolchain observed: Python 3.14.10, rustc 1.100.0, cargo 1.100.0.
+Repository status: Git `main` tracks `origin` at `https://github.com/swadhinbiswas/pygpui.git`; architecture baseline `5ce026d` is pushed. No feature code exists. Local toolchain observed: Python 3.14.10, rustc 1.100.0, cargo 1.100.0.
 
 ## Current objective
 
@@ -42,9 +42,9 @@ All eight researchers are Round 1 and may run concurrently. Their permitted writ
 
 ## Blocked
 
-- Skeptic review waits for all eight Round 1 research files.
-- Architecture and planning wait for Skeptic disposition.
-- No Git remote is configured, so remote PR creation is unavailable. Research is confined to harness files; later build tasks will use local branches/worktrees until a remote is supplied.
+- Red-Team-Planner waits for Planner's Phase 1 task graph and vertical-slice plan.
+- Feature implementation waits for Phase 0 approval after Red-Team review.
+- Remote workflow is available: `origin` is configured and `main` tracks `origin/main`. Do not force-push or rewrite published history.
 
 ## Next 3 actions
 
