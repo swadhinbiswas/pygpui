@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "task_id": "P1-TOOL-BRANCH01",
+  "record_path": "evidence/P1-TOOL-BRANCH01/branch-evidence.json",
+  "state": "implemented",
+  "independent_evidence": false,
+  "branch": "feat/P1-TOOL-BRANCH01-tooling",
+  "base_commit": "15d29b32a066eeab7f4fdcc9b8a02456c4c0434f",
+  "source_commit": "4b120d7460627ee18873cd1bc8882038eb22677c",
+  "source_tree": "15dad9dd5bf8442c98251e8238c4b91bb959b550",
+  "artifact_id": "P1-TOOL-BRANCH01-branch",
+  "artifact_sha256": "505ca6e3add4f31e0fb90ba52eeaafa99850e93ef0e651269b5c67562b920657",
+  "registry_sha256": "186313d1fdb4a95bad97ff50de553ce48d6cfcd8f6707b246a1b93a6fdbdc417",
+  "registry": {
+    "path": ".harness/sessions/registry.json",
+    "sha256": "186313d1fdb4a95bad97ff50de553ce48d6cfcd8f6707b246a1b93a6fdbdc417"
+  },
+  "implementer_session_id": null,
+  "reviewer_session_id": null,
+  "tester_session_id": null,
+  "integrator_session_id": null,
+  "review": {
+    "path": "evidence/P1-TOOL-BRANCH01/review.json",
+    "sha256": null
+  },
+  "test": {
+    "path": "evidence/P1-TOOL-BRANCH01/independent-test.json",
+    "sha256": null
+  },
+  "session_roles": {
+    "path": "evidence/P1-TOOL-BRANCH01/session-roles.json",
+    "sha256": null
+  },
+  "blocked_reason": "Author-run implementation and self-tests exist. Independent reviewer/tester sessions and an Integrator merge record are intentionally absent pending Orchestrator registration and independent verification."
+}
