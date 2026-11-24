@@ -41,10 +41,11 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - `P0-REM05` fresh retest confirmed D1–D6 closures but found four residuals (D7–D10). Remediation is not accepted.
 - `P0-REM06` fixed D7–D10 with canonical result identity, an Orchestrator registry seed, real PR-derived enforcement evidence and normalized ignored-`dist` detection. Root pytest now passes 67 tests plus 18 subtests.
 - `P0-REM07` final retest confirmed direct D1–D10 closures but found seven implementation-level defect groups (D11–D17) in future tools.
+- `P0-REM03` rejected the bounded-exception proposal because the restrictions were not encoded in authoritative Phase 1 tasks.
 
 ## Active work
 
-Orchestrator proposed bounded exceptions tying D11–D17 to their owning Phase 1 tool tasks. `P0-REM03` Red-Team is verifying only those exception boundaries. `P0-AP01` remains blocked pending that recommendation.
+`P0-REM08` is directly closing D11–D17 in current harness tooling and encoding adversarial gates in the owning Phase 1 tasks. `P0-REM03` attempt 2 and `P0-AP01` remain blocked.
 
 ## Blocked
 
@@ -54,9 +55,9 @@ Orchestrator proposed bounded exceptions tying D11–D17 to their owning Phase 1
 
 ## Next 3 actions
 
-1. `P0-REM03` verifies the bounded exception boundaries for D11–D17.
-2. Orchestrator records the final gate decision; if approved, marks `P0-AP01` done with exceptions.
-3. Dispatch Wave 0/1 foundational tool build tasks; UI feature work waits for its dependent tool gates.
+1. `P0-REM08` directly closes D11–D17 and encodes authoritative Phase 1 gates.
+2. `P0-REM03` attempt 2 verifies closure and recommends the gate decision.
+3. Orchestrator approves `P0-AP01` if clear, then dispatches Wave 0/1 foundational tool builds.
 
 ## Phase 0 exit gate
 

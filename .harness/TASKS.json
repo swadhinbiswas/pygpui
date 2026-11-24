@@ -433,20 +433,43 @@
       ]
     },
     {
-      "id": "P0-REM03",
-      "title": "Red-Team verify remediation and recommend gate decision",
-      "owner_role": "Red-Team-Planner",
+      "id": "P0-REM08",
+      "title": "Directly close D11 through D17 and encode authoritative gates",
+      "owner_role": "Planner",
       "deps": [
         "P0-REM06"
       ],
       "status": "in_progress",
       "attempt_count": 1,
       "acceptance_criteria": [
-        "A different Red-Team session adjudicates D11-D17 and the proposed bounded exceptions",
-        "The report either recommends P0-AP01 approval with enforceable exception gates or rejects the authorization"
+        "D11 through D17 are directly closed in harness tooling and encoded in owning P1 task acceptance criteria",
+        "All independent D11-D17 attacks are rejected and root pytest passes with new regression tests",
+        "evidence/P0-REM08/validation.txt contains exact reproducible output",
+        "P0-AP01 and every Phase 1 task remain blocked at attempt zero"
       ],
       "evidence_links": [
-        ".harness/REVIEWS/phase-0-remediation-red-team.md"
+        ".harness/PLANS/phase-0-remediation-round-4.md",
+        "evidence/P0-REM07/independent-verification.txt",
+        ".harness/REVIEWS/phase-0-remediation-red-team.md",
+        "evidence/P0-REM08/validation.txt"
+      ]
+    },
+    {
+      "id": "P0-REM03",
+      "title": "Red-Team verify remediation and recommend gate decision",
+      "owner_role": "Red-Team-Planner",
+      "deps": [
+        "P0-REM08"
+      ],
+      "status": "blocked",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "A different Red-Team session verifies direct D11-D17 closure and authoritative P1 gates",
+        "The report recommends P0-AP01 approval or identifies exact residual blockers"
+      ],
+      "evidence_links": [
+        ".harness/REVIEWS/phase-0-remediation-red-team.md",
+        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-REM03-1.md"
       ]
     },
     {
