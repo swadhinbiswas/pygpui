@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "task_id": "P1-TOOL-BRANCH01",
+  "record_path": "evidence/P1-TOOL-BRANCH01/review.json",
+  "session_id": "ses_df27261c9ffcukQUulA8P0LN89",
+  "role": "independent-reviewer",
+  "attempt": 1,
+  "implementation_attempt": 2,
+  "decision": "fail",
+  "decision_reason": "The dispatched test matrix and self-tests pass, but independent adversarial probes found four blocking control bypasses: the independent-evidence flag is not enforced, post-review descendant code can be merged, merged-state verification accepts self-asserted offline PR metadata without head/main ancestry, and PR repository identity is not bound to origin. Branch evidence remains implemented and independent_evidence=false.",
+  "branch": "feat/P1-TOOL-BRANCH01-tooling",
+  "base_commit": "15d29b32a066eeab7f4fdcc9b8a02456c4c0434f",
+  "source_commit": "031524fd65d14d5a5818e277ac1bfc28d6e0db5b",
+  "source_tree": "b6d70180cacfcaa8aa76a0e6d2a5aeae94cd7b6e",
+  "artifact_id": "P1-TOOL-BRANCH01-branch",
+  "artifact_sha256": "76d214d68d773084a3fa4e09422c2a19324beff9604d010b830d608aed514503",
+  "registry": {
+    "path": ".harness/sessions/registry.json",
+    "sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498"
+  },
+  "registry_sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498",
+  "session_roles": {
+    "path": "evidence/P1-TOOL-BRANCH01/session-roles.json",
+    "sha256": "71a5fbdb874e552963ef475a7e977b6d0d88b5f8fd34a88b7358f4c3befbba1b"
+  },
+  "independent_test": {
+    "path": "evidence/P1-TOOL-BRANCH01/independent-test.json",
+    "sha256": "7d48be25ea27b6724e954ef042ad50e2a01f25c42d82894162ad0887449b17c5",
+    "session_id": "ses_df27261c9ffdiy0RA5Ko2oSdxl",
+    "decision": "pass"
+  },
+  "pr": {
+    "number": 1,
+    "url": "https://github.com/swadhinbiswas/pygpui/pull/1",
+    "state_at_review": "OPEN",
+    "base_ref": "main",
+    "head_ref": "feat/P1-TOOL-BRANCH01-tooling",
+    "head_oid_at_dispatch": "995c710afc6f57922670eecb3b2bab5e2248cf55",
+    "head_oid_reviewed": "995c710afc6f57922670eecb3b2bab5e2248cf55",
+    "reviewed_head_tree": "4ac797100a74db054ac65c677a4efc0451a96ab3"
+  },
+  "branch_evidence_disposition": {
+    "path": "evidence/P1-TOOL-BRANCH01/branch-evidence.json",
+    "sha256_before": "88be62d31a829780e946bdb9423bad3e689d2242e1d7b05b13faef9968ab76c6",
+    "sha256_after": "88be62d31a829780e946bdb9423bad3e689d2242e1d7b05b13faef9968ab76c6",
+    "state": "implemented",
+    "independent_evidence": false,
+    "review_reference_updated": false,
+    "source_commit_changed": false
+  },
+  "findings": [
+    {
+      "id": "R-01",
+      "severity": "high",
+      "blocking": true,
+      "title": "independently_verified state is accepted while independent_evidence is false",
+      "location": "tools/ci/evidence.py:145-146 and tools/ci/tests/helpers.py:257-275",
+      "expected": "Pre-merge verification must require independent_evidence to be the boolean true in addition to state=independently_verified.",
+      "actual": "verify_premerge checks only state. A complete fixture bundle with independent_evidence=false passed verify_branch(..., independently_verified).",
+      "impact": "The machine-readable independence assertion can remain false while the gate certifies the branch as independently verified.",
+      "reproduction": "reviewer_adversarial.py probe independent_evidence_false; see reviewer-adversarial.txt line 1.",
+      "required_fix": "Require evidence.get('independent_evidence') is True before accepting pre-merge state, and add false, missing, null and non-boolean negative tests.",
+      "evidence": {
+        "script_sha256": "88792de51c9b35fc6bc8b0db4a3c48ecf7225b160163e2748b753d2f893adb05",
+        "log_sha256": "a44e671530d7934c39f8352ede6014c2d3e9970b53018f6d85b5b1c21355a5d5"
+      }
+    },
+    {
+      "id": "R-02",
+      "severity": "critical",
+      "blocking": true,
+      "title": "Unreviewed descendant commits are accepted and can be recorded as merged",
+      "location": "tools/ci/evidence.py:169-173 and tools/ci/record_merge.py:92-96,170-173",
+      "expected": "The commit/tree that reaches main must be the reviewed implementation, or every post-source delta must be restricted to explicitly reviewed canonical evidence paths.",
+      "actual": "After binding source, the probe committed canonical evidence and then an unreviewed fixture.txt code change. verify_premerge, create_merge_record and verify_branch(..., merged) all accepted the descendant head.",
+      "impact": "A feature branch can add or alter implementation after review and still pass the branch and merge gates.",
+      "reproduction": "reviewer_adversarial.py probe unreviewed_descendant_head; see reviewer-adversarial.txt line 3. The current PR's 031524f..995c710 delta is evidence-only, but the reusable control does not enforce that restriction.",
+      "required_fix": "Bind review to the final PR head/tree or enforce a canonical post-source path allowlist with a reviewer-attested delta hash. Reject any post-source implementation change and add a negative merge test.",
+      "evidence": {
+        "script_sha256": "88792de51c9b35fc6bc8b0db4a3c48ecf7225b160163e2748b753d2f893adb05",
+        "log_sha256": "a44e671530d7934c39f8352ede6014c2d3e9970b53018f6d85b5b1c21355a5d5",
+        "current_source_to_head_delta_sha256": "fe15ac9108ae24acf5aec8bd4b673ab935df7a96380d359f3ac36678bda6f7fd"
+      }
+    },
+    {
+      "id": "R-03",
+      "severity": "critical",
+      "blocking": true,
+      "title": "Merged-state gate accepts forged offline PR metadata without head-to-merge or main ancestry",
+      "location": "tools/ci/record_merge.py:142-145,226-341 and tools/ci/evidence.py:289-324",
+      "expected": "Merged state must be backed by authoritative PR metadata, a PR head contained by the merge commit, and a merge commit reachable from main/origin/main.",
+      "actual": "record_id is an unkeyed self-hash. verify_merge_record skips PR metadata unless a caller supplies it, checks only source ancestry, and verify_branch calls it without live metadata. A forged record with an attacker PR URL and a side-branch head not ancestral to the merge passed verify_merge_record and verify_branch(..., merged).",
+      "impact": "A self-consistent local JSON record can certify merged state without a real merge into main.",
+      "reproduction": "reviewer_adversarial.py probe offline_forged_merge_record; reviewer-adversarial.txt line 5 records side_is_ancestor=False.",
+      "required_fix": "Make merged-state verification fetch and validate live canonical GitHub metadata by default, require head_oid to be an ancestor of merge_sha, require merge_sha reachable from main/origin/main, and bind the expected merge SHA. Offline checks must not return a merged PASS.",
+      "evidence": {
+        "script_sha256": "88792de51c9b35fc6bc8b0db4a3c48ecf7225b160163e2748b753d2f893adb05",
+        "log_sha256": "a44e671530d7934c39f8352ede6014c2d3e9970b53018f6d85b5b1c21355a5d5"
+      }
+    },
+    {
+      "id": "R-04",
+      "severity": "high",
+      "blocking": true,
+      "title": "PR repository identity is not bound to the configured production origin",
+      "location": "tools/ci/record_merge.py:37,71-116,119-139",
+      "expected": "A merge record must reference the same GitHub owner/repository as origin; the requested PR must be a canonical URL, not an arbitrary gh selector or option.",
+      "actual": "PR_URL_RE accepts any GitHub owner/repo and _validate_pr_metadata never compares it with origin. With origin set to swadhinbiswas/pygpui, metadata for attacker/pygpui was accepted by create_merge_record.",
+      "impact": "A merge in an unrelated repository can satisfy the production merge-record control.",
+      "reproduction": "reviewer_adversarial.py probe external_repository_pr; reviewer-adversarial.txt line 4.",
+      "required_fix": "Resolve origin to a canonical GitHub owner/repo, require the PR URL to match it, validate the input selector before invoking gh, and add wrong-repository and option-like-input negatives.",
+      "evidence": {
+        "script_sha256": "88792de51c9b35fc6bc8b0db4a3c48ecf7225b160163e2748b753d2f893adb05",
+        "log_sha256": "a44e671530d7934c39f8352ede6014c2d3e9970b53018f6d85b5b1c21355a5d5"
+      }
+    },
+    {
+      "id": "R-05",
+      "severity": "medium",
+      "blocking": false,
+      "title": "Bound review and test records may declare contradictory roles",
+      "location": "tools/ci/evidence.py:78-117,223-255",
+      "expected": "Review and test records must repeat the canonical reviewer/tester role as well as the assigned session ID.",
+      "actual": "A review record with role=implementer and a test record with role=reviewer passed after their hashes were refreshed.",
+      "impact": "Canonical independent evidence can contain contradictory role identity even though the session IDs match the registry.",
+      "reproduction": "reviewer_adversarial.py probe contradictory_record_roles; reviewer-adversarial.txt line 2.",
+      "required_fix": "Validate normalized record roles against the assigned role and add wrong-role negatives for both records.",
+      "evidence": {
+        "script_sha256": "88792de51c9b35fc6bc8b0db4a3c48ecf7225b160163e2748b753d2f893adb05",
+        "log_sha256": "a44e671530d7934c39f8352ede6014c2d3e9970b53018f6d85b5b1c21355a5d5"
+      }
+    },
+    {
+      "id": "R-06",
+      "severity": "medium",
+      "blocking": false,
+      "title": "Red-main drill never makes the fixture remote main red",
+      "location": "tools/ci/red_main_drill.py:36-78",
+      "expected": "The isolated drill should exercise a red fixture origin/main and its restoration, not only a red local worktree main.",
+      "actual": "The only pushes are the initial green baseline and final restored green. red_main_sha is never pushed to the fixture remote.",
+      "impact": "The drill proves local control flow and production isolation but not remote red-main detection or recovery.",
+      "reproduction": "reviewer_adversarial.py probe red_main_fixture_remote_never_red; reviewer-adversarial.txt line 6 shows push_count=2 (baseline plus final green).",
+      "required_fix": "Push the simulated red merge to the fixture remote, assert fixture origin/main equals red_main_sha and fails the gate, then restore and archive both remote states.",
+      "evidence": {
+        "script_sha256": "88792de51c9b35fc6bc8b0db4a3c48ecf7225b160163e2748b753d2f893adb05",
+        "log_sha256": "a44e671530d7934c39f8352ede6014c2d3e9970b53018f6d85b5b1c21355a5d5"
+      }
+    },
+    {
+      "id": "R-07",
+      "severity": "low",
+      "blocking": false,
+      "title": "An existing empty fixture directory raises an unhandled FileExistsError",
+      "location": "tools/ci/fixture_git.py:15-27,63-66",
+      "expected": "The documented absent-or-empty fixture contract should accept an existing empty directory or reject it with GateError and a stable CLI exit.",
+      "actual": "validate_fixture accepts an empty directory, then initialize_fixture calls mkdir without exist_ok and raises FileExistsError.",
+      "impact": "A valid documented input produces a traceback and exit 1 instead of a controlled result.",
+      "reproduction": "reviewer_adversarial.py probe existing_empty_fixture; reviewer-adversarial.txt line 7.",
+      "required_fix": "Create the directory with exist_ok=True after validation, or reject existing directories explicitly with GateError; add a CLI regression test.",
+      "evidence": {
+        "script_sha256": "88792de51c9b35fc6bc8b0db4a3c48ecf7225b160163e2748b753d2f893adb05",
+        "log_sha256": "a44e671530d7934c39f8352ede6014c2d3e9970b53018f6d85b5b1c21355a5d5"
+      }
+    },
+    {
+      "id": "R-08",
+      "severity": "low",
+      "blocking": false,
+      "title": "Canonical README contains stale evidence and count statements",
+      "location": "evidence/P1-TOOL-BRANCH01/README.md:27,102-105,208-218,231-246",
+      "expected": "Canonical evidence documentation should match the committed attempt-2 records and current production-main observations.",
+      "actual": "The README says independent-test.json is absent although it is committed, says review/test/merge records are absent although the test record exists, reports an impossible collected-76/95-passed pair, and cites stale production-main hashes.",
+      "impact": "Integrators and future reviewers can be misled about which evidence exists and what was observed.",
+      "reproduction": "Compare the cited README lines with independent-test.json and the reviewer identity logs.",
+      "required_fix": "Refresh the README from canonical JSON and logs without rewriting preserved attempt-1 evidence.",
+      "evidence": {
+        "independent_test_sha256": "7d48be25ea27b6724e954ef042ad50e2a01f25c42d82894162ad0887449b17c5",
+        "identity_before_sha256": "cae6a447c70ee77b9cb925742f9086c9b1f9c6a17855fa8235a03504dfd9ecc5",
+        "identity_after_sha256": "33fa5121614f6f4b9e06d5c23cc2ba981558c715c8cca63a13194ddbf59e4220"
+      }
+    }
+  ],
+  "verification": {
+    "focused_pytest": {
+      "command": "python3 -m pytest tools/ci/tests",
+      "exit_code": 0,
+      "result": "95 passed in 4.69s",
+      "log_sha256": "bb6fed5668677dc64ded2ca9782a395da74999fe68e12e6aa6605111422307c0"
+    },
+    "full_local_gate": {
+      "command": "PYGPUI_RUFF=/tmp/opencode/uv-tools/ruff/bin/ruff python3 tools/ci/run_local_gate.py --mode full",
+      "exit_code": 0,
+      "result": "183 passed, 18 subtests passed; VALIDATION=PASS; LOCAL_GATE=PASS",
+      "log_sha256": "d27365379cc28734a173d938007633ed4733baa1bdabd0399a601e8cc9405251"
+    },
+    "self_tests": {
+      "exit_code": 0,
+      "passed": [
+        "SESSION_SEED_VERIFY=PASS",
+        "SESSION_SEED_SELF_TEST=PASS",
+        "BRANCH_GATE_SELF_TEST=PASS",
+        "RECORD_MERGE_SELF_TEST=PASS",
+        "REGISTER_ROLES_SELF_TEST=PASS",
+        "SESSION_ROLES_SELF_TEST=PASS",
+        "RED_MAIN_DRILL_SELF_TEST=PASS",
+        "ROLLBACK_DRILL_SELF_TEST=PASS",
+        "TAG_POINT_SELF_TEST=PASS",
+        "LOCAL_GATE_SELF_TEST=PASS"
+      ]
+    },
+    "tester_adversarial_replay": {
+      "exit_code": 0,
+      "result": "T-01 through T-05 PASS",
+      "log_sha256": "d019c10a0d113945dd1f5ffca84c3b3260e307b6eddc38dca9914af271194650"
+    },
+    "reviewer_adversarial": {
+      "exit_code": 0,
+      "accepted_control_bypasses": [
+        "independent_evidence_false",
+        "contradictory_record_roles",
+        "unreviewed_descendant_head",
+        "external_repository_pr",
+        "offline_forged_merge_record"
+      ],
+      "additional_observation": "red_main_fixture_remote_never_red",
+      "controlled_error_observation": "existing_empty_fixture raised FileExistsError",
+      "script_sha256": "88792de51c9b35fc6bc8b0db4a3c48ecf7225b160163e2748b753d2f893adb05",
+      "log_sha256": "a44e671530d7934c39f8352ede6014c2d3e9970b53018f6d85b5b1c21355a5d5"
+    },
+    "fresh_red_main_drill": {
+      "exit_code": 0,
+      "result": "RED_MAIN_DRILL=PASS production_unchanged=true",
+      "log_sha256": "66035ca9ccf4138ac973c5e807dd5173b21dbd9dda7e0b65a6ce6793180544ff",
+      "archive_sha256": "39986e91e24ef65426ee1ee81163670a080ae50e34d7b423f3b03ec36a2c0c11"
+    },
+    "fresh_rollback_drill": {
+      "exit_code": 0,
+      "result": "ROLLBACK_DRILL=PASS production_unchanged=true",
+      "log_sha256": "66522bf07aa7a82452f1acb653a48eefc263a39b5da2c8c05a87b659cc62ebfd",
+      "archive_sha256": "2940d274fe1150752785718858cd77918a994ccae9816d70dd3d6dd02a236ddc"
+    },
+    "missing_ruff": {
+      "exit_code": 69,
+      "result": "LOCAL_GATE_REJECT code=dependency",
+      "log_sha256": "9f4c14e93a0b8effa166999a88a64d0a542cc08de7ea49061053bbb402a944f0"
+    },
+    "diff_check": {
+      "exit_code": 0,
+      "result": "no output",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "production_main": {
+      "remote_before": "c2c6c5fecd3f8f8b55e5d0aa36fab9024f20acc1",
+      "remote_after": "c2c6c5fecd3f8f8b55e5d0aa36fab9024f20acc1",
+      "unchanged": true,
+      "identity_before_sha256": "cae6a447c70ee77b9cb925742f9086c9b1f9c6a17855fa8235a03504dfd9ecc5",
+      "identity_after_sha256": "33fa5121614f6f4b9e06d5c23cc2ba981558c715c8cca63a13194ddbf59e4220"
+    }
+  },
+  "evidence_hashes": {
+    "index_path": "/tmp/opencode/P1-TOOL-BRANCH01-review-ses_df27261c9ffcukQUulA8P0LN89/evidence-sha256.txt",
+    "index_sha256": "8a740460200b7da3739d5c06fb43c69d01699ccd09001133fc0fe48926747800",
+    "orchestrator_handoff_sha256": "228552e0a8bcbd620af79835d0a8adc3a3d938fe06d519780ee39ce28bc42205",
+    "tester_handoff_sha256": "7ac1edc9ff12f2d0315608a4cd2eda24fff54ccc3e6f0da872a41be3b1f11df1",
+    "full_pr_diff_sha256": "0290107c0114a9e4cb1c1087147c53d2b2d5935e9d364c8b60ee43c846b9b38d",
+    "pr_identity_log_sha256": "7e41d46efad20eff8369cbc40f519ad653a60c61f8b4ab658b08525440082e1d",
+    "attempt_1_independent_test_sha256": "cd60953cac91f9b667d6e58704241b457dc05226f72cb31b5e531fdbec03a3a4"
+  },
+  "scope_reviewed": [
+    "fail-closed state and independent-evidence semantics",
+    "canonical JSON, path containment and duplicate-key handling",
+    "subprocess argument construction and dependency errors",
+    "registry approval, task-bound roles and session separation",
+    "source commit/tree/artifact and branch ancestry",
+    "PR/merge identity, live metadata use and merge ancestry",
+    "fixture path isolation and production-ref snapshots",
+    "red-main and revert/revert-of-revert/restore semantics",
+    "error handling, atomic writes and append-only behavior",
+    "test mutation coverage, negative cases and documentation consistency"
+  ],
+  "limitations": [
+    "Review and execution used one Linux runner; no second clean runner or independent static-analysis service was available.",
+    "The wrong-repository PR path was exercised with deterministic local metadata rather than by creating an external GitHub repository.",
+    "GitHub reported mergeability UNKNOWN at dispatch; no merge was attempted or certified.",
+    "Current PR source-to-head changes were inspected and are evidence-only; R-02 concerns the reusable gate's acceptance of future post-review implementation changes."
+  ],
+  "scope_statement": "No implementation, independent-test.json, merge.json, TASKS.json, STATE.md, ADR, main, or UI file was edited. branch-evidence.json remains byte-for-byte unchanged at state=implemented and independent_evidence=false. This review does not authorize merge."
+}
