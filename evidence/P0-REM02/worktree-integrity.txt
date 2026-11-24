@@ -1,0 +1,4 @@
+7240d9be5d8959e199cfdd2a5fafa82f967860e6
+ M .harness/LOG.md
+?? evidence/P0-REM02/
+.harness/LOG.md

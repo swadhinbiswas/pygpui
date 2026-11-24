@@ -1,0 +1,406 @@
+P0-REM02 independent verification — attempt 1
+Date: 2026-11-24
+Reviewer: Test-Engineer (independent session)
+Remediation baseline: 7240d9be5d8959e199cfdd2a5fafa82f967860e6
+Accepted ADR baseline: 5ce026d
+Verdict: PARTIAL
+Unresolved remediation defects: 6 (D1–D6)
+P0-AP01: remains blocked at attempt zero
+
+Scope and limitations
+---------------------
+I independently read the assigned State, handoffs, targeted remediation plan,
+Red-Team attempt-3 review, Phase 1 plan, TASKS.json, gate schema, graph validator,
+existing validator tests, pytest.ini and P0-REM01 evidence. I reran the committed
+validators and root test discovery, then added a separate adversarial test file
+and a static semantic audit under evidence/P0-REM02/.
+
+No future gate/session/artifact/runtime tool exists. This is a plan-level
+executability verification, not runtime certification. I did not edit the plan,
+TASKS.json, schema, graph validator, existing tests, ADRs, research, reviews,
+STATE.md, PROCESS.md or feature code. I did not fix defects or commit.
+
+Summary
+-------
+The committed structural validator, Planner handoff validator, bare root pytest,
+python3 -m pytest and explicit hidden-suite pytest all pass. The graph has 82
+tasks, 65 Phase 1 tasks, 316 dependency edges, 52 full gates, 26 sub-gates and 13
+staged full gates. All 36 workflow=build tasks complete at merged, and the named
+RUSTCONTRACT01/CONREV01, INT01, MSRV, REL02, readiness and root-pytest remediations
+are present.
+
+Independent semantic attacks found six unresolved defects. The most serious is
+the gate-result file lifecycle: the schema accepts one object, but 16 tasks put
+multiple gate/sub-gate results in one file; eight staged aggregators read and
+write that same file, and PR-AUDIT01 writes two different full gates to one file.
+The other findings concern unmerged code-producing control tasks, missing
+per-PR enforcement evidence in AR09-G1/AR10-G3, license consumers auditing an
+unpopulated ignored directory, incomplete ignored-artifact detection, and
+unbound user-approval evidence.
+
+Exact commands and output
+-------------------------
+
+1. Environment and tracked-worktree integrity
+
+Command:
+  git rev-parse HEAD; git status --short; git diff --name-only; git diff --check
+
+Output:
+7240d9be5d8959e199cfdd2a5fafa82f967860e6
+ M .harness/LOG.md
+?? evidence/P0-REM02/
+.harness/LOG.md
+
+The only tracked modification at this point was the required append to LOG.md.
+All P0-REM02 artifacts are untracked evidence files. No commit was made.
+
+2. Graph validator with self-tests
+
+Command:
+  python3 .harness/scripts/validate_phase1_graph.py --baseline 5ce026d --history-baseline b9a8504 --self-test
+
+Output:
+Python 3.14.10
+7240d9be5d8959e199cfdd2a5fafa82f967860e6
+ M .harness/LOG.md
+?? evidence/P0-REM02/
+JSON_PARSE=PASS
+UNIQUE_IDS=PASS total=82 unique=82
+DEPS_RESOLVE=PASS checked=316
+CYCLES=PASS count=0
+TOPOLOGICAL_ORDER=PASS pass
+PHASE1_FIELDS=PASS tasks=65
+PHASE1_INITIAL_STATE=PASS blocked/attempt0/max4
+PHASE1_AP01_GATE=PASS checked=65
+PLAN_TASK_ORDER=PASS plan=65 json=65
+PLAN_JSON_METADATA=PASS checked=65
+ADR_GATE_COVERAGE=PASS adr=52 plan=52 aggregators=52
+ADR_GATE_MAPPINGS=PASS total=52
+STAGED_GATE_CLOSURE=PASS sub_gates=26
+GATE_RUNTIME=PASS schema+aggregate+independent-approval
+ATOMIC_GATE_EVIDENCE=PASS repository+MSRV+notice
+PHASE0_HISTORY=PASS compared=13
+COMMAND_PRODUCERS=PASS criteria=332
+REVIEW_MERGE_STATES=PASS merged-deps+premerge+session
+ARTIFACT_HANDOFF=PASS draft-release/fetch/verify
+CRATE_TAG_READINESS=PASS semantic
+PYTEST_ENTRYPOINT=PASS root pytest.ini
+SCOPE_NORMALIZATION=PASS normalized
+REMOTE_WORKFLOW=PASS stale=0
+SELF_TEST_PASS duplicate-id
+SELF_TEST_PASS missing-dependency
+SELF_TEST_PASS cycle
+SELF_TEST_PASS phase1-active
+SELF_TEST_PASS missing-gate
+SELF_TEST_PASS unowned-command
+SELF_TEST_PASS scope-mismatch
+SELF_TEST_PASS missing-review-evidence
+SELF_TEST_PASS stale-remote
+SELF_TEST_PASS plan-json-mismatch
+SELF_TEST_PASS title-mismatch
+SELF_TEST_PASS gate-mapping-mismatch
+SELF_TEST_PASS baseline-done-mutation
+SELF_TEST_PASS duplicate-producer
+SELF_TEST_PASS producer-outside-scope
+SELF_TEST_PASS deadlock-ar03-g5-ambiguity
+SELF_TEST_PASS deadlock-ar02-g1-proto-scene
+SELF_TEST_PASS deadlock-ar02-g1-proto-tst
+SELF_TEST_PASS deadlock-ar03-g1-api-tst
+SELF_TEST_PASS deadlock-ar07-g3-api-tst
+SELF_TEST_PASS deadlock-ar08-g1-bench00
+SELF_TEST_PASS deadlock-ar05-g2-render-plat01
+SELF_TEST_PASS deadlock-ar05-g2-render-plat02
+SELF_TEST_PASS deadlock-ar01-g1-platform-plat02
+SELF_TEST_PASS deadlock-ar02-g2-slice-plat02
+SELF_TEST_PASS deadlock-ar05-g2-plat01-plat02
+SELF_TEST_PASS deadlock-ar10-g1-rel-license
+SELF_TEST_PASS deadlock-ar07-g4-plat-wheel
+SELF_TEST_PASS deadlock-ar07-g4-plat-rel02
+SELF_TEST_PASS deadlock-ar07-g4-wheel-rel02
+SELF_TEST_PASS ar03-g5-forbidden-internal-contract
+SELF_TEST_PASS ignored-artifact-handoff
+SELF_TEST_PASS premerge-merged-state
+SELF_TEST_PASS proof-self-certification
+SELF_TEST_PASS illegal-core-test-dependency
+SELF_TEST_PASS post-contract-tag-timing
+SELF_TEST_PASS missing-native-lane-readiness
+SELF_TEST_PASS conflated-claim-readiness
+SELF_TEST_PASS missing-schema-validation
+SELF_TEST_PASS missing-aggregate-invocation
+SELF_TEST_PASS readiness-approval-self-certification
+SELF_TEST_PASS build-premerge-completion
+SELF_TEST_PASS rustcontract-missing-session-check
+SELF_TEST_PASS conrev-missing-branch-check
+SELF_TEST_PASS int01-missing-merge-record
+SELF_TEST_PASS repository-gate-missing-lic01
+SELF_TEST_PASS msrv-audit-missing
+SELF_TEST_PASS lic02-ignored-artifact
+SELF_TEST_PASS rel02-wayland-dependency
+SELF_TEST_PASS owner-notice-missing
+VALIDATION=PASS
+EXIT_CODE=0
+
+3. Planner handoff validator with explicit metadata
+
+Command:
+  python3 .harness/scripts/validate_handoff.py .harness/HANDOFFS/planner-to-test-engineer-P0-REM01-1.md --task-id P0-REM01 --to Test-Engineer --attempt 1
+
+Output:
+HANDOFF_FIELDS=PASS fields=13/13 files=7
+EXIT_CODE=0
+
+4. Bare root pytest
+
+Command:
+  pytest -q
+
+Output:
+.........................................                 [100%]
+41 passed, 15 subtests passed in 3.54s
+EXIT_CODE=0
+
+5. Root pytest via Python
+
+Command:
+  python3 -m pytest -q
+
+Output:
+.........................................                 [100%]
+41 passed, 15 subtests passed in 2.93s
+EXIT_CODE=0
+
+6. Explicit committed suite
+
+Command:
+  python3 -m pytest -q .harness/scripts/tests
+
+Output:
+.........................................                 [100%]
+41 passed, 15 subtests passed in 2.57s
+EXIT_CODE=0
+
+7. Independent static semantic audit
+
+Command:
+  python3 evidence/P0-REM02/semantic_audit.py
+
+Output:
+TASKS=82 PHASE1=65 EDGES=316
+GATES=52 SUB_GATES=26 STAGED_FULL_GATES=13
+STAGED_AGGREGATOR_AUDIT
+AR01-G1 owner=P1-PLAT02 schema=True exact_inputs=True self_overwrite=True output=evidence/P1-PLAT02/gate-results.json
+AR02-G1 owner=P1-TST01 schema=True exact_inputs=True self_overwrite=True output=evidence/P1-TST01/gate-results.json
+AR02-G2 owner=P1-PLAT02 schema=True exact_inputs=True self_overwrite=True output=evidence/P1-PLAT02/gate-results.json
+AR03-G1 owner=P1-TST01 schema=True exact_inputs=True self_overwrite=True output=evidence/P1-TST01/gate-results.json
+AR05-G2 owner=P1-PLAT02 schema=True exact_inputs=True self_overwrite=True output=evidence/P1-PLAT02/gate-results.json
+AR07-G3 owner=P1-TST01 schema=True exact_inputs=True self_overwrite=True output=evidence/P1-TST01/gate-results.json
+AR07-G4 owner=P1-REL02 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-REL02/gate-results.json
+AR08-G1 owner=P1-BENCH01 schema=True exact_inputs=True self_overwrite=True output=evidence/P1-BENCH01/gate-results.json
+AR08-G6 owner=P1-CERT-GATE01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-CERT-GATE01/gate-results.json
+AR09-G1 owner=P1-PR-AUDIT01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PR-AUDIT01/gate-results.json
+AR09-G4 owner=P1-WAYLAND-GATE01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-WAYLAND-GATE01/gate-results.json
+AR10-G1 owner=P1-LICENSE-CLOSE01 schema=True exact_inputs=True self_overwrite=True output=evidence/P1-LICENSE-CLOSE01/gate-results.json
+AR10-G3 owner=P1-PR-AUDIT01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PR-AUDIT01/gate-results.json
+SELF_OVERWRITE_GATES=8 AR01-G1,AR02-G1,AR02-G2,AR03-G1,AR05-G2,AR07-G3,AR08-G1,AR10-G1
+MULTI_RESULT_SINGLE_FILE_TASKS=16 P1-ARCH01,P1-LIC01,P1-PR-AUDIT01,P1-API01,P1-CORE02,P1-SCENE01,P1-TST01,P1-REV01,P1-PERF01,P1-BENCH01,P1-REL01,P1-PLAT02,P1-LIC02,P1-PERF02,P1-LICENSE-CLOSE01,P1-REL02
+SCHEMA_RESULT_TYPE=object
+BUILD_TASKS=36 MERGED_COMPLETION=36
+BUILD_DIRECT_IMPLEMENTATION_DEPS=0
+P1-RUSTCONTRACT01_BRANCH_CHECK=True SESSION_CHECK=True MERGED=True
+P1-CONREV01_BRANCH_CHECK=True SESSION_CHECK=True MERGED=True
+INT01_PREMERGE=True RECORD=True VERIFY=True
+AR09-G1_INPUTS=evidence/P1-LIC01/gate-results.json REQUIRED=AR09-G1.repository-evidence
+AR10-G3_INPUTS=evidence/P1-LIC01/gate-results.json REQUIRED=AR10-G3.repository-evidence
+AR04_G6_MSRV_AUDIT=True
+P1-LIC02_DIST_AUDIT_INDEX=0 FETCH_INDEX=5 FETCH_DIR=evidence/P1-LIC02/downloads
+P1-LICENSE-CLOSE01_DIST_AUDIT_INDEX=1 FETCH_INDEX=4 FETCH_DIR=evidence/P1-LICENSE-CLOSE01/downloads
+REL02_REACHES_WAYLAND=False REL02_REACHES_CLAIM_READY=False
+READINESS_RENAMED=True OWNER_NOTICE_DEP=True
+PYTEST_TESTPATHS=True
+P0_AP01=blocked/attempt0
+FORGED_APPROVER_SCHEMA_VALID=True
+P1-READY-CERT01_REACHES_LOCK_PRODUCER=False HAS_LOCK_COMMAND=False
+P1-READY-CLAIM01_REACHES_LOCK_PRODUCER=False HAS_LOCK_COMMAND=False
+VALIDATOR_ACCEPTS_DIST_WILDCARD_BYPASS=True
+VALIDATOR_ACCEPTS_NO_ENFORCEMENT_COMMAND=True
+DEFECT D1: single-object gate-results paths are reused by multiple results; eight aggregators overwrite an input and PR-AUDIT01 overwrites its first full-gate output with its second.
+DEFECT D2: P1-SESSION-REGISTRY01 and P1-GATE-SCHEMA01 produce code but complete recorded with no independent review or merge record.
+DEFECT D3: AR09-G1/AR10-G3 aggregate only LIC01 repository evidence; per-PR enforcement is not staged evidence and can be removed without validator rejection.
+DEFECT D4: LIC02/LICENSE-CLOSE01 audit dist/release before fetching, and fetch into evidence downloads rather than the audited dist/release path.
+DEFECT D5: ignored-artifact detection matches only literal dist/release/** and dist/local/**; dist/release/*.whl bypasses it.
+DEFECT D6: approval records accept an unbound approver ID and require a lockfile hash although neither approval task reaches the Cargo.lock producer or hashes it.
+UNRESOLVED_REMEDIATION_DEFECTS=6
+EXIT_CODE=0
+
+8. Independent falsification/semantic tests
+
+Command:
+  python3 -m pytest -q evidence/P0-REM02/test_p0_rem02_semantics.py
+
+Output:
+............................                                 [100%]
+28 passed in 0.31s
+EXIT_CODE=0
+
+Important: the TestDefectReproductionTests cases pass because they reproduce the
+unsafe conditions. TestValidatorBlindSpotTests cases pass because the committed
+validator accepts the invalid in-memory mutations. These are not assertions that
+the defects are safe or closed.
+
+Closure matrix
+--------------
+RT3-B01 — PARTIAL. All 13 staged full gates have a schema-validation command and
+an aggregate command whose input set matches gate_model. Approval sub-gates are
+independent verification tasks and syntactically valid user-approval fixtures
+pass the schema. However D1 (same-file/multi-result lifecycle) and D6 (unbound
+approver and unavailable lockfile binding) remain.
+
+RT3-B02 — PARTIAL. All 36 workflow=build tasks complete at merged after
+pre-merge verification; no build task directly depends on an implementation-state
+producer. RUSTCONTRACT01/CONREV01 have branch_gate and verify_roles commands.
+INT01 verifies SLICE01 pre-merge state and has record_merge/verify commands.
+However D2 remains: two code-producing control tasks complete recorded without a
+merge record.
+
+RT3-B03 — PARTIAL. AR09-G1/AR10-G3 depend on LIC01 and include repository-evidence
+sub-gates. AR04-G6 has an executable audit_msrv_claim.py command. D3 remains:
+per-PR enforcement is not staged or aggregated evidence for AR09-G1/AR10-G3.
+
+RT3-B04 — PARTIAL. LIC02/LICENSE-CLOSE01 declare the durable producer/store and
+contain gh release download plus store.py verify. D4 and D5 remain: the audits
+run before fetch against a different, unpopulated ignored path, and the validator
+misses alternate ignored-dist spellings.
+
+RT3-B05 — CLOSED for the targeted dependency issue. REL02 cannot reach
+P1-WAYLAND-GATE01 or P1-READY-CLAIM01; no signing/publication command is planned.
+
+RT3-N01 — ADDRESSED. Readiness IDs/titles match proof/build scope, and
+P1-OWNER-NOTICE01 explicitly produces the validated notice consumed by
+LICENSE-CLOSE01. Runtime owner approval remains future work.
+
+RT3-N02 — CLOSED. Root pytest.ini discovers the hidden committed suite; both
+pytest -q and python3 -m pytest -q pass 41 tests plus 15 subtests.
+
+Defect list
+-----------
+D1 — BLOCKING, RT3-B01 residual: gate-result paths cannot represent the planned
+results and staged aggregation overwrites evidence.
+References: .harness/schemas/gate-results.schema.json:5-24; TASKS.json gate_evidence
+and aggregate commands for P1-TST01, P1-PLAT02, P1-BENCH01, P1-LICENSE-CLOSE01 and
+P1-PR-AUDIT01; validate_phase1_graph.py:235-242.
+Evidence: schema type is object with one gate_id. Sixteen tasks have more than
+one full gate/sub-gate but one gate_evidence file. Eight aggregate commands list
+their output among their inputs. P1-PR-AUDIT01 writes AR09-G1 and AR10-G3 to the
+same output. All 13 schema validations precede aggregation; CERT-GATE01 and
+WAYLAND-GATE01 have no earlier command producing the validated file.
+Impact: sequential execution either destroys a required sub-gate/full-gate record
+or cannot encode multiple schema-valid results, so the staged model is not
+runtime-executable as written.
+Falsification: test_reproduces_eight_staged_aggregators_reading_and_writing_the_same_file;
+test_reproduces_multiple_gate_results_sharing_one_schema_object_file;
+test_reproduces_pr_audit_two_aggregates_writing_one_output;
+test_reproduces_schema_validation_before_aggregate_output_exists;
+test_validator_accepts_aggregate_self_overwrite.
+
+D2 — BLOCKING, RT3-B02 residual: foundational code producers are unmerged control
+tasks.
+References: TASKS.json P1-SESSION-REGISTRY01 and P1-GATE-SCHEMA01;
+validate_phase1_graph.py:226-228.
+Evidence: both produce tools/ code (and the gate schema) but have workflow=control,
+completion_state=recorded, no merge_task and no postmerge_command. Build consumers
+depend on them. The validator explicitly accepts recorded control completion.
+Impact: a dispatcher can treat locally recorded, unreviewed tool/schema code as a
+satisfied dependency and branch from main without that code being merged.
+Falsification: test_reproduces_unmerged_control_tasks_producing_code;
+test_validator_accepts_control_code_producer_without_merge.
+
+D3 — BLOCKING, RT3-B03 residual: AR09-G1/AR10-G3 do not aggregate per-PR
+enforcement evidence.
+References: TASKS.json P1-PR-AUDIT01 acceptance_criteria and gate_model entries for
+AR09-G1/AR10-G3; phase-0-targeted-remediation.md:25; Phase 1 plan lines 302/309.
+Evidence: each gate requires only <gate>.repository-evidence, and each aggregate
+input list contains only evidence/P1-LIC01/gate-results.json. The only enforcement
+command is pr_audit_gate.py --self-test. Removing both policy-test and
+pr_audit_gate.py commands still validates.
+Impact: the full gates can pass without staged evidence that per-PR provenance and
+authored-scope enforcement actually ran.
+Falsification: test_reproduces_repository_gates_without_enforcement_evidence;
+test_validator_accepts_repository_gate_without_any_enforcement_command.
+
+D4 — BLOCKING, RT3-B04 residual: durable license consumers still audit an
+unpopulated ignored directory.
+References: TASKS.json P1-LIC02 acceptance_criteria:3698-3704 and
+P1-LICENSE-CLOSE01 acceptance_criteria:3894-3898; .gitignore:9.
+Evidence: LIC02 audits dist/release/** at criterion index 0, then fetches at index
+5 into evidence/P1-LIC02/downloads. LICENSE-CLOSE01 audits at index 1, then fetches
+at index 4 into evidence/P1-LICENSE-CLOSE01/downloads. No command copies or audits
+the downloaded files, and no later command repopulates dist/release.
+Impact: in the declared fresh-worktree model, both tasks fail before the durable
+fetch/verify can help.
+Falsification: test_reproduces_license_audits_before_fetch_and_against_unpopulated_dist.
+
+D5 — BLOCKING, RT3-B04 residual: ignored-artifact consumer detection is not
+complete.
+References: validate_phase1_graph.py:388-391.
+Evidence: detection only tests literal "dist/release/**" or "dist/local/**".
+An in-memory LIC02 mutation using dist/release/*.whl, with consumes_artifacts and
+fetch/verify removed, validates with no errors.
+Impact: alternate glob/path spellings can reintroduce the original fresh-worktree
+failure while the validator reports ARTIFACT_HANDOFF=PASS.
+Falsification: test_validator_accepts_ignored_dist_consumer_with_wildcard_spelling.
+
+D6 — BLOCKING, RT3-B01 residual: user-approval evidence is not bound to a real
+approval session or available lockfile.
+References: gate-results.schema.json:44-62; TASKS.json P1-READY-CERT01 and
+P1-READY-CLAIM01 acceptance_criteria/deps.
+Evidence: a record with approver_session_id="forged-approver" is schema-valid.
+Only validate_result.py reads the approval gate-results file; verify_proof.py
+receives review/test evidence, not the gate result or approver ID. Neither approval
+task reaches P1-ARCH01 (the Cargo.lock producer), neither hashes Cargo.lock, and no
+Cargo.lock exists at the remediation baseline, although lockfile_sha256 is
+required.
+Impact: planned commands can accept invented approver/lockfile values, so schema
+validity does not establish authenticated, current approval evidence.
+Falsification: test_reproduces_approver_session_not_bound_to_approval_artifact_or_registry;
+test_reproduces_approval_tasks_without_a_real_lockfile_producer.
+
+Positive independent findings
+-----------------------------
+- All 52 ADR gates retain one final aggregator; all 26 sub-gates retain one producer.
+- All 13 staged aggregate commands include the exact gate_model input evidence and
+  a schema invocation, subject to D1's file-lifecycle defect.
+- All 36 build tasks complete at merged with independently_verified pre-merge
+  branch/session checks and no circular --state merged acceptance.
+- RUSTCONTRACT01 and CONREV01 both have explicit branch and session verification.
+- INT01 has explicit SLICE01 pre-merge verification, record_merge production and
+  record_merge verification commands.
+- AR09-G1/AR10-G3 include LIC01 repository evidence, subject to D3.
+- AR04-G6 invokes tools/release/audit_msrv_claim.py.
+- LIC02/LICENSE-CLOSE01 declare durable producer/store dependencies and fetch/verify
+  commands, subject to D4.
+- REL02 does not reach Wayland/claim-readiness dependencies.
+- Readiness names match scope and owner-notice production is explicit.
+- Bare root pytest discovers and passes the committed suite.
+- P0-AP01 and every Phase 1 task remain blocked at attempt zero.
+
+9. Final handoff and integrity checks
+
+The independent handoff field check (all 13 Part 3 fields, seven receiver files,
+STATUS exactly partial, next step directed to Red-Team-Planner) returned:
+HANDOFF_PART3=PASS fields=13/13 files=7 status=partial
+
+Command:
+  git rev-parse HEAD; git status --short; git diff --name-only; git diff --check
+
+Output:
+7240d9be5d8959e199cfdd2a5fafa82f967860e6
+ M .harness/LOG.md
+?? .harness/HANDOFFS/test-engineer-to-red-team-P0-REM02-1.md
+?? evidence/P0-REM02/
+.harness/LOG.md
+
+Final disposition
+-----------------
+STATUS: partial. Six unresolved remediation defects remain. P0-AP01 must remain
+blocked. No defect was fixed and no feature code was started.

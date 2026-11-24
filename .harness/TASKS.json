@@ -323,7 +323,7 @@
       "deps": [
         "P0-REM01"
       ],
-      "status": "in_progress",
+      "status": "blocked",
       "attempt_count": 1,
       "acceptance_criteria": [
         "A different session reruns the graph validator, handoff validator and full explicit pytest suite with exact archived output",
@@ -331,7 +331,47 @@
         "The independent report finds zero unresolved remediation defects"
       ],
       "evidence_links": [
-        "evidence/P0-REM02/independent-verification.txt"
+        "evidence/P0-REM02/independent-verification.txt",
+        ".harness/HANDOFFS/test-engineer-to-red-team-P0-REM02-1.md"
+      ]
+    },
+    {
+      "id": "P0-REM04",
+      "title": "Fix independent remediation defects D1 through D6",
+      "owner_role": "Planner",
+      "deps": [
+        "P0-REM01"
+      ],
+      "status": "in_progress",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "D1 through D6 have exact schema, task, command, path and validator closure",
+        "All independent defect reproductions fail against the revised graph/schema/validator",
+        "Existing tests plus new committed regression tests pass from bare root pytest",
+        "evidence/P0-REM04/validation.txt contains exact reproducible output",
+        "P0-AP01 and every Phase 1 task remain blocked at attempt zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-0-remediation-round-2.md",
+        "evidence/P0-REM02/independent-verification.txt",
+        "evidence/P0-REM04/validation.txt"
+      ]
+    },
+    {
+      "id": "P0-REM05",
+      "title": "Independently retest remediation round 2",
+      "owner_role": "Test-Engineer",
+      "deps": [
+        "P0-REM04"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "acceptance_criteria": [
+        "A different session reruns all validators/tests and reproduces or rejects D1 through D6",
+        "The independent report finds zero unresolved remediation defects"
+      ],
+      "evidence_links": [
+        "evidence/P0-REM05/independent-verification.txt"
       ]
     },
     {
@@ -339,7 +379,7 @@
       "title": "Red-Team verify remediation and recommend gate decision",
       "owner_role": "Red-Team-Planner",
       "deps": [
-        "P0-REM02"
+        "P0-REM05"
       ],
       "status": "blocked",
       "attempt_count": 0,

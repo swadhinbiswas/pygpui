@@ -1,0 +1,5 @@
+7240d9be5d8959e199cfdd2a5fafa82f967860e6
+ M .harness/LOG.md
+?? .harness/HANDOFFS/test-engineer-to-red-team-P0-REM02-1.md
+?? evidence/P0-REM02/
+.harness/LOG.md
