@@ -1,10 +1,11 @@
 # Phase 1 plan — execution-ready Counter slice
 
-- Planner task: `P0-PL01`, attempt 3
+- Planner remediation task: `P0-REM01`, attempt 1
+- Prior Planner task: `P0-PL01`, attempt 3
 - Prepared: 2026-11-24
 - Accepted ADR baseline: `5ce026d`
-- Red-Team blocker baseline: `8ffe8de`
-- Execution state: **final planned revision; `P0-AP01` and every Phase 1 task remain `blocked` at attempt zero**
+- Escalation/remediation baseline: `b9a8504`
+- Execution state: **targeted remediation; `P0-AP01` and every Phase 1 task remain `blocked` at attempt zero**
 - Authoritative graph: `.harness/TASKS.json`
 - Reproducible validators: `.harness/scripts/validate_phase1_graph.py`, `.harness/scripts/validate_handoff.py`
 - Gate schema: `.harness/schemas/gate-results.schema.json`
@@ -40,7 +41,7 @@ Deliver the ADR 0002 Counter window first: Python creates an entity/view; Rust p
 |---|---|
 | RT2-B01 | Added `gate_model`, 26 staged sub-gates, 52 single-owner final aggregators, `.harness/schemas/gate-results.schema.json`, `P1-GATE-SCHEMA01` and semantic validator checks for all 14 deadlocks plus AR03-G5. |
 | RT2-B02 | Added `P1-ARTIFACT-STORE01`; wheels use unique append-only GitHub draft-release tags, authenticated fetch/verify, source-commit/lockfile/toolchain binding and immutable artifact IDs. Ignored `dist/` is never shared state. |
-| RT2-B03 | Build tasks now complete pre-merge at `independently_verified`; Integrator merge records are post-merge. Every proof/verification task requires distinct reviewer/tester evidence checked by the trusted session registry. |
+| RT2-B03 | Build tasks satisfy dependencies at `merged` after pre-merge verification; Integrator merge records are explicit. Every proof/verification task requires distinct reviewer/tester evidence checked by the trusted session registry. |
 | RT2-B04 | Cross-crate contract compile tests moved to `crates/pygpui-contract-tests`; production crates never depend on it and `pygpui-core` has no foreign-crate test dependency. |
 | RT2-B05 | `P1-TAG-CONTRACT01` now runs before `P1-PROTO01` and verifies the tagged tree lacks the protocol contract. |
 | RT2-B06 | Added `P1-NATIVE-READY01`; candidate wheel builds require native Linux/Windows/macOS lanes. |
@@ -49,17 +50,24 @@ Deliver the ADR 0002 Counter window first: Python creates an entity/view; Rust p
 | RT2-N02 | Scopes/producers are normalized; duplicate entries and `produces` outside `write_scope` fail validation. |
 | RT2-N03 | Aggregate estimates and unbounded external waits are stated in §9. |
 | RT2-N04 | Session roles live in an append-only Orchestrator-controlled registry; records are checked rather than merely asserted. Branch protection remains deferred. |
+| RT3-B01 | Every gated task validates `gate-results.json`; every staged aggregator invokes `tools/gates/aggregate.py`; approval sub-gates are independently verified and use `evidence_type: user-approval`. |
+| RT3-B02 | Build tasks now satisfy dependencies only at `merged`; RUSTCONTRACT01/CONREV01 run pre-merge branch/session checks; INT01 records and verifies the actual Counter merge SHA. |
+| RT3-B03 | AR09-G1/AR10-G3 include LIC01 repository-evidence sub-gates; AR04-G6 runs an executable MSRV-claim audit. |
+| RT3-B04 | LIC02/LICENSE-CLOSE01 fetch and verify durable release artifacts; the validator detects every ignored `dist/` consumer. |
+| RT3-B05 | REL02 no longer depends on Wayland/signing/channel claim approvals; those gate only their corresponding claims/publication. |
+| RT3-N01 | Readiness IDs/titles now match proof/build scope; `P1-OWNER-NOTICE01` explicitly produces the owner-notice input. |
+| RT3-N02 | Root `pytest.ini` sets `testpaths = .harness/scripts/tests`, so bare `python3 -m pytest -q` discovers the suite. |
 
 ## 4. Staged gate model
 
 Each full `ARxx-Gn` has exactly one final aggregator in `gate_model`. Producer tasks emit named sub-gates such as `AR02-G1.schema`, `AR05-G2.linux-installed` or `AR07-G4.same-wheel-callbacks`. An aggregator passes only when every required sub-gate passes with current source/artifact hashes.
 
-- `gate-results.json` conforms to `.harness/schemas/gate-results.schema.json`.
+- `gate-results.json` conforms to `.harness/schemas/gate-results.schema.json` and includes `evidence_type`; `user-approval` records also require an approver session.
 - Status is one of `pass`, `fail`, `inconclusive`, `blocked` or `not_measured`.
 - Every result binds source commit, lockfile SHA-256, toolchain and SHA-256 evidence.
 - Reviewer and tester session IDs must differ and exist in `.harness/sessions/registry.json`.
 - Missing, disabled, stale or inconclusive evidence fails closed.
-- AR03-G5 contains only metadata and crate-graph stages; internal-contract tests are deliberately not part of that ADR gate.
+- AR03-G5 is atomic in ARCH01 and excludes internal-contract tests; AR09-G1/AR10-G3 include LIC01 repository evidence.
 
 ## 5. Dependency and branch-state semantics
 
@@ -70,7 +78,7 @@ A dependency is satisfied only when the producer reaches its declared state:
 - `merged`: the Integrator accepted pre-merge evidence, merged the PR and recorded the merge SHA; consumers branch from this `main`.
 - `recorded`: a control/readiness task archived a structured result without a code-merge claim.
 
-Build tasks complete at `independently_verified`. Their acceptance cannot require `--state merged`. After merge, the Integrator runs `tools/ci/record_merge.py` and writes `evidence/<task-id>/merge.json`; dependent branches wait for that record. `P1-SLICE01` is the sole implementation-stage exception, followed by `P1-TST01`, `P1-REV01` and `P1-INT01`.
+Build tasks complete at `merged`. Their acceptance runs only pre-merge `independently_verified` checks and cannot require `--state merged`. After the Integrator records the merge SHA with `tools/ci/record_merge.py`, the task can reach `done`; dependent branches wait for that merged state. `P1-SLICE01` is the sole implementation-stage exception, followed by `P1-TST01`, `P1-REV01` and `P1-INT01`, which records and verifies the actual Counter merge SHA.
 
 ### Trusted single-identity review model
 
@@ -115,16 +123,17 @@ All tasks start at attempt 0, status `blocked` and branch state `not_started`. R
 | `P1-TOOL-BENCH01` | Own benchmark readiness, collector and interpreter diagnostic tools | Perf-Engineer | `P1-GOV01`, `P1-TOOL-BRANCH01` | M / 3–5 |
 | `P1-ARTIFACT-STORE01` | Own immutable draft-release artifact storage, fetch and verification | Release-CI-Engineer | `P1-GOV01`, `P1-TOOL-BRANCH01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
 | `P1-READY-PLATFORM01` | Record physical platform, IME and AT runner readiness | Orchestrator | `P1-GOV01`, `P1-TOOL-PLATFORM01` | S / 1–2 |
-| `P1-READY-BENCH01` | Record benchmark hardware, collector and OQ-02 readiness | Orchestrator | `P1-GOV01`, `P1-TOOL-BENCH01` | S / 1–2 |
-| `P1-READY-RELEASE01` | Record CPython, copyright, Wayland and release-channel readiness | Orchestrator | `P1-GOV01`, `P1-TOOL-RELEASE01` | S / 1–2 |
+| `P1-READY-BENCH-PROOF01` | Record local benchmark proof prerequisites | Orchestrator | `P1-GOV01`, `P1-TOOL-BENCH01` | S / 1–2 |
+| `P1-READY-RELEASE-BUILD01` | Record wheel/sdist build prerequisites | Orchestrator | `P1-GOV01`, `P1-TOOL-RELEASE01` | S / 1–2 |
 | `P1-ARCH01` | Create exact workspace, crate graph, pins and production lock | Integrator | `P1-GOV01`, `P1-TOOL-GRAPH01`, `P1-TOOL-BRANCH01`, `P1-TOOL-AUDIT01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
 | `P1-NATIVE-READY01` | Record native Linux, Windows and macOS wheel-build lane readiness | Orchestrator | `P1-GOV01`, `P1-TOOL-RELEASE01` | S / 1–2 |
-| `P1-READY-CERT01` | Record OQ-02 performance certification approval | Orchestrator | `P1-GOV01`, `P1-TOOL-BENCH01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | S / 1–2 |
-| `P1-READY-CLAIM01` | Record Wayland, signing and publication claim approvals | Orchestrator | `P1-GOV01`, `P1-TOOL-RELEASE01`, `P1-TOOL-AUDIT01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | S / 1–2 |
+| `P1-READY-CERT01` | Independently verify OQ-02 certification approval evidence | Orchestrator | `P1-GOV01`, `P1-TOOL-BENCH01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | S / 1–2 |
+| `P1-READY-CLAIM01` | Independently verify Wayland/signing/channel claim approvals | Orchestrator | `P1-GOV01`, `P1-TOOL-RELEASE01`, `P1-TOOL-AUDIT01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | S / 1–2 |
+| `P1-OWNER-NOTICE01` | Record the owner-supplied copyright notice input | Orchestrator | `P1-GOV01`, `P1-TOOL-RELEASE01` | XS / 0.5–1 |
 | `P1-PACK01` | Create root Python packaging and locked development environment | Python-API-Engineer | `P1-ARCH01` | M / 3–5 |
 | `P1-CI01` | Configure local CI, per-PR audits and isolated red-main policy | Release-CI-Engineer | `P1-ARCH01`, `P1-TOOL-BRANCH01`, `P1-TOOL-AUDIT01` | M / 3–5 |
 | `P1-LIC01` | Establish clean-room provenance and Apache-2.0 repository baseline | License-Compliance-Reviewer | `P1-ARCH01`, `P1-PACK01`, `P1-TOOL-AUDIT01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
-| `P1-PR-AUDIT01` | Enforce provenance and authored-scope audits on every PR | License-Compliance-Reviewer | `P1-CI01`, `P1-TOOL-AUDIT01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | S / 2–3 |
+| `P1-PR-AUDIT01` | Enforce provenance and authored-scope audits on every PR | License-Compliance-Reviewer | `P1-CI01`, `P1-TOOL-AUDIT01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01`, `P1-LIC01` | S / 2–3 |
 | `P1-TAG-CONTRACT01` | Create the immutable pre-contract rollback tag | Integrator | `P1-ARCH01`, `P1-PR-AUDIT01`, `P1-TOOL-BRANCH01` | XS / 0.5–1 |
 | `P1-PROTO01` | Define snapshot, command, event, error and identity contracts | Protocol-Engineer | `P1-ARCH01`, `P1-PR-AUDIT01`, `P1-TAG-CONTRACT01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
 | `P1-API01` | Freeze typed Python API, handle semantics and public stubs | Python-API-Engineer | `P1-PROTO01`, `P1-PACK01`, `P1-PR-AUDIT01`, `P1-TAG-CONTRACT01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
@@ -146,19 +155,19 @@ All tasks start at attempt 0, status `blocked` and branch state `not_started`. R
 | `P1-TST01` | Independently verify Counter behavior, typing and snapshot properties | Test-Engineer | `P1-SLICE01`, `P1-LOCALWHEEL01`, `P1-ARTIFACT-STORE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
 | `P1-REV01` | Independently review Counter correctness and unsafe/GIL/lifetime safety | Independent-Reviewer | `P1-SLICE01`, `P1-TST01`, `P1-LOCALWHEEL01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
 | `P1-INT01` | Integrator-only merge of the verified Counter PR | Integrator | `P1-REV01`, `P1-TST01`, `P1-TOOL-BRANCH01`, `P1-LIC01` | S / 1–2 |
-| `P1-PERF01` | Prove callback-free windows and separate-interpreter diagnostics | Perf-Engineer | `P1-INT01`, `P1-BENCHCLI01`, `P1-READY-BENCH01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
+| `P1-PERF01` | Prove callback-free windows and separate-interpreter diagnostics | Perf-Engineer | `P1-INT01`, `P1-BENCHCLI01`, `P1-READY-BENCH-PROOF01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
 | `P1-PLAT01` | Run Linux headless and native common-runtime smoke gates | Platform-Test-Engineer | `P1-INT01`, `P1-LOCALWHEEL01`, `P1-TOOL-PLATFORM01`, `P1-ARTIFACT-STORE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
 | `P1-A11Y-MANIFEST01` | Add exact AccessKit dependencies and refresh lock under Integrator ownership | Integrator | `P1-INT01`, `P1-PR-AUDIT01` | S / 1–2 |
 | `P1-DOC01` | Write initial Counter documentation and claim-evidence policy | Technical-Writer | `P1-API01`, `P1-INT01`, `P1-TOOL-DOC01` | S / 2–3 |
 | `P1-BENCH01` | Implement deterministic scenes, qualify collectors and capture immutable baseline | Perf-Engineer | `P1-INT01`, `P1-PERF01`, `P1-BENCHCLI01`, `P1-PLAT01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | L / 6–8 |
 | `P1-A11Y01` | Implement Rust semantic mirror, AccessKit adapter and window lifecycle wiring | Rust-Accessibility-Engineer | `P1-A11Y-MANIFEST01`, `P1-PLATFORM01`, `P1-INPUT01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | L / 6–8 |
-| `P1-REL01` | Build and audit native candidate wheels and sdist | Release-CI-Engineer | `P1-INT01`, `P1-A11Y01`, `P1-LIC01`, `P1-READY-RELEASE01`, `P1-TOOL-RELEASE01`, `P1-NATIVE-READY01`, `P1-ARTIFACT-STORE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | L / 6–8 |
+| `P1-REL01` | Build and audit native candidate wheels and sdist | Release-CI-Engineer | `P1-INT01`, `P1-A11Y01`, `P1-LIC01`, `P1-READY-RELEASE-BUILD01`, `P1-TOOL-RELEASE01`, `P1-NATIVE-READY01`, `P1-ARTIFACT-STORE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | L / 6–8 |
 | `P1-A11Y-LIST01` | Implement and unit-test the accessible 10,000-row representation | Rust-Accessibility-Engineer | `P1-A11Y01`, `P1-BENCH01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
 | `P1-PLAT02` | Close candidate platform certification and support-manifest gates | Platform-Test-Engineer | `P1-REL01`, `P1-PLAT01`, `P1-A11Y01`, `P1-READY-PLATFORM01`, `P1-ARTIFACT-STORE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | L / 6–8 |
-| `P1-LIC02` | Close artifact license, SBOM, notice and Wayland distribution gates | License-Compliance-Reviewer | `P1-REL01`, `P1-LIC01`, `P1-READY-RELEASE01`, `P1-TOOL-RELEASE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
-| `P1-PERF02` | Qualify presented/input metrics, execute ABBA compare gate and decide scaling | Perf-Engineer | `P1-BENCH01`, `P1-PLAT02`, `P1-READY-BENCH01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | L / 6–8 |
+| `P1-LIC02` | Close artifact license, SBOM, notice and Wayland distribution gates | License-Compliance-Reviewer | `P1-REL01`, `P1-LIC01`, `P1-READY-RELEASE-BUILD01`, `P1-TOOL-RELEASE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01`, `P1-ARTIFACT-STORE01` | M / 3–5 |
+| `P1-PERF02` | Qualify presented/input metrics, execute ABBA compare gate and decide scaling | Perf-Engineer | `P1-BENCH01`, `P1-PLAT02`, `P1-READY-BENCH-PROOF01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | L / 6–8 |
 | `P1-IME01` | Run physical IME matrix and cited platform defect exercises | Platform-Test-Engineer | `P1-PLAT02`, `P1-READY-PLATFORM01`, `P1-REL01`, `P1-ARTIFACT-STORE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
-| `P1-LICENSE-CLOSE01` | Close AR10-G1 with the owner notice and exact artifact metadata | License-Compliance-Reviewer | `P1-LIC02`, `P1-REL01`, `P1-READY-RELEASE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | S / 1–2 |
+| `P1-LICENSE-CLOSE01` | Close AR10-G1 with the owner notice and exact artifact metadata | License-Compliance-Reviewer | `P1-LIC02`, `P1-REL01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01`, `P1-OWNER-NOTICE01`, `P1-ARTIFACT-STORE01` | S / 1–2 |
 | `P1-WAYLAND-GATE01` | Aggregate AR09-G4 only after artifact audit and claim disposition | License-Compliance-Reviewer | `P1-LIC02`, `P1-READY-CLAIM01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | S / 1–2 |
 | `P1-A11Y-AT01` | Certify physical AT workflows after IME evidence | Accessibility-Test-Engineer | `P1-IME01`, `P1-A11Y-LIST01`, `P1-PLAT02`, `P1-READY-PLATFORM01`, `P1-REL01`, `P1-ARTIFACT-STORE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
 | `P1-A11Y-BENCH01` | Prove AT-on frame, idle and callback gates after benchmark qualification | Perf-Engineer | `P1-A11Y01`, `P1-BENCH01`, `P1-PERF02`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
@@ -166,7 +175,7 @@ All tasks start at attempt 0, status `blocked` and branch state `not_started`. R
 | `P1-WHEEL-CALLBACK01` | Rerun callback and AT-on proof on the exact release wheel hashes | Perf-Engineer | `P1-REL01`, `P1-PERF01`, `P1-BENCHCLI01`, `P1-A11Y-BENCH01`, `P1-ARTIFACT-STORE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | M / 3–5 |
 | `P1-ARTIFACT-GATE01` | Verify current artifact hashes and invalidate stale downstream evidence | Release-CI-Engineer | `P1-REL01`, `P1-PLAT02`, `P1-PERF02`, `P1-IME01`, `P1-A11Y-AT01`, `P1-A11Y-BENCH01`, `P1-WHEEL-CALLBACK01`, `P1-LIC02`, `P1-LICENSE-CLOSE01` | S / 1–2 |
 | `P1-DOC-FINAL01` | Close final documentation and claim register against current evidence hashes | Technical-Writer | `P1-DOC01`, `P1-PERF02`, `P1-IME01`, `P1-A11Y-AT01`, `P1-A11Y-BENCH01`, `P1-LICENSE-CLOSE01`, `P1-ARTIFACT-GATE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | S / 1–2 |
-| `P1-REL02` | Verify same-wheel clean installs and assemble the final reproducible release bundle | Release-CI-Engineer | `P1-REL01`, `P1-PLAT02`, `P1-PERF02`, `P1-IME01`, `P1-A11Y-AT01`, `P1-A11Y-BENCH01`, `P1-WHEEL-CALLBACK01`, `P1-LIC02`, `P1-LICENSE-CLOSE01`, `P1-ARTIFACT-GATE01`, `P1-DOC-FINAL01`, `P1-READY-RELEASE01`, `P1-ARTIFACT-STORE01`, `P1-WAYLAND-GATE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | L / 6–8 |
+| `P1-REL02` | Verify same-wheel clean installs and assemble the final reproducible release bundle | Release-CI-Engineer | `P1-REL01`, `P1-PLAT02`, `P1-PERF02`, `P1-IME01`, `P1-A11Y-AT01`, `P1-A11Y-BENCH01`, `P1-WHEEL-CALLBACK01`, `P1-LIC02`, `P1-LICENSE-CLOSE01`, `P1-ARTIFACT-GATE01`, `P1-DOC-FINAL01`, `P1-READY-RELEASE-BUILD01`, `P1-ARTIFACT-STORE01`, `P1-GATE-SCHEMA01`, `P1-SESSION-REGISTRY01` | L / 6–8 |
 
 Later rows are evidence gates, not authorization for broader features. Missing readiness or evidence keeps the affected task and claim blocked.
 
@@ -260,7 +269,7 @@ Per-task ranges imply roughly **70–110 ideal engineer-days** on the Counter cr
 | AR03-G2 | `P1-CORE02` | atomic | Handle lifetime/generation tests pass |
 | AR03-G3 | `P1-PY01` | atomic | Reentrancy and release tests pass |
 | AR03-G4 | `P1-REV01` | atomic | No Python reference in snapshot/scene/cache |
-| AR03-G5 | `P1-ARCH01` | `AR03-G5.metadata`, `AR03-G5.crate-graph` | Metadata and crate-graph sub-gates pass; no internal-contract stage |
+| AR03-G5 | `P1-ARCH01` | atomic | Metadata and crate-graph checks pass in ARCH01; no internal-contract stage |
 | AR04-G1 | `P1-ARCH01` | atomic | Locked check and target metadata pass |
 | AR04-G2 | `P1-SCENE01` | atomic | Taffy constrained subset and fallback pass |
 | AR04-G3 | `P1-CORE02` | atomic | Slot cap and no-detach audit pass |
@@ -290,16 +299,16 @@ Per-task ranges imply roughly **70–110 ideal engineer-days** on the Counter cr
 | AR08-G4 | `P1-PERF02` | atomic | Presented/input qualification passes or is inconclusive |
 | AR08-G5 | `P1-PERF02` | atomic | Actual compare command enforces >10% diagnosis rule |
 | AR08-G6 | `P1-CERT-GATE01` | `AR08-G6.approval`, `AR08-G6.measurements` | Measurement and OQ-02 approval sub-gates pass |
-| AR09-G1 | `P1-PR-AUDIT01` | atomic | Per-PR provenance audit prevents unapproved merge |
+| AR09-G1 | `P1-PR-AUDIT01` | `AR09-G1.repository-evidence` | LIC01 repository evidence plus per-PR enforcement pass |
 | AR09-G2 | `P1-LIC02` | atomic | Artifact license/advisory closure passes |
 | AR09-G3 | `P1-LIC02` | atomic | Notice/content audit matches SBOM |
 | AR09-G4 | `P1-WAYLAND-GATE01` | `AR09-G4.wayland-disposition`, `AR09-G4.artifact-audit` | Artifact-audit and Wayland-disposition sub-gates pass |
 | AR09-G5 | `P1-LIC01` | atomic | Source-exception workflow rejects incomplete records |
 | AR10-G1 | `P1-LICENSE-CLOSE01` | `AR10-G1.artifact-metadata`, `AR10-G1.owner-notice` | Artifact-metadata and owner-notice sub-gates pass |
 | AR10-G2 | `P1-LIC02` | atomic | Artifact contents/SBOM agree |
-| AR10-G3 | `P1-PR-AUDIT01` | atomic | Per-PR authored-scope audit passes |
+| AR10-G3 | `P1-PR-AUDIT01` | `AR10-G3.repository-evidence` | LIC01 repository evidence plus per-PR authored-scope enforcement pass |
 | AR10-G4 | `P1-DOC-FINAL01` | atomic | Final docs link only current evidence or blocked claims |
 
 ## 15. Plan completion
 
-This revision is complete only when graph/handoff validators and negative tests pass, exact output is written to `evidence/P0-PL01/validation-attempt-3.txt`, `P0-PL01` is done at attempt 3 and the Red-Team attempt-3 handoff contains every Part 3 field. No Phase 1 task or `P0-AP01` is authorized by this plan.
+This remediation is complete only when graph/handoff validators and root pytest pass, exact output is written to `evidence/P0-REM01/validation.txt`, `P0-REM01` is done at attempt 1 and the independent Test-Engineer handoff contains every Part 3 field. No Phase 1 task or `P0-AP01` is authorized by this plan.

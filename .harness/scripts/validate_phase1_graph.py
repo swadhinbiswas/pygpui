@@ -195,10 +195,15 @@ def validate(
             ):
                 if not task.get(field):
                     field_errors.append(f"{task['id']} missing branch evidence field {field}")
-            if completion != "independently_verified" or task.get("premerge_state") != "independently_verified":
-                field_errors.append(f"{task['id']} build task must complete independently_verified")
+            if completion != "merged" or task.get("premerge_state") != "independently_verified":
+                field_errors.append(f"{task['id']} build task must complete merged after pre-merge verification")
             if task.get("postmerge_state") != "merged" or task.get("merge_owner_role") != "Integrator":
                 field_errors.append(f"{task['id']} post-merge record must be Integrator-owned")
+            criteria_text = "\n".join(task.get("acceptance_criteria", []))
+            if "tools/ci/branch_gate.py verify" not in criteria_text or "--state independently_verified" not in criteria_text:
+                field_errors.append(f"{task['id']} lacks pre-merge branch verification")
+            if "tools/session/verify_roles.py" not in criteria_text:
+                field_errors.append(f"{task['id']} lacks trusted session verification")
             if any("--state merged" in c for c in task.get("acceptance_criteria", [])):
                 field_errors.append(f"{task['id']} has circular pre-merge merged-state acceptance")
         elif workflow == "implementation":
@@ -227,6 +232,14 @@ def validate(
             gate_evidence = task.get("gate_evidence")
             if not gate_evidence or gate_evidence not in task.get("evidence_links", []):
                 field_errors.append(f"{task['id']} has gates without linked gate_evidence")
+        if task.get("gates") or task.get("sub_gates"):
+            criteria_text = "\n".join(task.get("acceptance_criteria", []))
+            if "tools/gates/validate_result.py" not in criteria_text or ".harness/schemas/gate-results.schema.json" not in criteria_text:
+                field_errors.append(f"{task['id']} gate result lacks schema validation")
+            if task.get("gates"):
+                for gate in task.get("gates", []):
+                    if data.get("gate_model", {}).get(gate, {}).get("required_sub_gates") and f"tools/gates/aggregate.py --gate {gate}" not in criteria_text:
+                        field_errors.append(f"{task['id']} staged aggregator {gate} lacks aggregate invocation")
     if field_errors:
         errors.extend(field_errors)
 
@@ -239,8 +252,11 @@ def validate(
     if not_gated:
         errors.append(f"Phase 1 tasks not transitively gated by P0-AP01: {not_gated}")
     planner = by_id.get("P0-PL01")
-    if not planner or planner.get("attempt_count") != 3 or planner.get("status") not in {"in_progress", "done"}:
-        errors.append("P0-PL01 must be attempt 3 and in_progress or done")
+    if not planner or planner.get("attempt_count") != 3 or planner.get("status") != "done":
+        errors.append("P0-PL01 must remain done at attempt 3")
+    remediation = by_id.get("P0-REM01")
+    if not remediation or remediation.get("attempt_count") != 1 or remediation.get("status") not in {"in_progress", "done"}:
+        errors.append("P0-REM01 must be attempt 1 and in_progress or done")
 
     rows = _plan_rows(plan_text)
     plan_ids = [r[0] for r in rows]
@@ -293,6 +309,7 @@ def validate(
         errors.append("plan/JSON ADR gate aggregator mappings mismatch")
 
     subgate_producers: dict[str, list[str]] = {}
+    subgate_objects: dict[str, tuple[str, dict[str, Any]]] = {}
     for task in phase1:
         for sg in task.get("sub_gates", []):
             sg_id = sg.get("id", "")
@@ -300,9 +317,13 @@ def validate(
                 errors.append(f"{task['id']} has invalid sub-gate id {sg_id}")
                 continue
             subgate_producers.setdefault(sg_id, []).append(task["id"])
+            subgate_objects[sg_id] = (task["id"], sg)
             evidence = sg.get("evidence")
             if not evidence or not any(_matches(evidence, p) for p in task.get("produces", [])):
                 errors.append(f"{task['id']} sub-gate {sg_id} lacks produced evidence")
+            if sg.get("evidence_type") == "user-approval":
+                if task.get("workflow") != "verification" or not task.get("review_evidence") or not task.get("test_evidence"):
+                    errors.append(f"{task['id']} user-approval sub-gate lacks independent verification")
     metrics["sub_gates"] = sum(len(t.get("sub_gates", [])) for t in phase1)
     for gate, model in gate_model.items():
         aggregator = model.get("aggregator")
@@ -364,6 +385,10 @@ def validate(
             criteria = "\n".join(task.get("acceptance_criteria", []))
             if "gh release download" not in criteria or "tools/artifacts/store.py verify" not in criteria:
                 artifact_errors.append(f"{task['id']} artifact consumer lacks fetch/verify commands")
+        criteria = "\n".join(task.get("acceptance_criteria", []))
+        if not task.get("artifact_binding") and ("dist/release/**" in criteria or "dist/local/**" in criteria):
+            if not task.get("consumes_artifacts") or "gh release download" not in criteria or "tools/artifacts/store.py verify" not in criteria:
+                artifact_errors.append(f"{task['id']} ignored-artifact consumer lacks durable fetch/verify")
     if artifact_errors:
         errors.extend(artifact_errors)
 
@@ -385,6 +410,32 @@ def validate(
         errors.append("callback proof is conflated with OQ-02 certification")
     if _reachable("P1-REL01", by_id, "P1-READY-CERT01") or _reachable("P1-REL01", by_id, "P1-READY-CLAIM01"):
         errors.append("candidate artifact build is conflated with claim approvals")
+    if _reachable("P1-REL02", by_id, "P1-WAYLAND-GATE01") or _reachable("P1-REL02", by_id, "P1-READY-CLAIM01"):
+        errors.append("draft release bundle is conflated with Wayland/signing/channel approvals")
+
+    int01 = by_id.get("P1-INT01", {})
+    int_criteria = "\n".join(int01.get("acceptance_criteria", []))
+    for required in (
+        "branch_gate.py verify --task P1-SLICE01 --state independently_verified",
+        "record_merge.py --task P1-SLICE01",
+        "record_merge.py verify --task P1-SLICE01",
+    ):
+        if required not in int_criteria:
+            errors.append("INT01 lacks reproducible Counter merge recording/verification")
+    if "P1-LIC01" not in by_id.get("P1-PR-AUDIT01", {}).get("deps", []):
+        errors.append("AR09-G1/AR10-G3 aggregator lacks LIC01 repository evidence")
+    for gate in ("AR09-G1", "AR10-G3"):
+        if not any(sg.startswith(gate + ".repository-evidence") for t in phase1 for sg in [x["id"] for x in t.get("sub_gates", [])]):
+            errors.append(f"{gate} lacks LIC01 repository-evidence sub-gate")
+    if not any("tools/release/audit_msrv_claim.py" in c for c in by_id.get("P1-REL02", {}).get("acceptance_criteria", [])):
+        errors.append("AR04-G6 lacks executable MSRV-claim audit")
+    if "P1-OWNER-NOTICE01" not in by_id.get("P1-LICENSE-CLOSE01", {}).get("deps", []):
+        errors.append("owner-notice input has no explicit producer dependency")
+    if "P1-READY-BENCH01" in by_id or "P1-READY-RELEASE01" in by_id:
+        errors.append("stale readiness task IDs remain")
+    pytest_ini = repo_root / "pytest.ini"
+    if not pytest_ini.exists() or "testpaths = .harness/scripts/tests" not in pytest_ini.read_text():
+        errors.append("root pytest entry point is not configured")
 
     # Command producer/write-scope closure.
     baseline_producers = data.get("baseline_producers", {})
@@ -518,13 +569,75 @@ def run_self_tests(repo_root: Path, baseline: str, history_baseline: str) -> lis
         "conflated-claim-readiness",
         lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PERF01")["deps"].append("P1-READY-CERT01"),
     )
+    expect_failure(
+        "missing-schema-validation",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"].__setitem__(
+            slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"] if "tools/gates/validate_result.py" not in c]
+        ),
+    )
+    expect_failure(
+        "missing-aggregate-invocation",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PLAT02")["acceptance_criteria"].__setitem__(
+            slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-PLAT02")["acceptance_criteria"] if "tools/gates/aggregate.py" not in c]
+        ),
+    )
+    expect_failure(
+        "readiness-approval-self-certification",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-READY-CERT01").update(workflow="readiness", completion_state="recorded"),
+    )
+    expect_failure(
+        "build-premerge-completion",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-ARCH01").update(completion_state="independently_verified"),
+    )
+    expect_failure(
+        "rustcontract-missing-session-check",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-RUSTCONTRACT01")["acceptance_criteria"].__setitem__(
+            slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-RUSTCONTRACT01")["acceptance_criteria"] if "verify_roles.py" not in c]
+        ),
+    )
+    expect_failure(
+        "conrev-missing-branch-check",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-CONREV01")["acceptance_criteria"].__setitem__(
+            slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-CONREV01")["acceptance_criteria"] if "branch_gate.py" not in c]
+        ),
+    )
+    expect_failure(
+        "int01-missing-merge-record",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-INT01")["acceptance_criteria"].__setitem__(
+            slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-INT01")["acceptance_criteria"] if "record_merge.py" not in c]
+        ),
+    )
+    expect_failure(
+        "repository-gate-missing-lic01",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["deps"].remove("P1-LIC01"),
+    )
+    expect_failure(
+        "msrv-audit-missing",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-REL02")["acceptance_criteria"].__setitem__(
+            slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-REL02")["acceptance_criteria"] if "audit_msrv_claim.py" not in c]
+        ),
+    )
+    expect_failure(
+        "lic02-ignored-artifact",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"].__setitem__(
+            slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"] if "gh release download" not in c]
+        ),
+    )
+    expect_failure(
+        "rel02-wayland-dependency",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-REL02")["deps"].append("P1-WAYLAND-GATE01"),
+    )
+    expect_failure(
+        "owner-notice-missing",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LICENSE-CLOSE01")["deps"].remove("P1-OWNER-NOTICE01"),
+    )
     return results
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--baseline", default="5ce026d")
-    parser.add_argument("--history-baseline", default="8ffe8de")
+    parser.add_argument("--history-baseline", default="b9a8504")
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -545,7 +658,7 @@ def main() -> int:
         ("DEPS_RESOLVE", not any(e.startswith("unresolved dependencies") for e in errors), f"checked={metrics['dependency_count']}"),
         ("CYCLES", not any("dependency cycle" in e for e in errors), "count=0"),
         ("TOPOLOGICAL_ORDER", not any("not topological" in e for e in errors), "pass"),
-        ("PHASE1_FIELDS", not any("missing fields" in e or "branch evidence" in e or "must complete" in e or "unknown workflow" in e or "gates without" in e or "branch_state" in e for e in errors), f"tasks={metrics['phase1_total']}"),
+        ("PHASE1_FIELDS", not any("missing fields" in e or "branch evidence" in e or "must complete" in e or "unknown workflow" in e or "gates without" in e or "branch_state" in e or "schema validation" in e or "aggregate invocation" in e or "lacks pre-merge" in e or "lacks trusted session" in e for e in errors), f"tasks={metrics['phase1_total']}"),
         ("PHASE1_INITIAL_STATE", not any("blocked at attempt zero" in e or "max_attempts" in e or "P0-AP01 must" in e for e in errors), "blocked/attempt0/max4"),
         ("PHASE1_AP01_GATE", not any("not transitively gated" in e for e in errors), f"checked={metrics['phase1_total']}"),
         ("PLAN_TASK_ORDER", not any("plan/JSON Phase 1 task order" in e for e in errors), f"plan={metrics['plan_tasks']} json={metrics['phase1_total']}"),
@@ -553,11 +666,14 @@ def main() -> int:
         ("ADR_GATE_COVERAGE", metrics["adr_gates"] == metrics["plan_gates"] == metrics["task_gate_mappings"] and not any("full gate coverage" in e for e in errors), f"adr={metrics['adr_gates']} plan={metrics['plan_gates']} aggregators={metrics['task_gate_mappings']}"),
         ("ADR_GATE_MAPPINGS", not any("aggregator mappings" in e for e in errors), f"total={metrics['task_gate_mapping_total']}"),
         ("STAGED_GATE_CLOSURE", not any("sub-gate" in e or "aggregator" in e or "known deadlock" in e for e in errors), f"sub_gates={metrics['sub_gates']}"),
+        ("GATE_RUNTIME", not any("schema validation" in e or "aggregate invocation" in e or "user-approval sub-gate" in e for e in errors), "schema+aggregate+independent-approval"),
+        ("ATOMIC_GATE_EVIDENCE", not any("AR09-G1" in e or "AR10-G3" in e or "AR04-G6" in e or "owner-notice" in e for e in errors), "repository+MSRV+notice"),
         ("PHASE0_HISTORY", not any("Phase 0 history" in e or "baseline-done tasks missing" in e for e in errors), f"compared={metrics['phase0_history_compared']}"),
         ("COMMAND_PRODUCERS", not any("command path" in e for e in errors), f"criteria={metrics['acceptance_criteria_checked']}"),
-        ("REVIEW_MERGE_STATES", not any("circular pre-merge" in e or "post-merge record" in e or "independent proof field" in e or "proof task is not gated" in e for e in errors), "premerge/postmerge/session"),
+        ("REVIEW_MERGE_STATES", not any("circular pre-merge" in e or "post-merge record" in e or "independent proof field" in e or "proof task is not gated" in e or "build task must complete" in e or "lacks pre-merge" in e or "lacks trusted session" in e or "INT01 lacks" in e for e in errors), "merged-deps+premerge+session"),
         ("ARTIFACT_HANDOFF", not any("artifact" in e for e in errors), "draft-release/fetch/verify"),
-        ("CRATE_TAG_READINESS", not any("neutral test crate" in e or "illegally test" in e or "tag timing" in e or "tag does not prove" in e or "native-lane readiness" in e or "conflated" in e for e in errors), "semantic"),
+        ("CRATE_TAG_READINESS", not any("neutral test crate" in e or "illegally test" in e or "tag timing" in e or "tag does not prove" in e or "native-lane readiness" in e or "conflated" in e or "draft release bundle" in e for e in errors), "semantic"),
+        ("PYTEST_ENTRYPOINT", "root pytest entry point" not in errors, "root pytest.ini"),
         ("SCOPE_NORMALIZATION", not any("duplicate produces" in e or "duplicate write_scope" in e or "outside write_scope" in e for e in errors), "normalized"),
         ("REMOTE_WORKFLOW", not any("stale remote" in e or "git_workflow" in e for e in errors), "stale=0"),
     ]

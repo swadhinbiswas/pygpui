@@ -33,6 +33,8 @@ def main() -> int:
         default=".harness/HANDOFFS/planner-to-red-team-P0-RT01-3.md",
     )
     parser.add_argument("--attempt", type=int, default=3)
+    parser.add_argument("--task-id", default="P0-PL01")
+    parser.add_argument("--to", default="Red-Team-Planner")
     args = parser.parse_args()
     text = Path(args.path).read_text(encoding="utf-8")
     missing = [field for field in FIELDS if field not in text]
@@ -41,8 +43,8 @@ def main() -> int:
         errors.append(f"missing fields: {missing}")
     for expected in (
         "FROM: Planner",
-        "TO: Red-Team-Planner",
-        "TASK-ID: P0-PL01",
+        f"TO: {args.to}",
+        f"TASK-ID: {args.task_id}",
         f"ATTEMPT #: {args.attempt}",
         "STATUS: done",
     ):
@@ -50,8 +52,8 @@ def main() -> int:
             errors.append(f"missing header: {expected}")
     next_step_match = re.search(r"EXACT NEXT STEP:(.*?)(?=FILES THE RECEIVER|$)", text, re.S)
     next_step = next_step_match.group(1).strip() if next_step_match else ""
-    if not next_step.startswith("Red-Team-Planner:"):
-        errors.append("EXACT NEXT STEP does not direct Red-Team-Planner")
+    if not next_step.startswith(f"{args.to}:"):
+        errors.append(f"EXACT NEXT STEP does not direct {args.to}")
     files_match = re.search(
         r"FILES THE RECEIVER MUST READ \(ordered, max 7\):(.*?)(?=CONTEXT I WISH I HAD HAD:|$)",
         text,

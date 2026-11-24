@@ -6,6 +6,8 @@ import json
 import unittest
 from pathlib import Path
 
+import jsonschema
+
 ROOT = Path(__file__).resolve().parents[3]
 VALIDATOR_PATH = ROOT / ".harness" / "scripts" / "validate_phase1_graph.py"
 SPEC = importlib.util.spec_from_file_location("phase1_graph_validator", VALIDATOR_PATH)
@@ -20,7 +22,7 @@ class GraphValidatorSemanticTests(unittest.TestCase):
         cls.data = json.loads((ROOT / ".harness" / "TASKS.json").read_text())
         cls.plan = (ROOT / ".harness" / "PLANS" / "phase-1-vertical-slice.md").read_text()
         cls.baseline = VALIDATOR._load_baseline(ROOT, "5ce026d")
-        cls.history_baseline = VALIDATOR._load_baseline(ROOT, "8ffe8de")
+        cls.history_baseline = VALIDATOR._load_baseline(ROOT, "b9a8504")
 
     def assert_invalid(self, mutate_data=None, mutate_plan=None) -> None:
         data = copy.deepcopy(self.data)
@@ -111,6 +113,86 @@ class GraphValidatorSemanticTests(unittest.TestCase):
 
     def test_conflated_claim_readiness_is_rejected(self) -> None:
         self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PERF01")["deps"].append("P1-READY-CERT01"))
+
+    def test_missing_schema_validation_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"].__setitem__(slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"] if "tools/gates/validate_result.py" not in c]))
+
+    def test_missing_aggregate_invocation_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PLAT02")["acceptance_criteria"].__setitem__(slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-PLAT02")["acceptance_criteria"] if "tools/gates/aggregate.py" not in c]))
+
+    def test_readiness_approval_self_certification_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-READY-CERT01").update(workflow="readiness", completion_state="recorded"))
+
+    def test_build_premerge_completion_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-ARCH01").update(completion_state="independently_verified"))
+
+    def test_rustcontract_missing_session_check_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-RUSTCONTRACT01")["acceptance_criteria"].__setitem__(slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-RUSTCONTRACT01")["acceptance_criteria"] if "verify_roles.py" not in c]))
+
+    def test_conrev_missing_branch_check_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-CONREV01")["acceptance_criteria"].__setitem__(slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-CONREV01")["acceptance_criteria"] if "branch_gate.py" not in c]))
+
+    def test_int01_missing_merge_record_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-INT01")["acceptance_criteria"].__setitem__(slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-INT01")["acceptance_criteria"] if "record_merge.py" not in c]))
+
+    def test_repository_gate_missing_lic01_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["deps"].remove("P1-LIC01"))
+
+    def test_msrv_audit_missing_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-REL02")["acceptance_criteria"].__setitem__(slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-REL02")["acceptance_criteria"] if "audit_msrv_claim.py" not in c]))
+
+    def test_lic02_ignored_artifact_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"].__setitem__(slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"] if "gh release download" not in c]))
+
+    def test_rel02_wayland_dependency_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-REL02")["deps"].append("P1-WAYLAND-GATE01"))
+
+    def test_owner_notice_missing_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LICENSE-CLOSE01")["deps"].remove("P1-OWNER-NOTICE01"))
+
+
+class GateResultSchemaTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.schema = json.loads((ROOT / ".harness/schemas/gate-results.schema.json").read_text())
+        cls.valid = {
+            "schema_version": 1,
+            "gate_id": "AR08-G6.approval",
+            "task_id": "P1-READY-CERT01",
+            "stage": "approval",
+            "status": "pass",
+            "evidence_type": "user-approval",
+            "evidence": [{"path": "evidence/P1-READY-CERT01/approval.json", "sha256": "a" * 64}],
+            "source_commit": "b" * 40,
+            "lockfile_sha256": "c" * 64,
+            "toolchain": "rustc 1.100.0",
+            "reviewer_session_id": "reviewer-1",
+            "tester_session_id": "tester-1",
+            "approver_session_id": "approver-1",
+            "aggregator": False,
+        }
+
+    def test_valid_approval_record_passes(self) -> None:
+        jsonschema.validate(self.valid, self.schema)
+
+    def test_missing_session_ids_fail(self) -> None:
+        record = dict(self.valid)
+        record.pop("reviewer_session_id")
+        record.pop("tester_session_id")
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(record, self.schema)
+
+    def test_user_approval_without_approver_fails(self) -> None:
+        record = dict(self.valid)
+        record.pop("approver_session_id")
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(record, self.schema)
+
+    def test_missing_evidence_type_fails(self) -> None:
+        record = dict(self.valid)
+        record.pop("evidence_type")
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(record, self.schema)
 
 
 if __name__ == "__main__":

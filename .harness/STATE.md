@@ -35,10 +35,11 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - Planner attempt 3 completed with 64 Phase 1 tasks, 308 resolving dependencies, 52 final gate aggregators, 26 staged sub-gates, durable draft-release artifacts, trusted pre/post-merge evidence and 25 passing tests plus 15 subtests. Orchestrator independently reran all validators.
 - Red-Team attempt 3 completed with changes requested: five blocking findings (RT3-B01–RT3-B05) and five nonblocking findings. The three planned review rounds are exhausted.
 - Orchestrator authorized targeted remediation only: no UI feature code until `P0-AP01` opens after independent remediation verification.
+- `P0-REM01` completed with 65 Phase 1 tasks, 316 dependencies, 52 aggregators, 26 sub-gates, root pytest discovery and 41 passing tests plus 15 subtests. Orchestrator independently reran validation.
 
 ## Active work
 
-`P0-REM01` is implementing the five exact remediation fixes. `P0-REM02` independent testing and `P0-REM03` Red-Team verification are blocked behind it. `P0-AP01` remains blocked.
+`P0-REM02` independent Test-Engineer verification is running against the remediated semantics. `P0-REM03` Red-Team verification and `P0-AP01` remain blocked.
 
 ## Blocked
 
@@ -48,8 +49,8 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 
 ## Next 3 actions
 
-1. `P0-REM01` closes RT3-B01 through RT3-B05 in the plan, graph, schema and validators.
-2. `P0-REM02` independently tests the remediation; `P0-REM03` performs final Red-Team verification.
+1. `P0-REM02` independently attacks and tests RT3-B01 through RT3-B05 closure.
+2. `P0-REM03` performs final Red-Team verification of the remediation.
 3. Orchestrator approves `P0-AP01` only after remediation verification, then authorizes and dispatches the first Counter-slice build wave.
 
 ## Phase 0 exit gate
