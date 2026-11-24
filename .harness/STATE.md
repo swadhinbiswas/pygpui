@@ -50,7 +50,7 @@ Begin Wave 0/1 foundational implementation: governance records, trusted registry
 
 ## Active work
 
-`P1-TOOL-BRANCH01` attempt 2 passed independent testing but failed independent review on R-01–R-04. Build attempt 3 is fixing evidence-state enforcement, reviewed-head/evidence-only delta binding, authoritative merge verification, and origin-bound PR identity. Integrator remains blocked.
+`P1-TOOL-BRANCH01` attempt 3 is on PR #1 at head `cfd8a2d5f976741400706be9fe61dfe65a76e423`; R-01–R-08 author verification passes. Independent Test-Engineer attempt 3 is active; Reviewer and Integrator remain blocked.
 
 ## Blocked
 
