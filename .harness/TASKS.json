@@ -514,8 +514,8 @@
       "deps": [
         "P0-AP01"
       ],
-      "status": "blocked",
-      "attempt_count": 0,
+      "status": "done",
+      "attempt_count": 1,
       "max_attempts": 4,
       "dispatch_wave": "0",
       "workflow": "control",
@@ -540,10 +540,14 @@
         "gh auth status exits zero and .harness/PHASE1-EVIDENCE.md records task waves, readiness blockers, branch/PR policy and four-attempt escalation"
       ],
       "evidence_links": [
-        ".harness/PLANS/phase-1-vertical-slice.md",
-        "evidence/P1-GOV01/README.md"
+        ".harness/PHASE1-EVIDENCE.md",
+        "evidence/P1-GOV01/README.md",
+        "evidence/P1-GOV01/graph-validation.txt",
+        "evidence/P1-GOV01/remote.txt",
+        "evidence/P1-GOV01/branches.txt",
+        "evidence/P1-GOV01/github-auth.txt"
       ],
-      "branch_state": "not_started",
+      "branch_state": "recorded",
       "sub_gates": [],
       "gate_results": []
     },
@@ -554,13 +558,13 @@
       "deps": [
         "P1-GOV01"
       ],
-      "status": "blocked",
-      "attempt_count": 0,
+      "status": "done",
+      "attempt_count": 1,
       "max_attempts": 4,
       "dispatch_wave": "1-seed",
       "workflow": "control",
       "completion_state": "recorded",
-      "branch_state": "not_started",
+      "branch_state": "recorded",
       "write_scope": [
         ".harness/sessions/registry.json",
         ".harness/sessions/seed-approval.json",
@@ -587,9 +591,12 @@
         "sha256sum .harness/sessions/registry.json .harness/sessions/seed-approval.json > evidence/P1-SESSION-SEED01/seed-sha256.txt exits zero"
       ],
       "evidence_links": [
-        ".harness/PLANS/phase-1-vertical-slice.md",
         ".harness/sessions/registry.json",
         ".harness/sessions/seed-approval.json",
+        "evidence/P1-SESSION-SEED01/seed.txt",
+        "evidence/P1-SESSION-SEED01/self-test.txt",
+        "evidence/P1-SESSION-SEED01/verify.txt",
+        "evidence/P1-SESSION-SEED01/pytest.txt",
         "evidence/P1-SESSION-SEED01/seed-sha256.txt"
       ]
     },

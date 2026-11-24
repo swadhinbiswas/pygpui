@@ -1,0 +1,2 @@
+186313d1fdb4a95bad97ff50de553ce48d6cfcd8f6707b246a1b93a6fdbdc417  .harness/sessions/registry.json
+e3dbdd465a0c9632f5cb6f54531f33d0648c62abcaa8fd0fd8fa55b72c7787bc  .harness/sessions/seed-approval.json

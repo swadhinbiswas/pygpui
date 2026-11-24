@@ -1,0 +1,18 @@
+{
+  "append_only": true,
+  "schema_version": 1,
+  "seed_history": [
+    {
+      "approver_session_id": "orchestrator-main-a433d68",
+      "registry_sha256": "fd81ba37470d23918374182496f82d5c304792debdc5db8928aff62d06322def"
+    }
+  ],
+  "sessions": {
+    "orchestrator-main-a433d68": {
+      "role": "orchestrator",
+      "seed": true,
+      "trusted": true
+    }
+  },
+  "trust_root": "orchestrator"
+}

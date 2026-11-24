@@ -1,0 +1,1 @@
+SESSION_SEED=PASS registry=.harness/sessions/registry.json approval=.harness/sessions/seed-approval.json

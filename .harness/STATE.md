@@ -45,10 +45,12 @@ Begin Wave 0/1 foundational implementation: governance records, trusted registry
 - `P0-REM08` directly closed D11–D17 and encoded adversarial gates in all owning tasks. Root pytest passes 86 tests plus 18 subtests; the independent attack suite passes 41 tests; seed self-test passes.
 - `P0-REM03` attempt 2 reported zero blockers and recommended `P0-AP01` approval for Wave 0/1 only.
 - `P0-AP01` is approved at attempt 1 with Red-Team evidence. Phase 1 is authorized for foundational tooling only; no D11–D17 exception is required.
+- `P1-GOV01` is complete with remote/auth, graph-validation, wave, readiness and escalation evidence.
+- `P1-SESSION-SEED01` is complete with an append-only, hash-bound registry trust root; seed, self-test, verify and four dedicated tests pass.
 
 ## Active work
 
-Wave 0 governance (`P1-GOV01`) is next. After it is recorded, Wave 1 starts with `P1-SESSION-SEED01`, then `P1-TOOL-BRANCH01`, then the remaining independent foundational tools.
+`P1-TOOL-BRANCH01` implementation is next. The build agent will implement and self-test branch/merge/rollback tooling on a PR branch. Orchestrator will register distinct implementer/reviewer/tester/Integrator sessions as they are spawned; independent verification and merge follow implementation.
 
 ## Blocked
 
@@ -58,8 +60,8 @@ Wave 0 governance (`P1-GOV01`) is next. After it is recorded, Wave 1 starts with
 
 ## Next 3 actions
 
-1. Execute and record `P1-GOV01`: environment, remote/auth, graph validation, wave and escalation policy.
-2. Complete `P1-SESSION-SEED01` using the validated seed contract, then dispatch `P1-TOOL-BRANCH01`.
+1. Dispatch `P1-TOOL-BRANCH01` implementation on a feature branch; require self-tests and a PR, not self-merge.
+2. Register distinct reviewer/tester sessions, independently verify the branch, and have Integrator record/merge it.
 3. After branch tooling merges, dispatch the remaining independent Wave 1 tool tasks in parallel; keep UI feature tasks blocked.
 
 ## Phase 0 exit gate

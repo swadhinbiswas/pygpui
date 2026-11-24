@@ -239,16 +239,29 @@ def validate(
 
     phase1 = [t for t in tasks if t.get("id", "").startswith("P1-")]
     metrics["phase1_total"] = len(phase1)
+    ap01 = by_id.get("P0-AP01", {})
+    phase1_authorized = (
+        ap01.get("status") == "done"
+        and ap01.get("attempt_count") == 1
+        and bool(ap01.get("evidence_links"))
+    )
     field_errors: list[str] = []
     for task in phase1:
         absent = sorted(REQUIRED_PHASE1_FIELDS - set(task))
         if absent:
             field_errors.append(f"{task['id']} missing fields {absent}")
-        if task.get("status") != "blocked" or task.get("attempt_count") != 0:
+        recorded_control = (
+            phase1_authorized
+            and task.get("workflow") in {"control", "readiness"}
+            and task.get("status") == "done"
+            and task.get("attempt_count", 0) >= 1
+            and task.get("branch_state") == "recorded"
+        )
+        if not recorded_control and (task.get("status") != "blocked" or task.get("attempt_count") != 0):
             field_errors.append(f"{task['id']} is not blocked at attempt zero")
         if task.get("max_attempts") != 4:
             field_errors.append(f"{task['id']} does not preserve max_attempts=4")
-        if task.get("branch_state") != "not_started":
+        if not recorded_control and task.get("branch_state") != "not_started":
             field_errors.append(f"{task['id']} branch_state is not not_started")
         if not task.get("acceptance_criteria") or not task.get("evidence_links"):
             field_errors.append(f"{task['id']} has empty criteria/evidence")
@@ -835,7 +848,7 @@ def run_self_tests(repo_root: Path, baseline: str, history_baseline: str) -> lis
     expect_failure("duplicate-id", lambda d: d["tasks"].append(copy.deepcopy(next(t for t in d["tasks"] if t["id"] == "P1-GOV01"))))
     expect_failure("missing-dependency", lambda d: next(t for t in d["tasks"] if t["id"] == "P1-ARCH01")["deps"].append("P1-NOEXIST"))
     expect_failure("cycle", lambda d: next(t for t in d["tasks"] if t["id"] == "P0-AP01")["deps"].append("P1-GOV01"))
-    expect_failure("phase1-active", lambda d: next(t for t in d["tasks"] if t["id"] == "P1-GOV01").update(status="done"))
+    expect_failure("phase1-active", lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TOOL-BRANCH01").update(status="done"))
     expect_failure("missing-gate", lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PERF01")["gates"].remove("AR01-G3"))
     expect_failure("unowned-command", lambda d: next(t for t in d["tasks"] if t["id"] == "P1-GOV01")["acceptance_criteria"].append("python3 tools/missing/proof.py exits zero"))
     expect_failure("scope-mismatch", lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TOOL-GRAPH01").update(write_scope=["unrelated/**"]))
