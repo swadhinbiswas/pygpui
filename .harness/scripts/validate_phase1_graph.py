@@ -8,8 +8,10 @@ import copy
 import fnmatch
 import json
 import re
+import shlex
 import subprocess
 import sys
+import posixpath
 from pathlib import Path
 from typing import Any
 
@@ -42,8 +44,42 @@ def _matches(path: str, pattern: str) -> bool:
     return pattern.endswith("/") and path.startswith(pattern)
 
 
+def _expand_braces(value: str) -> list[str]:
+    match = re.search(r"\{([^{}]+)\}", value)
+    if not match:
+        return [value]
+    expanded: list[str] = []
+    for option in match.group(1).split(","):
+        expanded.extend(_expand_braces(value[:match.start()] + option + value[match.end():]))
+    return expanded
+
+
 def _ignored_artifact_refs(text: str) -> list[str]:
-    return re.findall(r"(?<![\w])dist/(?:release|local)(?:/[A-Za-z0-9_.*<>${}/-]+)?", text)
+    tokens = re.findall(r"(?<![\w])dist(?:/[^\s;|&<>]+)*(?=$|[\s;|&<>\"'])", text)
+    normalized: list[str] = []
+    for token in tokens:
+        token = token.strip("'\".,")
+        for candidate in _expand_braces(token):
+            path = posixpath.normpath(candidate)
+            if path == "dist" or path.startswith("dist/"):
+                normalized.append(path)
+    return normalized
+
+
+def _parse_write_result(command: str) -> dict[str, str] | None:
+    if "tools/gates/write_result.py" not in command or "--self-test" in command:
+        return None
+    try:
+        tokens = shlex.split(command)
+    except ValueError:
+        return {}
+    parsed: dict[str, str] = {}
+    for flag in ("--task", "--gate", "--output"):
+        if flag in tokens:
+            index = tokens.index(flag)
+            if index + 1 < len(tokens):
+                parsed[flag] = tokens[index + 1]
+    return parsed
 
 
 def _scope_covers_pattern(produce: str, scope: str) -> bool:
@@ -277,8 +313,22 @@ def validate(
     if not remediation or remediation.get("attempt_count") != 1 or remediation.get("status") != "done":
         errors.append("P0-REM01 must remain done at attempt 1")
     remediation2 = by_id.get("P0-REM04")
-    if not remediation2 or remediation2.get("attempt_count") != 1 or remediation2.get("status") not in {"in_progress", "done"}:
-        errors.append("P0-REM04 must be attempt 1 and in_progress or done")
+    if not remediation2 or remediation2.get("attempt_count") != 1 or remediation2.get("status") != "done":
+        errors.append("P0-REM04 must remain done at attempt 1")
+    remediation3 = by_id.get("P0-REM06")
+    if not remediation3 or remediation3.get("attempt_count") != 1 or remediation3.get("status") not in {"in_progress", "done"}:
+        errors.append("P0-REM06 must be attempt 1 and in_progress or done")
+    seed = by_id.get("P1-SESSION-SEED01")
+    if not seed or seed.get("owner_role") != "Orchestrator" or seed.get("workflow") != "control":
+        errors.append("trusted session-registry seed is missing or not Orchestrator-controlled")
+    if seed and ".harness/sessions/registry.json" not in seed.get("produces", []):
+        errors.append("session-registry seed does not produce the trust root")
+    if "P1-SESSION-SEED01" not in by_id.get("P1-TOOL-BRANCH01", {}).get("deps", []):
+        errors.append("first merged build lacks session-registry seed dependency")
+    if seed and any(dep.startswith("P1-") and by_id.get(dep, {}).get("workflow") == "build" for dep in seed.get("deps", [])):
+        errors.append("session-registry seed has circular build dependency")
+    if "P1-SESSION-SEED01" not in by_id.get("P1-SESSION-REGISTRY01", {}).get("deps", []):
+        errors.append("session-registry build does not extend the seeded trust root")
 
     rows = _plan_rows(plan_text)
     plan_ids = [r[0] for r in rows]
@@ -374,6 +424,14 @@ def validate(
         for result in task.get("gate_results", []):
             path = result.get("path", "")
             result_path_owners.setdefault(path, []).append(task["id"])
+            for index, criterion in enumerate(criteria):
+                parsed = _parse_write_result(criterion)
+                if parsed is None:
+                    continue
+                if parsed.get("--output") == path:
+                    expected_gate = result.get("gate_id")
+                    if parsed.get("--task") != task["id"] or parsed.get("--gate") != expected_gate:
+                        errors.append(f"{task['id']} write_result identity does not match canonical path {path}")
             creation_indices = [
                 index for index, criterion in enumerate(criteria)
                 if ("tools/gates/write_result.py" in criterion or "tools/gates/aggregate.py" in criterion)
@@ -390,6 +448,18 @@ def validate(
             for index in creation_indices:
                 if "tools/gates/aggregate.py" in criteria[index] and f"--inputs {path}" in criteria[index]:
                     errors.append(f"{task['id']} aggregate command reads and writes {path}")
+        expected_write_outputs = {
+            f"evidence/{task['id']}/{sg['id']}.json" for sg in task.get("sub_gates", [])
+        } | {
+            f"evidence/{task['id']}/{gate}.json" for gate in task.get("gates", [])
+            if not gate_model.get(gate, {}).get("required_sub_gates")
+        }
+        actual_write_outputs = {
+            parsed.get("--output") for criterion in criteria
+            if (parsed := _parse_write_result(criterion)) is not None
+        }
+        if actual_write_outputs != expected_write_outputs:
+            errors.append(f"{task['id']} write_result outputs do not match canonical result identities")
         for gate in task.get("gates", []):
             model = gate_model.get(gate, {})
             if not model.get("required_sub_gates"):
@@ -436,10 +506,23 @@ def validate(
         required = gate_model.get(gate, {}).get("required_sub_gates", [])
         if f"{gate}.repository-evidence" not in required or f"{gate}.pr-enforcement" not in required:
             errors.append(f"{gate} does not aggregate repository and per-PR enforcement evidence")
-    pr_criteria = "\n".join(by_id.get("P1-PR-AUDIT01", {}).get("acceptance_criteria", []))
+    pr_task = by_id.get("P1-PR-AUDIT01", {})
+    pr_criteria = pr_task.get("acceptance_criteria", [])
+    if not any("gh pr view" in c and "--json number,headRefOid,baseRefOid,author,state" in c for c in pr_criteria):
+        errors.append("per-PR enforcement lacks real PR identity command")
+    if not any("gh pr diff" in c and "--name-only" in c for c in pr_criteria):
+        errors.append("per-PR enforcement lacks real PR changed-file command")
     for gate in ("AR09-G1", "AR10-G3"):
-        if f"pr_audit_gate.py" not in pr_criteria or f"--gate {gate}" not in pr_criteria:
-            errors.append(f"{gate} lacks real per-PR enforcement command")
+        output = f"evidence/P1-PR-AUDIT01/{gate}.pr-enforcement.json"
+        producers = [c for c in pr_criteria if "pr_audit_gate.py" in c and f"--output {output}" in c]
+        if len(producers) != 1:
+            errors.append(f"{gate} lacks exactly one real per-PR enforcement producer")
+            continue
+        command = producers[0]
+        if "--self-test" in command or "fixtures/" in command:
+            errors.append(f"{gate} enforcement evidence is fixture/self-test based")
+        if "--pr evidence/P1-PR-AUDIT01/pr.json" not in command or "--changed-files evidence/P1-PR-AUDIT01/changed-files.txt" not in command:
+            errors.append(f"{gate} enforcement command does not consume real PR evidence")
     for pattern in data.get("known_deadlock_patterns", []):
         upstream = by_id.get(pattern.get("upstream_task"))
         gate = pattern.get("gate")
@@ -482,8 +565,15 @@ def validate(
                 artifact_errors.append(f"{task['id']} artifact consumer lacks fetch/verify commands")
         criteria = "\n".join(task.get("acceptance_criteria", []))
         ignored_refs = _ignored_artifact_refs(criteria)
-        if not task.get("artifact_binding") and ignored_refs:
-            artifact_errors.append(f"{task['id']} non-producer references ignored artifact paths: {ignored_refs}")
+        if task.get("ignored_output_paths") and not task.get("artifact_binding"):
+            artifact_errors.append(f"{task['id']} declares ignored output paths without artifact producer binding")
+        if task.get("artifact_binding"):
+            allowed = task.get("ignored_output_paths", [])
+            for ref in ignored_refs:
+                if not any(_matches(ref, pattern) for pattern in allowed):
+                    artifact_errors.append(f"{task['id']} producer references undeclared ignored dist path {ref}")
+        elif ignored_refs:
+            artifact_errors.append(f"{task['id']} non-producer references ignored dist paths: {ignored_refs}")
         if task.get("consumes_artifacts"):
             fetch_indices = [i for i, c in enumerate(task.get("acceptance_criteria", [])) if "gh release download" in c]
             verify_indices = [i for i, c in enumerate(task.get("acceptance_criteria", [])) if "tools/artifacts/store.py verify" in c]
@@ -564,7 +654,7 @@ def validate(
                     continue
                 valid = False
                 for producer_id in set(candidates):
-                    if producer_id in {task["id"], "P0-PL01"}:
+                    if producer_id in {task["id"], "P0-PL01", "P0-REM06"}:
                         valid = True
                         break
                     if producer_id in by_id and _reachable(task["id"], by_id, producer_id):
@@ -783,13 +873,48 @@ def run_self_tests(repo_root: Path, baseline: str, history_baseline: str) -> lis
         "d6-unbound-approval",
         lambda d: next(t for t in d["tasks"] if t["id"] == "P1-READY-CERT01")["sub_gates"][0].pop("approval_registry"),
     )
+    expect_failure(
+        "d7-wrong-gate-identity",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"].__setitem__(
+            slice(None), [c.replace("--gate AR02-G1.integrated-properties", "--gate AR02-G1.schema") if "write_result.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"]]
+        ),
+    )
+    expect_failure(
+        "d7-wrong-task-identity",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"].__setitem__(
+            slice(None), [c.replace("--task P1-TST01", "--task P1-PROTO01") if "write_result.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"]]
+        ),
+    )
+    expect_failure(
+        "d8-missing-registry-seed",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TOOL-BRANCH01")["deps"].remove("P1-SESSION-SEED01"),
+    )
+    expect_failure(
+        "d9-fixture-enforcement",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"].__setitem__(
+            slice(None), [c.replace("evidence/P1-PR-AUDIT01/changed-files.txt", "tools/ci/tests/fixtures/changed-files.txt") if "pr_audit_gate.py" in c and "--self-test" not in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"]]
+        ),
+    )
+    expect_failure(
+        "d9-self-test-enforcement",
+        lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"].__setitem__(
+            slice(None), [c.replace("python3 tools/ci/pr_audit_gate.py", "python3 tools/ci/pr_audit_gate.py --self-test") if "pr_audit_gate.py" in c and "--output evidence/P1-PR-AUDIT01/AR09-G1.pr-enforcement.json" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"]]
+        ),
+    )
+    for variant in ("dist/./release/*.whl", "dist/{release,local}/*.whl", "dist/*/*.whl"):
+        expect_failure(
+            f"d10-dist-variant-{variant}",
+            lambda d, variant=variant: next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"].append(
+                f"python3 tools/release/audit_artifacts.py --artifacts {variant} exits zero"
+            ),
+        )
     return results
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--baseline", default="5ce026d")
-    parser.add_argument("--history-baseline", default="4e307b2")
+    parser.add_argument("--history-baseline", default="63beab0")
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -810,7 +935,7 @@ def main() -> int:
         ("DEPS_RESOLVE", not any(e.startswith("unresolved dependencies") for e in errors), f"checked={metrics['dependency_count']}"),
         ("CYCLES", not any("dependency cycle" in e for e in errors), "count=0"),
         ("TOPOLOGICAL_ORDER", not any("not topological" in e for e in errors), "pass"),
-        ("PHASE1_FIELDS", not any("missing fields" in e or "branch evidence" in e or "must complete" in e or "unknown workflow" in e or "gates without" in e or "branch_state" in e or "schema validation" in e or "aggregate invocation" in e or "lacks pre-merge" in e or "lacks trusted session" in e or "code-producing control" in e or "gate_results" in e or "result path" in e for e in errors), f"tasks={metrics['phase1_total']}"),
+        ("PHASE1_FIELDS", not any("missing fields" in e or "branch evidence" in e or "must complete" in e or "unknown workflow" in e or "gates without" in e or "branch_state" in e or "schema validation" in e or "aggregate invocation" in e or "lacks pre-merge" in e or "lacks trusted session" in e or "code-producing control" in e or "gate_results" in e or "result path" in e or "write_result" in e for e in errors), f"tasks={metrics['phase1_total']}"),
         ("PHASE1_INITIAL_STATE", not any("blocked at attempt zero" in e or "max_attempts" in e or "P0-AP01 must" in e for e in errors), "blocked/attempt0/max4"),
         ("PHASE1_AP01_GATE", not any("not transitively gated" in e for e in errors), f"checked={metrics['phase1_total']}"),
         ("PLAN_TASK_ORDER", not any("plan/JSON Phase 1 task order" in e for e in errors), f"plan={metrics['plan_tasks']} json={metrics['phase1_total']}"),
@@ -820,12 +945,16 @@ def main() -> int:
         ("STAGED_GATE_CLOSURE", not any("sub-gate" in e or "aggregator" in e or "known deadlock" in e for e in errors), f"sub_gates={metrics['sub_gates']}"),
         ("GATE_RUNTIME", not any("schema validation" in e or "aggregate invocation" in e or "user-approval sub-gate" in e for e in errors), "schema+aggregate+independent-approval"),
         ("GATE_RESULT_LIFECYCLE", not any("result" in e and any(word in e for word in ("create", "validate", "shared", "self-overwrites", "gate_results", "path")) for e in errors), f"unique_paths={metrics.get('gate_result_paths', 0)}"),
+        ("CANONICAL_RESULT_IDENTITY", not any("write_result identity" in e or "write_result outputs" in e for e in errors), "task+gate+path"),
+        ("REGISTRY_BOOTSTRAP", not any("session-registry seed" in e or "first merged build lacks" in e or "seeded trust root" in e for e in errors), "orchestrator-seed-before-build"),
+        ("REAL_PR_EVIDENCE", not any("per-PR enforcement" in e or "enforcement evidence" in e or "enforcement command" in e or "enforcement producer" in e for e in errors), "gh-pr-identity+diff"),
         ("APPROVAL_BINDING", not any("approval" in e or "not-applicable" in e or "approver" in e for e in errors), "session+artifact+registry+prelock"),
         ("ATOMIC_GATE_EVIDENCE", not any("AR09-G1" in e or "AR10-G3" in e or "AR04-G6" in e or "owner-notice" in e or "per-PR enforcement" in e for e in errors), "repository+enforcement+MSRV+notice"),
         ("PHASE0_HISTORY", not any("Phase 0 history" in e or "baseline-done tasks missing" in e for e in errors), f"compared={metrics['phase0_history_compared']}"),
         ("COMMAND_PRODUCERS", not any("command path" in e for e in errors), f"criteria={metrics['acceptance_criteria_checked']}"),
         ("REVIEW_MERGE_STATES", not any("circular pre-merge" in e or "post-merge record" in e or "independent proof field" in e or "proof task is not gated" in e or "build task must complete" in e or "lacks pre-merge" in e or "lacks trusted session" in e or "INT01 lacks" in e for e in errors), "merged-deps+premerge+session"),
-        ("ARTIFACT_HANDOFF", not any("artifact" in e for e in errors), "draft-release/fetch/verify"),
+        ("ARTIFACT_HANDOFF", not any("artifact" in e or "ignored dist" in e for e in errors), "draft-release/fetch/verify/normalized-dist"),
+        ("DIST_NORMALIZATION", not any("ignored dist" in e or "undeclared ignored" in e for e in errors), "segments+braces+globs"),
         ("CRATE_TAG_READINESS", not any("neutral test crate" in e or "illegally test" in e or "tag timing" in e or "tag does not prove" in e or "native-lane readiness" in e or "conflated" in e or "draft release bundle" in e for e in errors), "semantic"),
         ("PYTEST_ENTRYPOINT", "root pytest entry point" not in errors, "root pytest.ini"),
         ("SCOPE_NORMALIZATION", not any("duplicate produces" in e or "duplicate write_scope" in e or "outside write_scope" in e for e in errors), "normalized"),

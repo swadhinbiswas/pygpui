@@ -390,19 +390,28 @@
       "deps": [
         "P0-REM04"
       ],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
-        "D7 through D10 have exact task, command, path and validator closure",
-        "All independent D7-D10 attack cases fail against the revised graph/schema/validator",
-        "D1 through D6 closures remain intact and root pytest passes with new regression tests",
-        "evidence/P0-REM06/validation.txt contains exact reproducible output",
-        "P0-AP01 and every Phase 1 task remain blocked at attempt zero"
+        "python3 .harness/scripts/validate_phase1_graph.py --baseline 5ce026d --history-baseline 63beab0 --self-test exits zero",
+        "python3 .harness/scripts/validate_handoff.py .harness/HANDOFFS/planner-to-test-engineer-P0-REM06-1.md --task-id P0-REM06 --to Test-Engineer --attempt 1 exits zero",
+        "python3 -m pytest -q exits zero from the repository root",
+        "D7 through D10 attack cases fail and D1 through D6 closures remain intact",
+        "All 52 aggregators, 26 sub-gates and 78 result identities remain canonical",
+        "P0-AP01 and every Phase 1 task remain blocked at attempt zero",
+        "evidence/P0-REM06/validation.txt contains exact reproducible output"
       ],
       "evidence_links": [
-        ".harness/PLANS/phase-0-remediation-round-3.md",
-        "evidence/P0-REM05/independent-verification.txt",
-        "evidence/P0-REM06/validation.txt"
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        ".harness/TASKS.json",
+        ".harness/schemas/gate-results.schema.json",
+        ".harness/scripts/validate_phase1_graph.py",
+        ".harness/scripts/seed_session_registry.py",
+        ".harness/scripts/tests/test_validate_phase1_graph.py",
+        "pytest.ini",
+        "evidence/P0-REM06/validation.txt",
+        ".harness/HANDOFFS/planner-to-test-engineer-P0-REM06-1.md",
+        "evidence/P0-REM05/independent-verification.txt"
       ]
     },
     {
@@ -412,8 +421,8 @@
       "deps": [
         "P0-REM06"
       ],
-      "status": "blocked",
-      "attempt_count": 0,
+      "status": "in_progress",
+      "attempt_count": 1,
       "acceptance_criteria": [
         "A different session reruns all validators/tests and replays D1 through D10",
         "The independent report finds zero unresolved remediation defects"
@@ -497,11 +506,56 @@
       "gate_results": []
     },
     {
+      "id": "P1-SESSION-SEED01",
+      "title": "Create the Orchestrator-controlled session-registry trust root",
+      "owner_role": "Orchestrator",
+      "deps": [
+        "P1-GOV01"
+      ],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1-seed",
+      "workflow": "control",
+      "completion_state": "recorded",
+      "branch_state": "not_started",
+      "write_scope": [
+        ".harness/sessions/registry.json",
+        ".harness/sessions/seed-approval.json",
+        "evidence/P1-SESSION-SEED01/**"
+      ],
+      "produces": [
+        ".harness/sessions/registry.json",
+        ".harness/sessions/seed-approval.json",
+        "evidence/P1-SESSION-SEED01/**"
+      ],
+      "size": "XS",
+      "estimate_range_days": [
+        0.5,
+        1
+      ],
+      "gates": [],
+      "sub_gates": [],
+      "gate_results": [],
+      "acceptance_criteria": [
+        "python3 .harness/scripts/seed_session_registry.py --orchestrator-session <orchestrator-session> --output .harness/sessions/registry.json --approval .harness/sessions/seed-approval.json exits zero",
+        "python3 .harness/scripts/seed_session_registry.py --self-test exits zero",
+        "sha256sum .harness/sessions/registry.json .harness/sessions/seed-approval.json > evidence/P1-SESSION-SEED01/seed-sha256.txt exits zero"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        ".harness/sessions/registry.json",
+        ".harness/sessions/seed-approval.json",
+        "evidence/P1-SESSION-SEED01/seed-sha256.txt"
+      ]
+    },
+    {
       "id": "P1-TOOL-BRANCH01",
       "title": "Own branch evidence, isolated red-main, tag and rollback tooling",
       "owner_role": "Release-CI-Engineer",
       "deps": [
-        "P1-GOV01"
+        "P1-GOV01",
+        "P1-SESSION-SEED01"
       ],
       "status": "blocked",
       "attempt_count": 0,
@@ -569,7 +623,8 @@
       "owner_role": "Orchestrator",
       "deps": [
         "P1-GOV01",
-        "P1-TOOL-BRANCH01"
+        "P1-TOOL-BRANCH01",
+        "P1-SESSION-SEED01"
       ],
       "status": "blocked",
       "attempt_count": 0,
@@ -1810,14 +1865,12 @@
       "write_scope": [
         "tools/ci/pr_audit_policy.json",
         "tools/ci/tests/test_pr_policy.py",
-        "evidence/P1-PR-AUDIT01/**",
-        "tools/ci/tests/fixtures/**"
+        "evidence/P1-PR-AUDIT01/**"
       ],
       "produces": [
         "tools/ci/pr_audit_policy.json",
         "tools/ci/tests/test_pr_policy.py",
-        "evidence/P1-PR-AUDIT01/**",
-        "tools/ci/tests/fixtures/**"
+        "evidence/P1-PR-AUDIT01/**"
       ],
       "size": "S",
       "estimate_range_days": [
@@ -1829,8 +1882,10 @@
         "AR10-G3"
       ],
       "acceptance_criteria": [
-        "python3 tools/ci/pr_audit_gate.py --policy tools/ci/pr_audit_policy.json --changed-files tools/ci/tests/fixtures/changed-files.txt --ledger provenance/ledger.json --gate AR09-G1 --output evidence/P1-PR-AUDIT01/AR09-G1.pr-enforcement.json exits zero only with real per-PR provenance enforcement evidence",
-        "python3 tools/ci/pr_audit_gate.py --policy tools/ci/pr_audit_policy.json --changed-files tools/ci/tests/fixtures/changed-files.txt --ledger provenance/ledger.json --gate AR10-G3 --output evidence/P1-PR-AUDIT01/AR10-G3.pr-enforcement.json exits zero only with real per-PR authored-scope enforcement evidence",
+        "gh pr view <pr-number> --json number,headRefOid,baseRefOid,author,state > evidence/P1-PR-AUDIT01/pr.json exits zero",
+        "gh pr diff <pr-number> --name-only > evidence/P1-PR-AUDIT01/changed-files.txt exits zero",
+        "python3 tools/ci/pr_audit_gate.py --policy tools/ci/pr_audit_policy.json --pr evidence/P1-PR-AUDIT01/pr.json --changed-files evidence/P1-PR-AUDIT01/changed-files.txt --ledger provenance/ledger.json --gate AR09-G1 --output evidence/P1-PR-AUDIT01/AR09-G1.pr-enforcement.json exits zero only with real PR provenance enforcement evidence",
+        "python3 tools/ci/pr_audit_gate.py --policy tools/ci/pr_audit_policy.json --pr evidence/P1-PR-AUDIT01/pr.json --changed-files evidence/P1-PR-AUDIT01/changed-files.txt --ledger provenance/ledger.json --gate AR10-G3 --output evidence/P1-PR-AUDIT01/AR10-G3.pr-enforcement.json exits zero only with real PR authored-scope enforcement evidence",
         "python3 -m pytest tools/ci/tests/test_pr_policy.py exits zero",
         "python3 tools/ci/pr_audit_gate.py --policy tools/ci/pr_audit_policy.json --self-test exits zero after verifying nonzero rejection for copied/adapted expression without an approved exception and for authored files without Apache-2.0 coverage",
         "python3 tools/ci/branch_gate.py verify --task P1-PR-AUDIT01 --state independently_verified --evidence evidence/P1-PR-AUDIT01/branch-evidence.json exits zero",
@@ -3241,7 +3296,10 @@
         "manifest": "artifacts/local/<artifact-id>/manifest.json",
         "tag_pattern": "artifacts/<artifact-id>"
       },
-      "gate_results": []
+      "gate_results": [],
+      "ignored_output_paths": [
+        "dist/local/**"
+      ]
     },
     {
       "id": "P1-TST01",
@@ -4057,6 +4115,9 @@
           "kind": "full_gate",
           "evidence_type": "contract"
         }
+      ],
+      "ignored_output_paths": [
+        "dist/release/**"
       ]
     },
     {
@@ -5265,7 +5326,8 @@
     ".harness/scripts/validate_phase1_graph.py": "P0-PL01",
     ".harness/scripts/tests/test_validate_phase1_graph.py": "P0-PL01",
     ".harness/schemas/gate-results.schema.json": "P0-PL01",
-    ".harness/scripts/validate_handoff.py": "P0-PL01"
+    ".harness/scripts/validate_handoff.py": "P0-PL01",
+    ".harness/scripts/seed_session_registry.py": "P0-REM06"
   },
   "artifact_store": {
     "mechanism": "GitHub draft release assets",
@@ -5658,5 +5720,7 @@
   ],
   "remediation_baseline": "b9a8504",
   "remediation_round_2_baseline": "4e307b2",
-  "gate_result_policy": "Exactly one schema object is stored per unique gate/sub-gate result file. Aggregators read only sub-gate files and write a distinct full-gate file; schema validation runs after the result is created. No command may read and write the same result path."
+  "gate_result_policy": "Exactly one schema object is stored per unique gate/sub-gate result file. Aggregators read only sub-gate files and write a distinct full-gate file; schema validation runs after the result is created. No command may read and write the same result path.",
+  "remediation_round_3_baseline": "63beab0",
+  "session_seed_policy": "P1-SESSION-SEED01 is an Orchestrator-controlled recorded trust-root task. It creates the initial .harness/sessions/registry.json before any merged build; P1-TOOL-BRANCH01 depends on it and P1-SESSION-REGISTRY01 later extends the same append-only registry."
 }

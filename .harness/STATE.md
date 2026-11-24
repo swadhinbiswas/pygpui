@@ -39,10 +39,11 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - `P0-REM02` independent verification found six unresolved defects (D1–D6) despite green structural tests. The remediation is not accepted.
 - `P0-REM04` fixed D1–D6 with 78 unique gate-result paths, merged foundational tool tasks, per-PR enforcement evidence, fetch-before-audit artifacts, normalized ignored-path detection and bound approvals. Root pytest now passes 57 tests plus 15 subtests.
 - `P0-REM05` fresh retest confirmed D1–D6 closures but found four residuals (D7–D10). Remediation is not accepted.
+- `P0-REM06` fixed D7–D10 with canonical result identity, an Orchestrator registry seed, real PR-derived enforcement evidence and normalized ignored-`dist` detection. Root pytest now passes 67 tests plus 18 subtests.
 
 ## Active work
 
-`P0-REM06` is fixing D7–D10 in a third narrow pass. `P0-REM07` independent retest and `P0-REM03` Red-Team verification remain blocked. `P0-AP01` remains blocked.
+`P0-REM07` final independent Test-Engineer retest is replaying D1–D10. `P0-REM03` Red-Team verification and `P0-AP01` remain blocked.
 
 ## Blocked
 
@@ -52,8 +53,8 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 
 ## Next 3 actions
 
-1. `P0-REM06` fixes residuals D7–D10 in the plan, graph, schema and validators.
-2. `P0-REM07` independently replays D1–D10; `P0-REM03` performs final Red-Team verification.
+1. `P0-REM07` independently replays D1–D10 against the round-3 fixes.
+2. `P0-REM03` performs final Red-Team verification of the remediation.
 3. Orchestrator approves `P0-AP01` only after remediation verification, then authorizes and dispatches the first Counter-slice build wave.
 
 ## Phase 0 exit gate

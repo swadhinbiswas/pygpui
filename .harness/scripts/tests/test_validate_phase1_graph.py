@@ -3,6 +3,8 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -22,7 +24,7 @@ class GraphValidatorSemanticTests(unittest.TestCase):
         cls.data = json.loads((ROOT / ".harness" / "TASKS.json").read_text())
         cls.plan = (ROOT / ".harness" / "PLANS" / "phase-1-vertical-slice.md").read_text()
         cls.baseline = VALIDATOR._load_baseline(ROOT, "5ce026d")
-        cls.history_baseline = VALIDATOR._load_baseline(ROOT, "4e307b2")
+        cls.history_baseline = VALIDATOR._load_baseline(ROOT, "63beab0")
 
     def assert_invalid(self, mutate_data=None, mutate_plan=None) -> None:
         data = copy.deepcopy(self.data)
@@ -210,6 +212,32 @@ class GraphValidatorSemanticTests(unittest.TestCase):
     def test_d6_unbound_approval_is_rejected(self) -> None:
         self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-READY-CERT01")["sub_gates"][0].pop("approval_registry"))
 
+    def test_d7_wrong_gate_identity_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"].__setitem__(slice(None), [c.replace("--gate AR02-G1.integrated-properties", "--gate AR02-G1.schema") if "write_result.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"]]))
+
+    def test_d7_wrong_task_identity_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"].__setitem__(slice(None), [c.replace("--task P1-TST01", "--task P1-PROTO01") if "write_result.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-TST01")["acceptance_criteria"]]))
+
+    def test_d8_missing_registry_seed_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-TOOL-BRANCH01")["deps"].remove("P1-SESSION-SEED01"))
+
+    def test_d8_non_orchestrator_seed_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-SESSION-SEED01").update(owner_role="Release-CI-Engineer"))
+
+    def test_d9_fixture_enforcement_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"].__setitem__(slice(None), [c.replace("evidence/P1-PR-AUDIT01/changed-files.txt", "tools/ci/tests/fixtures/changed-files.txt") if "pr_audit_gate.py" in c and "--self-test" not in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"]]))
+
+    def test_d9_self_test_enforcement_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"].__setitem__(slice(None), [c.replace("python3 tools/ci/pr_audit_gate.py", "python3 tools/ci/pr_audit_gate.py --self-test") if "pr_audit_gate.py" in c and "--output evidence/P1-PR-AUDIT01/AR09-G1.pr-enforcement.json" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"]]))
+
+    def test_d10_normalized_dist_variants_are_rejected(self) -> None:
+        for variant in ("dist/./release/*.whl", "dist/{release,local}/*.whl", "dist/*/*.whl"):
+            with self.subTest(variant=variant):
+                self.assert_invalid(lambda d, variant=variant: next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"].append(f"python3 tools/release/audit_artifacts.py --artifacts {variant} exits zero"))
+
+    def test_d10_nonproducer_bare_dist_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"].append("python3 tools/release/audit_artifacts.py --artifacts dist exits zero"))
+
 
 class GateResultSchemaTests(unittest.TestCase):
     @classmethod
@@ -274,6 +302,32 @@ class GateResultSchemaTests(unittest.TestCase):
         record["lockfile"] = {"state": "sha256"}
         with self.assertRaises(jsonschema.ValidationError):
             jsonschema.validate(record, self.schema)
+
+
+class SessionSeedScriptTests(unittest.TestCase):
+    def test_seed_self_test_passes(self) -> None:
+        result = subprocess.run(
+            ["python3", str(ROOT / ".harness/scripts/seed_session_registry.py"), "--orchestrator-session", "orch-1", "--self-test"],
+            cwd=ROOT, text=True, capture_output=True,
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertIn("SESSION_SEED_SELF_TEST=PASS", result.stdout)
+
+    def test_seed_creates_bound_registry_and_approval(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            registry = Path(directory) / "registry.json"
+            approval = Path(directory) / "seed-approval.json"
+            result = subprocess.run(
+                ["python3", str(ROOT / ".harness/scripts/seed_session_registry.py"), "--orchestrator-session", "orch-1", "--output", str(registry), "--approval", str(approval)],
+                cwd=ROOT, text=True, capture_output=True,
+            )
+            self.assertEqual(0, result.returncode, result.stderr)
+            registry_data = json.loads(registry.read_text())
+            approval_data = json.loads(approval.read_text())
+            self.assertEqual("orchestrator", registry_data["trust_root"])
+            self.assertEqual("orchestrator", registry_data["sessions"]["orch-1"]["role"])
+            self.assertEqual("orch-1", approval_data["approver_session_id"])
+            self.assertEqual(64, len(approval_data["registry_sha256"]))
 
 
 if __name__ == "__main__":

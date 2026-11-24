@@ -1,10 +1,10 @@
 # Phase 1 plan — execution-ready Counter slice
 
-- Planner remediation task: `P0-REM04`, attempt 1
-- Prior remediation task: `P0-REM01`, attempt 1
+- Planner remediation task: `P0-REM06`, attempt 1
+- Prior remediation task: `P0-REM04`, attempt 1
 - Prepared: 2026-11-24
 - Accepted ADR baseline: `5ce026d`
-- Remediation round-2 baseline: `4e307b2`
+- Remediation round-3 baseline: `63beab0`
 - Execution state: **targeted remediation; `P0-AP01` and every Phase 1 task remain `blocked` at attempt zero**
 - Authoritative graph: `.harness/TASKS.json`
 - Reproducible validators: `.harness/scripts/validate_phase1_graph.py`, `.harness/scripts/validate_handoff.py`
@@ -63,12 +63,17 @@ Deliver the ADR 0002 Counter window first: Python creates an entity/view; Rust p
 | D4 | LIC02/LICENSE-CLOSE01 fetch and verify durable artifacts first, then audit only the downloaded files; ignored `dist/release` audits are removed. |
 | D5 | The validator normalizes and rejects every ignored `dist/release`/`dist/local` path or glob variant, including `*.whl`. |
 | D6 | User approvals bind approver session, approval artifact, trusted registry and scope; pre-lock approvals use `lockfile.state: not_applicable` with a reason. |
+| D7 | Every `write_result.py` command is parsed and required to match canonical `evidence/<task>/<gate>.json` identity. |
+| D8 | `P1-SESSION-SEED01` creates the Orchestrator-controlled trust root before `P1-TOOL-BRANCH01`; the later registry build extends it. |
+| D9 | Per-PR enforcement derives identity and changed files from `gh pr view`/`gh pr diff`; fixtures and `--self-test` cannot produce enforcement evidence. |
+| D10 | Ignored `dist/` detection normalizes dot segments, braces and glob variants; only declared build-output producers may reference `dist/`. |
 
 ## 4. Staged gate model
 
 Each full `ARxx-Gn` has exactly one final aggregator in `gate_model`. Producer tasks emit named sub-gates such as `AR02-G1.schema`, `AR05-G2.linux-installed` or `AR07-G4.same-wheel-callbacks`. An aggregator passes only when every required sub-gate passes with current source/artifact hashes.
 
 - Exactly one schema object is stored per canonical `evidence/<task-id>/<gate-id>.json` file. Aggregators read only distinct sub-gate files and write a distinct full-gate file.
+- Every `write_result.py --task/--gate/--output` tuple is parsed and must match the canonical path identity.
 - Every result is created before schema validation; aggregate commands may not read and write the same path.
 - `gate-results.json` conforms to `.harness/schemas/gate-results.schema.json` and includes `evidence_type`; `user-approval` records also require approver session, approval artifact, registry hash and scope.
 - Status is one of `pass`, `fail`, `inconclusive`, `blocked` or `not_measured`.
@@ -86,7 +91,7 @@ A dependency is satisfied only when the producer reaches its declared state:
 - `merged`: the Integrator accepted pre-merge evidence, merged the PR and recorded the merge SHA; consumers branch from this `main`.
 - `recorded`: a control/readiness task archived a structured result without a code-merge claim.
 
-Build tasks complete at `merged`. Their acceptance runs only pre-merge `independently_verified` checks and cannot require `--state merged`. After the Integrator records the merge SHA with `tools/ci/record_merge.py`, the task can reach `done`; dependent branches wait for that merged state. `P1-SESSION-REGISTRY01` and `P1-GATE-SCHEMA01` are build tasks, not control tasks, because they produce code/schema consumed by later branches. `P1-SLICE01` is the sole implementation-stage exception, followed by `P1-TST01`, `P1-REV01` and `P1-INT01`, which records and verifies the actual Counter merge SHA.
+Build tasks complete at `merged`. Their acceptance runs only pre-merge `independently_verified` checks and cannot require `--state merged`. After the Integrator records the merge SHA with `tools/ci/record_merge.py`, the task can reach `done`; dependent branches wait for that merged state. `P1-SESSION-SEED01` is an Orchestrator-controlled recorded trust root created before the first merged build; `P1-TOOL-BRANCH01` depends on it, and `P1-SESSION-REGISTRY01` later extends the same append-only registry. `P1-SESSION-REGISTRY01` and `P1-GATE-SCHEMA01` are build tasks, not control tasks, because they produce code/schema consumed by later branches. `P1-SLICE01` is the sole implementation-stage exception, followed by `P1-TST01`, `P1-REV01` and `P1-INT01`, which records and verifies the actual Counter merge SHA.
 
 ### Trusted single-identity review model
 
@@ -111,7 +116,7 @@ One GitHub identity is available. Role separation is procedural but machine-chec
 - Immutability: never reuse a tag, overwrite/delete an asset or rewrite a manifest. Repair creates a new artifact ID.
 - Binding: manifest records source commit, `Cargo.lock` SHA-256, Rust toolchain, target/features and artifact SHA-256.
 
-`P1-LOCALWHEEL01` binds its wheel to the reviewed `P1-SLICE01` commit. Every installed-wheel consumer fetches and verifies the durable asset before auditing it. LIC02/LICENSE-CLOSE01 audit only `evidence/<task-id>/downloads/**`; no consumer references ignored `dist/` paths. `P1-ARTIFACT-GATE01` rejects stale downstream hashes.
+`P1-LOCALWHEEL01` binds its wheel to the reviewed `P1-SLICE01` commit. Every installed-wheel consumer fetches and verifies the durable asset before auditing it. LIC02/LICENSE-CLOSE01 audit only `evidence/<task-id>/downloads/**`; no consumer references ignored `dist/` paths. The validator normalizes dot segments, brace expansions and glob variants, and only `P1-LOCALWHEEL01`/`P1-REL01` may reference their declared ignored output paths. `P1-ARTIFACT-GATE01` rejects stale downstream hashes.
 
 ## 7. Dependency-ordered task graph
 
@@ -120,8 +125,9 @@ All tasks start at attempt 0, status `blocked` and branch state `not_started`. R
 | ID | Deliverable | Owner | Dependencies | Size / range |
 |---|---|---|---|---|
 | `P1-GOV01` | Authorize Phase 1 and record execution readiness | Orchestrator | `P0-AP01` | S / 1–2 |
-| `P1-TOOL-BRANCH01` | Own branch evidence, isolated red-main, tag and rollback tooling | Release-CI-Engineer | `P1-GOV01` | L / 6–8 |
-| `P1-SESSION-REGISTRY01` | Own the trusted append-only session-role registry | Orchestrator | `P1-GOV01`, `P1-TOOL-BRANCH01` | M / 3–5 |
+| `P1-SESSION-SEED01` | Create the Orchestrator-controlled session-registry trust root | Orchestrator | `P1-GOV01` | XS / 0.5–1 |
+| `P1-TOOL-BRANCH01` | Own branch evidence, isolated red-main, tag and rollback tooling | Release-CI-Engineer | `P1-GOV01`, `P1-SESSION-SEED01` | L / 6–8 |
+| `P1-SESSION-REGISTRY01` | Own the trusted append-only session-role registry | Orchestrator | `P1-GOV01`, `P1-TOOL-BRANCH01`, `P1-SESSION-SEED01` | M / 3–5 |
 | `P1-TOOL-GRAPH01` | Own and negatively test graph and contract-freeze validators | Release-CI-Engineer | `P1-GOV01`, `P1-TOOL-BRANCH01` | M / 3–5 |
 | `P1-TOOL-AUDIT01` | Own fail-closed provenance, source, safety and per-PR audit tools | License-Compliance-Reviewer | `P1-GOV01`, `P1-TOOL-BRANCH01` | L / 6–8 |
 | `P1-TOOL-PLATFORM01` | Own readiness, platform, IME, AT and support-manifest gate tools | Platform-Test-Engineer | `P1-GOV01`, `P1-TOOL-BRANCH01` | L / 6–8 |
@@ -319,4 +325,4 @@ Per-task ranges imply roughly **70–110 ideal engineer-days** on the Counter cr
 
 ## 15. Plan completion
 
-This remediation is complete only when graph/handoff validators and root pytest pass, exact output is written to `evidence/P0-REM04/validation.txt`, `P0-REM04` is done at attempt 1 and the independent Test-Engineer handoff contains every Part 3 field. No Phase 1 task or `P0-AP01` is authorized by this plan.
+This remediation is complete only when graph/handoff validators and root pytest pass, exact output is written to `evidence/P0-REM06/validation.txt`, `P0-REM06` is done at attempt 1 and the independent Test-Engineer handoff contains every Part 3 field. No Phase 1 task or `P0-AP01` is authorized by this plan.
