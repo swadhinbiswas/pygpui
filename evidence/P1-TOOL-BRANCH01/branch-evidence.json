@@ -25,7 +25,7 @@
   },
   "test": {
     "path": "evidence/P1-TOOL-BRANCH01/independent-test.json",
-    "sha256": null
+    "sha256": "7d48be25ea27b6724e954ef042ad50e2a01f25c42d82894162ad0887449b17c5"
   },
   "session_roles": {
     "path": "evidence/P1-TOOL-BRANCH01/session-roles.json",

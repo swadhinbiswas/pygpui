@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "task_id": "P1-TOOL-BRANCH01",
+  "record_path": "evidence/P1-TOOL-BRANCH01/independent-test.json",
+  "session_id": "ses_df27261c9ffdiy0RA5Ko2oSdxl",
+  "role": "test-engineer",
+  "attempt": 2,
+  "decision": "pass",
+  "decision_reason": "The full independent matrix, all self-tests, fresh isolated drills, and the exact attempt-1 T-01-T-05 adversarial script passed against the dispatched PR head and bound source identity.",
+  "branch": "feat/P1-TOOL-BRANCH01-tooling",
+  "base_commit": "15d29b32a066eeab7f4fdcc9b8a02456c4c0434f",
+  "source_commit": "031524fd65d14d5a5818e277ac1bfc28d6e0db5b",
+  "source_tree": "b6d70180cacfcaa8aa76a0e6d2a5aeae94cd7b6e",
+  "artifact_id": "P1-TOOL-BRANCH01-branch",
+  "artifact_sha256": "76d214d68d773084a3fa4e09422c2a19324beff9604d010b830d608aed514503",
+  "registry_sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498",
+  "registry": {
+    "path": ".harness/sessions/registry.json",
+    "sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498"
+  },
+  "session_roles": {
+    "path": "evidence/P1-TOOL-BRANCH01/session-roles.json",
+    "sha256": "71a5fbdb874e552963ef475a7e977b6d0d88b5f8fd34a88b7358f4c3befbba1b"
+  },
+  "pr": {
+    "number": 1,
+    "url": "https://github.com/swadhinbiswas/pygpui/pull/1",
+    "state": "OPEN",
+    "base_ref": "main",
+    "head_ref": "feat/P1-TOOL-BRANCH01-tooling",
+    "head_oid_at_dispatch": "a1aae471d699ea10df2b75d34d477428ccb3a66b",
+    "head_oid_after_checks": "a1aae471d699ea10df2b75d34d477428ccb3a66b"
+  },
+  "environment": {
+    "platform": "linux",
+    "python": "3.14.10",
+    "pytest": "9.2.0",
+    "ruff": "0.17.6",
+    "ruff_path": "/tmp/opencode/uv-tools/ruff/bin/ruff",
+    "worktree": "/tmp/opencode/pygpui-P1-TOOL-BRANCH01",
+    "completed_at": "2026-11-24T13:40:55Z"
+  },
+  "attempt_1_preservation": {
+    "path": "evidence/P1-TOOL-BRANCH01/attempt-1/independent-test.json",
+    "sha256": "cd60953cac91f9b667d6e58704241b457dc05226f72cb31b5e531fdbec03a3a4",
+    "decision": "fail",
+    "unchanged": true
+  },
+  "required_matrix": {
+    "status": "pass",
+    "seed_verify": "SESSION_SEED_VERIFY=PASS",
+    "tools_ci_pytest": "95 passed in 4.93s",
+    "full_local_gate": "LOCAL_GATE=PASS steps=fmt,lint,tests,graph; 183 passed, 18 subtests passed in 17.63s; VALIDATION=PASS",
+    "self_tests": [
+      "SESSION_SEED_SELF_TEST=PASS",
+      "BRANCH_GATE_SELF_TEST=PASS",
+      "RECORD_MERGE_SELF_TEST=PASS",
+      "REGISTER_ROLES_SELF_TEST=PASS",
+      "SESSION_ROLES_SELF_TEST=PASS",
+      "RED_MAIN_DRILL_SELF_TEST=PASS",
+      "ROLLBACK_DRILL_SELF_TEST=PASS",
+      "TAG_POINT_SELF_TEST=PASS",
+      "LOCAL_GATE_SELF_TEST=PASS"
+    ],
+    "red_main_drill": {
+      "status": "pass",
+      "fixture": "/tmp/opencode/red-main-attempt-2-independent",
+      "baseline_sha": "7e132829761568774519076a296b3726a8ba7ae9",
+      "red_main": "076d1f5184be448a33b928e25c9fd1850f690d9c",
+      "restored_green": "0484beb8c01bd058a403bd58f8f349e6a02dd548",
+      "gate_on_red": {"exit_code": 1, "status": "fail"},
+      "gate_after_fix": {"exit_code": 0, "status": "pass"},
+      "production_unchanged": true
+    },
+    "rollback_drill": {
+      "status": "pass",
+      "fixture": "/tmp/opencode/rollback-attempt-2-independent",
+      "tag": "phase1/contracts-premerge",
+      "tag_commit": "7e132829761568774519076a296b3726a8ba7ae9",
+      "reviewed_merge_sha": "e97be9e09175656e33b9c01bfc7071c771472c52",
+      "injected_failure_sha": "98838be433d4b82cc0e14914b438ab133495b768",
+      "revert_sha": "174dd1f958722291cfcd4371126849a52475959c",
+      "gate_after_revert": {"exit_code": 0, "status": "pass"},
+      "revert_of_revert_sha": "a11dc499182595fa60806e21407163891d046740",
+      "gate_after_revert_of_revert": {"exit_code": 1, "status": "fail"},
+      "restored_green_sha": "a469fad061cc1dee3145122920e61b07d9bc1d3c",
+      "gate_after_remerge": {"exit_code": 0, "status": "pass"},
+      "production_unchanged": true
+    }
+  },
+  "adversarial_checks": {
+    "status": "pass",
+    "script_path": "/tmp/opencode/P1-TOOL-BRANCH01-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/adversarial_checks.py",
+    "script_sha256": "eb7f189a43b35b1e0bb7c0b2b27f646b001f95dd1ea39120a64d22187e4c9ab7",
+    "archived_script_sha256": "eb7f189a43b35b1e0bb7c0b2b27f646b001f95dd1ea39120a64d22187e4c9ab7",
+    "exact_attempt_1_script": true,
+    "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/adversarial-checks.txt",
+    "log_sha256": "a0f61fe0ba4b1a1d43b230e5c8a2ed494faa6716ac46cb73d0f4ad2f779b5cb1",
+    "passed": 5,
+    "failed": 0,
+    "checks": [
+      {"id": "T-01", "result": "pass", "rejection": "code=commit named branch ref does not exist"},
+      {"id": "T-02", "result": "pass", "rejection": "code=role session lacks an explicit matching task binding"},
+      {"id": "T-03", "result": "pass", "rejection": "code=artifact source tree does not match the branch artifact"},
+      {"id": "T-04", "result": "pass", "rejection": "code=identity branch does not match the branch artifact"},
+      {"id": "T-05", "result": "pass", "rejection": "LOCAL_GATE_REJECT code=dependency; exit=69"}
+    ]
+  },
+  "code_inspection": {
+    "status": "pass",
+    "T-01": "tools/ci/common.py:213-227 resolves refs/heads/<branch>; tools/ci/evidence.py:169-173 requires source ancestry from that tip.",
+    "T-02": "tools/ci/common.py:300-325 requires a non-empty explicit task_id equal to the requested task for every checked role.",
+    "T-03_T-04": "tools/ci/evidence.py:78-117 and 206-222 require exact source_tree and branch on review, independent-test and session-role records.",
+    "T-05": "tools/ci/run_local_gate.py:23-35 maps command OSError to GateError(dependency); lines 158-166 return CLI exit 69."
+  },
+  "defects": [],
+  "production_main": {
+    "remote_before": "755028a48c2849e166f1096a437bd98629c3d2c5",
+    "remote_after": "755028a48c2849e166f1096a437bd98629c3d2c5",
+    "local_main_before": "755028a48c2849e166f1096a437bd98629c3d2c5",
+    "local_main_after": "755028a48c2849e166f1096a437bd98629c3d2c5",
+    "origin_main_before": "755028a48c2849e166f1096a437bd98629c3d2c5",
+    "origin_main_after": "755028a48c2849e166f1096a437bd98629c3d2c5",
+    "unchanged": true,
+    "before_log_sha256": "a3c98e980bcdf8f88c76b5276695b143a043a23d547f8d0a7fae6f8597877255",
+    "after_log_sha256": "a3c98e980bcdf8f88c76b5276695b143a043a23d547f8d0a7fae6f8597877255",
+    "red_drill_snapshot_unchanged": true,
+    "rollback_drill_snapshot_unchanged": true
+  },
+  "fixture_evidence": [
+    {
+      "path": "/tmp/opencode/red-main-attempt-2-independent/archive.json",
+      "sha256": "60e261c5a1ccec1764220a5ba18ec9b2182a21fcbae74622436bc62ca9f305ec",
+      "commands_path": "/tmp/opencode/red-main-attempt-2-independent/commands.txt",
+      "commands_sha256": "091b45ffb546677fdac8641df90dc0f0a83239b1cc48be7b6600960fb693b35d"
+    },
+    {
+      "path": "/tmp/opencode/rollback-attempt-2-independent/archive.json",
+      "sha256": "7d76d2ffd862fdc14774b3e34660c6c70bcf850dcb707c33fa3ee2fe040582e2",
+      "commands_path": "/tmp/opencode/rollback-attempt-2-independent/commands.txt",
+      "commands_sha256": "6b989b5d553fe5344b2a19915cbc8d6d74f572a643409a19c5659c8b4dc0cb9d",
+      "tag_record_path": "/tmp/opencode/rollback-attempt-2-independent/work/evidence/tag-record.json",
+      "tag_record_sha256": "32e01025bb29ce27665e6c7eb08d388cb862b6185851ca82538a15681a022afa"
+    }
+  ],
+  "reviewed_evidence_hashes": {
+    "branch_evidence_before_test_reference_sha256": "40290150b84074a5fedeb9f6ae42fed2e7dc5abd4947b9e54f5b9a757c9af283",
+    "registry_sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498",
+    "seed_approval_sha256": "83c767e7d46b4851d5244c99cbaee0f4a2d0b23a83be178445723e5e195700b8",
+    "session_roles_sha256": "71a5fbdb874e552963ef475a7e977b6d0d88b5f8fd34a88b7358f4c3befbba1b",
+    "attempt_1_independent_test_sha256": "cd60953cac91f9b667d6e58704241b457dc05226f72cb31b5e531fdbec03a3a4",
+    "pr_identity_log_sha256": "968128470669be085030098bc6f47cfaa02078e23307aba0f6d67f648072426a",
+    "pr_checks_log_sha256": "a040e0a20f49056c7b27293822118155c4541be8e8f2ee2f285799921e87c264",
+    "diff_check_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "commands": [
+    {
+      "name": "seed_verify",
+      "command": "python3 .harness/scripts/seed_session_registry.py --verify",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "SESSION_SEED_VERIFY=PASS",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/seed-verify.txt",
+      "log_sha256": "703e4e77a155d89930e9233a38c157120489d10ebdb6b599b4319550b065e711"
+    },
+    {
+      "name": "seed_self_test",
+      "command": "python3 .harness/scripts/seed_session_registry.py --self-test",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "SESSION_SEED_SELF_TEST=PASS",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/seed-self-test.txt",
+      "log_sha256": "ac133732d20ed9692c6028477f42a67b5eee4a9fd59d595626318a1fabec28c8"
+    },
+    {
+      "name": "tools_ci_pytest",
+      "command": "python3 -m pytest tools/ci/tests",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "collected 95 items; 95 passed in 4.93s",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/pytest-tools-ci.txt",
+      "log_sha256": "989c007ec13e9a7bc7d16054b02b2230b3049e7be0b43d2b158bb81e4053966f"
+    },
+    {
+      "name": "full_local_gate",
+      "command": "PYGPUI_RUFF=/tmp/opencode/uv-tools/ruff/bin/ruff python3 tools/ci/run_local_gate.py --mode full",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "20 files already formatted; All checks passed!; 183 passed, 18 subtests passed in 17.63s; VALIDATION=PASS; LOCAL_GATE=PASS steps=fmt,lint,tests,graph",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/local-gate.txt",
+      "log_sha256": "c7fffed339d099dba5181df0536e6b5fffd2e4b78726a128f09a6f7456d70a58"
+    },
+    {
+      "name": "branch_gate_self_test",
+      "command": "python3 tools/ci/branch_gate.py --self-test",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "BRANCH_GATE_SELF_TEST=PASS",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/branch-gate-self-test.txt",
+      "log_sha256": "db1190bfc8456824b1ed40f822c11cd9bd2f7ccfea77021dcba5604407529ef1"
+    },
+    {
+      "name": "record_merge_self_test",
+      "command": "python3 tools/ci/record_merge.py --self-test",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "RECORD_MERGE_SELF_TEST=PASS",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/record-merge-self-test.txt",
+      "log_sha256": "681a9aa9db8f932629ad212546340ad9ab3642512e907c9ec7e0d735c79103d6"
+    },
+    {
+      "name": "register_roles_self_test",
+      "command": "python3 tools/session/register_roles.py --self-test",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "REGISTER_ROLES_SELF_TEST=PASS",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/register-roles-self-test.txt",
+      "log_sha256": "8730f823b4cbaf02439538300d5d230ddcc1c14de7bcb0e2969d922d657ccaf1"
+    },
+    {
+      "name": "verify_roles_self_test",
+      "command": "python3 tools/session/verify_roles.py --self-test",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "SESSION_ROLES_SELF_TEST=PASS",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/verify-roles-self-test.txt",
+      "log_sha256": "52d5152475fbae59f7463069bae03ad5c155a3f772c47d061fd374af260504ea"
+    },
+    {
+      "name": "red_main_self_test",
+      "command": "python3 tools/ci/red_main_drill.py --self-test",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "RED_MAIN_DRILL_SELF_TEST=PASS",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/red-main-self-test.txt",
+      "log_sha256": "a706459c844ab7afd4eddceec71ccefd7851040fe7ed41a216afc8614d19a926"
+    },
+    {
+      "name": "rollback_self_test",
+      "command": "python3 tools/ci/rollback_drill.py --self-test",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "ROLLBACK_DRILL_SELF_TEST=PASS",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/rollback-self-test.txt",
+      "log_sha256": "6a5fb1cceed08a22398fb32c1a119b99c745ccfcaaebd657c124bbe19f0364bd"
+    },
+    {
+      "name": "tag_point_self_test",
+      "command": "python3 tools/ci/tag_point.py --self-test",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "TAG_POINT_SELF_TEST=PASS",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/tag-point-self-test.txt",
+      "log_sha256": "368d9a0d3d0661e20789079646205604f0fd34c8cde17c90e7fcb3364056838f"
+    },
+    {
+      "name": "local_gate_self_test",
+      "command": "python3 tools/ci/run_local_gate.py --self-test",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "LOCAL_GATE_SELF_TEST=PASS; the preceding LOCAL_GATE=FAIL line is the deliberate fail-fast fixture",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/local-gate-self-test.txt",
+      "log_sha256": "2293e14098c17b8e2e373b4afb38daed9c4aa07c37f84e78293e49283c3e7bfd"
+    },
+    {
+      "name": "adversarial_checks",
+      "command": "python3 /tmp/opencode/P1-TOOL-BRANCH01-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/adversarial_checks.py",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "T-01 through T-05 PASS; ADVERSARIAL_SUMMARY failed=[] passed=true",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/adversarial-checks.txt",
+      "log_sha256": "a0f61fe0ba4b1a1d43b230e5c8a2ed494faa6716ac46cb73d0f4ad2f779b5cb1"
+    },
+    {
+      "name": "red_main_independent_drill",
+      "command": "python3 tools/ci/red_main_drill.py --fixture /tmp/opencode/red-main-attempt-2-independent",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "RED_MAIN_DRILL=PASS red_main=076d1f5184be448a33b928e25c9fd1850f690d9c restored_green=0484beb8c01bd058a403bd58f8f349e6a02dd548 production_unchanged=true",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/red-main-drill.txt",
+      "log_sha256": "c55bc516e367f9f445ec83fcb63ab865e15850adb4043592a85e0d020822df32"
+    },
+    {
+      "name": "rollback_independent_drill",
+      "command": "python3 tools/ci/rollback_drill.py --fixture /tmp/opencode/rollback-attempt-2-independent --tag phase1/contracts-premerge",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "ROLLBACK_DRILL=PASS revert=174dd1f958722291cfcd4371126849a52475959c revert_of_revert=a11dc499182595fa60806e21407163891d046740 restored_green=a469fad061cc1dee3145122920e61b07d9bc1d3c production_unchanged=true",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/rollback-drill.txt",
+      "log_sha256": "8b3e4974dba59cb165ceeaf9d391e6aaa4a573ec7e543911b337f1a47e0d8c60"
+    },
+    {
+      "name": "production_main_before",
+      "command": "git ls-remote origin refs/heads/main",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "755028a48c2849e166f1096a437bd98629c3d2c5 refs/heads/main",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/production-main-before.txt",
+      "log_sha256": "a3c98e980bcdf8f88c76b5276695b143a043a23d547f8d0a7fae6f8597877255"
+    },
+    {
+      "name": "git_identity_before",
+      "command": "git rev-parse HEAD HEAD^{tree} main origin/main 031524fd65d14d5a5818e277ac1bfc28d6e0db5b 031524fd65d14d5a5818e277ac1bfc28d6e0db5b^{tree}",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "HEAD=a1aae471d699ea10df2b75d34d477428ccb3a66b; HEAD tree=e72ed03715fd060a03fa9fc79d85627db6acd4b6; main=origin/main=755028a48c2849e166f1096a437bd98629c3d2c5; source=031524fd65d14d5a5818e277ac1bfc28d6e0db5b; source tree=b6d70180cacfcaa8aa76a0e6d2a5aeae94cd7b6e",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/git-identity-before.txt",
+      "log_sha256": "10464d5d3c6fe59997655cd3220d22a5f35f5d2653789d5a146f24f100f1ccd6"
+    },
+    {
+      "name": "ruff_version",
+      "command": "/tmp/opencode/uv-tools/ruff/bin/ruff --version",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "ruff 0.17.6",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/ruff-version.txt",
+      "log_sha256": "6757c928a1b5abbd19a77cc4881a84a045c5fd4ada023601d3ffecfcc87457c8"
+    },
+    {
+      "name": "identity_hashes",
+      "command": "sha256sum .harness/sessions/registry.json .harness/sessions/seed-approval.json evidence/P1-TOOL-BRANCH01/session-roles.json evidence/P1-TOOL-BRANCH01/branch-evidence.json evidence/P1-TOOL-BRANCH01/attempt-1/independent-test.json",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "registry=bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498; seed approval=83c767e7d46b4851d5244c99cbaee0f4a2d0b23a83be178445723e5e195700b8; session roles=71a5fbdb874e552963ef475a7e977b6d0d88b5f8fd34a88b7358f4c3befbba1b; branch evidence before test reference=40290150b84074a5fedeb9f6ae42fed2e7dc5abd4947b9e54f5b9a757c9af283; attempt-1 fail evidence=cd60953cac91f9b667d6e58704241b457dc05226f72cb31b5e531fdbec03a3a4",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/identity-sha256.txt",
+      "log_sha256": "2f3a6721518a8d812b627a66ace181fe0c83617dba494d6506378c61cb015d10"
+    },
+    {
+      "name": "artifact_identity",
+      "command": "python3 -c 'from pathlib import Path; from tools.ci.common import branch_artifact, sha256_file; root=Path(\".\"); print(branch_artifact(root,\"P1-TOOL-BRANCH01\",\"031524fd65d14d5a5818e277ac1bfc28d6e0db5b\",\"feat/P1-TOOL-BRANCH01-tooling\")); print(\"registry_sha256=\"+sha256_file(root/\".harness/sessions/registry.json\")); print(\"session_roles_sha256=\"+sha256_file(root/\"evidence/P1-TOOL-BRANCH01/session-roles.json\"))'",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "artifact_id=P1-TOOL-BRANCH01-branch; artifact_sha256=76d214d68d773084a3fa4e09422c2a19324beff9604d010b830d608aed514503; source_tree=b6d70180cacfcaa8aa76a0e6d2a5aeae94cd7b6e; registry and session-role hashes matched",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/artifact-identity.txt",
+      "log_sha256": "0d6b256173f7728641d9280bdbed26ebbfbb79d354ba814a669a723671fd03e2"
+    },
+    {
+      "name": "pr_identity",
+      "command": "gh pr view 1 --json number,state,headRefName,headRefOid,baseRefName,url",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "PR #1 OPEN; base=main; head=feat/P1-TOOL-BRANCH01-tooling; headRefOid=a1aae471d699ea10df2b75d34d477428ccb3a66b",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/pr-identity.txt",
+      "log_sha256": "968128470669be085030098bc6f47cfaa02078e23307aba0f6d67f648072426a"
+    },
+    {
+      "name": "pr_checks",
+      "command": "gh pr checks 1",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "CodeRabbit skipping; GitGuardian Security Checks pass",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/pr-checks.txt",
+      "log_sha256": "a040e0a20f49056c7b27293822118155c4541be8e8f2ee2f285799921e87c264"
+    },
+    {
+      "name": "diff_check",
+      "command": "git diff --check 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f...a1aae471d699ea10df2b75d34d477428ccb3a66b",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "no output; exit 0",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/diff-check.txt",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "production_main_after",
+      "command": "git ls-remote origin refs/heads/main",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "755028a48c2849e166f1096a437bd98629c3d2c5 refs/heads/main",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/production-main-after.txt",
+      "log_sha256": "a3c98e980bcdf8f88c76b5276695b143a043a23d547f8d0a7fae6f8597877255"
+    },
+    {
+      "name": "git_identity_after",
+      "command": "git rev-parse HEAD HEAD^{tree} main origin/main",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "HEAD=a1aae471d699ea10df2b75d34d477428ccb3a66b; HEAD tree=e72ed03715fd060a03fa9fc79d85627db6acd4b6; main=origin/main=755028a48c2849e166f1096a437bd98629c3d2c5",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/git-identity-after.txt",
+      "log_sha256": "ce2988b9a6cd596d22d0f74ab6b4a3fc9632d8c5e64ccd70b312660938b35eaf"
+    },
+    {
+      "name": "completed_at",
+      "command": "date -u +%Y-%m-%dT%H:%M:%SZ",
+      "exit_code": 0,
+      "status": "pass",
+      "result": "2026-11-24T13:40:55Z",
+      "log_path": "/tmp/opencode/P1-TOOL-BRANCH01-attempt2-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/completed-at.txt",
+      "log_sha256": "5a3efe4632477ae6e7c261519963f7c9400de0646bebea6d75322904a4ab9d77"
+    }
+  ],
+  "scope_statement": "Attempt-1 fail evidence was preserved unchanged. No implementation, review.json, merge.json, TASKS.json, STATE.md, ADR, main, or UI files were edited. Only this attempt-2 independent test record and the branch-evidence test reference hash are authorized on the feature branch; the handoff and final LOG action are written in the primary harness repository."
+}
