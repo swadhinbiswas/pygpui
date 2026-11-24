@@ -1,0 +1,75 @@
+{
+  "baseline_sha": "867cea8501b63a76f53877cb1538aef299ecc02c",
+  "fixture": true,
+  "fixture_origin_main": "1ebe438876472342d8c2fbeff5dcc9cf529ea7a0",
+  "fixture_red_origin_main": "afbab3d6830079036774374443e9c83cfa5c8e6d",
+  "fixture_remote": "/tmp/opencode/red-main-attempt-3/origin.git",
+  "gate_after_fix": {
+    "exit_code": 0,
+    "status": "pass",
+    "stderr": "",
+    "stdout": ""
+  },
+  "gate_on_red": {
+    "exit_code": 1,
+    "status": "fail",
+    "stderr": "",
+    "stdout": ""
+  },
+  "gate_on_remote_green": {
+    "exit_code": 0,
+    "status": "pass",
+    "stderr": "",
+    "stdout": ""
+  },
+  "gate_on_remote_red": {
+    "exit_code": 1,
+    "status": "fail",
+    "stderr": "",
+    "stdout": ""
+  },
+  "independent_evidence": false,
+  "pause_unrelated_merges": true,
+  "production_after": {
+    "head": "a4c0ae7b0539bc3a78a267049336af95c6c0c00e",
+    "main_refs": [
+      "refs/remotes/origin/main 88417230087ffaa09f0565ea5d4bbf72f34d1e44"
+    ],
+    "remotes": [
+      "origin\thttps://github.com/swadhinbiswas/pygpui.git (fetch)",
+      "origin\thttps://github.com/swadhinbiswas/pygpui.git (push)"
+    ],
+    "root": "/tmp/opencode/pygpui-P1-TOOL-BRANCH01"
+  },
+  "production_before": {
+    "head": "a4c0ae7b0539bc3a78a267049336af95c6c0c00e",
+    "main_refs": [
+      "refs/remotes/origin/main 88417230087ffaa09f0565ea5d4bbf72f34d1e44"
+    ],
+    "remotes": [
+      "origin\thttps://github.com/swadhinbiswas/pygpui.git (fetch)",
+      "origin\thttps://github.com/swadhinbiswas/pygpui.git (push)"
+    ],
+    "root": "/tmp/opencode/pygpui-P1-TOOL-BRANCH01"
+  },
+  "production_unchanged": true,
+  "pull_requests": [
+    {
+      "fixture": true,
+      "kind": "red-main-injection",
+      "merge_sha": "afbab3d6830079036774374443e9c83cfa5c8e6d",
+      "review": "simulated-two-parent-fixture-merge"
+    },
+    {
+      "fixture": true,
+      "kind": "restoration",
+      "merge_sha": "1ebe438876472342d8c2fbeff5dcc9cf529ea7a0",
+      "review": "simulated-two-parent-fixture-merge"
+    }
+  ],
+  "red_commit": "490a23e86c41fdac4b7c4f410c93324672f79855",
+  "red_main_sha": "afbab3d6830079036774374443e9c83cfa5c8e6d",
+  "restore_commit": "1e34559a362961c3b445d0af0f2cbb3e58c1ee27",
+  "restored_green_sha": "1ebe438876472342d8c2fbeff5dcc9cf529ea7a0",
+  "schema_version": 1
+}

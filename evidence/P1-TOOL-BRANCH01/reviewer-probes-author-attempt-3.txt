@@ -1,0 +1,8 @@
+PASS R-01-independent-flag: state: branch evidence independent_evidence must be boolean true
+PASS R-05-record-roles: role: review record role is not an independent reviewer
+PASS R-02-unreviewed-descendant: identity: post-review implementation changes are forbidden: ['fixture.txt']
+PASS R-03-offline-forged-merge: merge: recorded PR head is not an ancestor of the merge commit
+PASS R-04-wrong-repository: pr: PR repository does not match canonical origin
+PASS R-06-remote-red-green: pushes=3
+PASS R-07-existing-empty: accepted
+AUTHOR_REVIEWER_PROBES_SUMMARY={"author_run": true, "failed": [], "independent_evidence": false, "passed": true, "probes": [{"detail": "state: branch evidence independent_evidence must be boolean true", "name": "R-01-independent-flag", "passed": true}, {"detail": "role: review record role is not an independent reviewer", "name": "R-05-record-roles", "passed": true}, {"detail": "identity: post-review implementation changes are forbidden: ['fixture.txt']", "name": "R-02-unreviewed-descendant", "passed": true}, {"detail": "merge: recorded PR head is not an ancestor of the merge commit", "name": "R-03-offline-forged-merge", "passed": true}, {"detail": "pr: PR repository does not match canonical origin", "name": "R-04-wrong-repository", "passed": true}, {"detail": "pushes=3", "name": "R-06-remote-red-green", "passed": true}, {"detail": "accepted", "name": "R-07-existing-empty", "passed": true}]}

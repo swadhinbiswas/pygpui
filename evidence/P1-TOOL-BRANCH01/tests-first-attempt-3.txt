@@ -1,0 +1,561 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/opencode/pygpui-P1-TOOL-BRANCH01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.5
+collected 67 items
+
+tools/ci/tests/test_branch_gate.py .FFFFF.FFFFFF....................F... [ 55%]
+                                                                         [ 55%]
+tools/ci/tests/test_record_merge.py .............FFFFFFFF.               [ 88%]
+tools/ci/tests/test_drills.py F..F....                                   [100%]
+
+=================================== FAILURES ===================================
+______ test_branch_gate_requires_boolean_true_independent_evidence[False] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_requires_bool0')
+value = False
+
+    @pytest.mark.parametrize("value", [False, None, "true", 1])
+    def test_branch_gate_requires_boolean_true_independent_evidence(
+        tmp_path: Path, value: object
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        evidence["independent_evidence"] = value
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:47: Failed
+______ test_branch_gate_requires_boolean_true_independent_evidence[None] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_requires_bool1')
+value = None
+
+    @pytest.mark.parametrize("value", [False, None, "true", 1])
+    def test_branch_gate_requires_boolean_true_independent_evidence(
+        tmp_path: Path, value: object
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        evidence["independent_evidence"] = value
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:47: Failed
+______ test_branch_gate_requires_boolean_true_independent_evidence[true] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_requires_bool2')
+value = 'true'
+
+    @pytest.mark.parametrize("value", [False, None, "true", 1])
+    def test_branch_gate_requires_boolean_true_independent_evidence(
+        tmp_path: Path, value: object
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        evidence["independent_evidence"] = value
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:47: Failed
+________ test_branch_gate_requires_boolean_true_independent_evidence[1] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_requires_bool3')
+value = 1
+
+    @pytest.mark.parametrize("value", [False, None, "true", 1])
+    def test_branch_gate_requires_boolean_true_independent_evidence(
+        tmp_path: Path, value: object
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        evidence["independent_evidence"] = value
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:47: Failed
+____________ test_branch_gate_rejects_missing_independent_evidence _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_rejects_missi0')
+
+    def test_branch_gate_rejects_missing_independent_evidence(tmp_path: Path) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        evidence.pop("independent_evidence")
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:59: Failed
+______ test_branch_gate_rejects_implementation_change_after_reviewed_head ______
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_rejects_imple0')
+
+    def test_branch_gate_rejects_implementation_change_after_reviewed_head(
+        tmp_path: Path,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        write_bundle(tmp_path, base, source)
+        git(tmp_path, "add", f"evidence/{TASK_ID}")
+        git(tmp_path, "commit", "-m", "test: canonical evidence after review")
+        (tmp_path / "fixture.txt").write_text("unreviewed implementation change\n", encoding="utf-8")
+        git(tmp_path, "add", "fixture.txt")
+        git(tmp_path, "commit", "-m", "feat: unreviewed implementation change")
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:89: Failed
+_ test_branch_gate_rejects_missing_reviewed_head_identity[reviewed_head_commit] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_rejects_missi1')
+field = 'reviewed_head_commit'
+
+    @pytest.mark.parametrize("field", ["reviewed_head_commit", "reviewed_head_tree"])
+    def test_branch_gate_rejects_missing_reviewed_head_identity(
+        tmp_path: Path, field: str
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        evidence.pop(field)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:104: Failed
+_ test_branch_gate_rejects_missing_reviewed_head_identity[reviewed_head_tree] __
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_rejects_missi2')
+field = 'reviewed_head_tree'
+
+    @pytest.mark.parametrize("field", ["reviewed_head_commit", "reviewed_head_tree"])
+    def test_branch_gate_rejects_missing_reviewed_head_identity(
+        tmp_path: Path, field: str
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        evidence.pop(field)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:104: Failed
+_____________ test_branch_gate_rejects_reviewed_head_tree_mismatch _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_rejects_revie0')
+
+    def test_branch_gate_rejects_reviewed_head_tree_mismatch(tmp_path: Path) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        evidence["reviewed_head_tree"] = "0" * 40
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:116: Failed
+_ test_branch_gate_rejects_contradictory_record_roles[review-evidence/P1-TOOL-BRANCH01/review.json-implementer] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_rejects_contr0')
+key = 'review', path = 'evidence/P1-TOOL-BRANCH01/review.json'
+wrong_role = 'implementer'
+
+    @pytest.mark.parametrize(
+        ("key", "path", "wrong_role"),
+        [
+            ("review", REVIEW_EVIDENCE, "implementer"),
+            ("test", TEST_EVIDENCE, "reviewer"),
+        ],
+    )
+    def test_branch_gate_rejects_contradictory_record_roles(
+        tmp_path: Path, key: str, path: str, wrong_role: str
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        record["role"] = wrong_role
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:140: Failed
+_ test_branch_gate_rejects_contradictory_record_roles[test-evidence/P1-TOOL-BRANCH01/independent-test.json-reviewer] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_rejects_contr1')
+key = 'test', path = 'evidence/P1-TOOL-BRANCH01/independent-test.json'
+wrong_role = 'reviewer'
+
+    @pytest.mark.parametrize(
+        ("key", "path", "wrong_role"),
+        [
+            ("review", REVIEW_EVIDENCE, "implementer"),
+            ("test", TEST_EVIDENCE, "reviewer"),
+        ],
+    )
+    def test_branch_gate_rejects_contradictory_record_roles(
+        tmp_path: Path, key: str, path: str, wrong_role: str
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        record["role"] = wrong_role
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:140: Failed
+________ test_branch_gate_merged_state_accepts_bound_integrator_record _________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_branch_gate_merged_state_1')
+
+    def test_branch_gate_merged_state_accepts_bound_integrator_record(
+        tmp_path: Path,
+    ) -> None:
+        base, source = make_repository(tmp_path, with_origin=True)
+        evidence = write_bundle(tmp_path, base, source)
+        git(tmp_path, "switch", "main")
+        git(
+            tmp_path,
+            "merge",
+            "--no-ff",
+            f"feat/{TASK_ID}-tooling",
+            "-m",
+            "test: fixture merge",
+        )
+        merge_sha = git(tmp_path, "rev-parse", "HEAD")
+        metadata = merge_metadata(tmp_path, source, merge_sha)
+        evidence["merge_sha"] = merge_sha
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+        create_merge_record(
+            tmp_path,
+            TASK_ID,
+            str(metadata["url"]),
+            merge_sha,
+            MERGE_EVIDENCE,
+            metadata,
+        )
+
+>       result = verify_branch(
+            tmp_path,
+            TASK_ID,
+            BRANCH_EVIDENCE,
+            "merged",
+            pr_metadata=metadata,
+        )
+E       TypeError: verify_branch() got an unexpected keyword argument 'pr_metadata'
+
+tools/ci/tests/test_branch_gate.py:315: TypeError
+________ test_record_merge_rejects_unreviewed_implementation_descendant ________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_record_merge_rejects_unre0')
+
+    def test_record_merge_rejects_unreviewed_implementation_descendant(
+        tmp_path: Path,
+    ) -> None:
+        base, source = make_repository(tmp_path, with_origin=True)
+        write_bundle(tmp_path, base, source)
+        git(tmp_path, "add", f"evidence/{TASK_ID}")
+        git(tmp_path, "commit", "-m", "test: evidence after review")
+        (tmp_path / "fixture.txt").write_text("unreviewed code\n", encoding="utf-8")
+        git(tmp_path, "add", "fixture.txt")
+        git(tmp_path, "commit", "-m", "feat: unreviewed code")
+        head = git(tmp_path, "rev-parse", "HEAD")
+        git(tmp_path, "switch", "main")
+        git(tmp_path, "merge", "--no-ff", f"feat/{TASK_ID}-tooling", "-m", "test: merge")
+        merge_sha = git(tmp_path, "rev-parse", "HEAD")
+        metadata = merge_metadata(tmp_path, head, merge_sha)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_record_merge.py:339: Failed
+___________ test_record_merge_rejects_pr_head_not_contained_by_merge ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_record_merge_rejects_pr_h0')
+
+    def test_record_merge_rejects_pr_head_not_contained_by_merge(tmp_path: Path) -> None:
+        base, source = make_repository(tmp_path, with_origin=True)
+        write_bundle(tmp_path, base, source)
+        git(tmp_path, "switch", "-c", "fixture/side")
+        (tmp_path / "side.txt").write_text("side\n", encoding="utf-8")
+        git(tmp_path, "add", "side.txt")
+        git(tmp_path, "commit", "-m", "test: side branch")
+        side_head = git(tmp_path, "rev-parse", "HEAD")
+        git(tmp_path, "switch", "main")
+        git(tmp_path, "merge", "--no-ff", f"feat/{TASK_ID}-tooling", "-m", "test: merge")
+        merge_sha = git(tmp_path, "rev-parse", "HEAD")
+        metadata = merge_metadata(tmp_path, side_head, merge_sha)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_record_merge.py:365: Failed
+_________ test_record_merge_rejects_wrong_repository_pr_before_writing _________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_record_merge_rejects_wron2')
+
+    def test_record_merge_rejects_wrong_repository_pr_before_writing(tmp_path: Path) -> None:
+        _, merge_sha, metadata = make_merged_repository(tmp_path)
+        metadata["url"] = "https://github.com/attacker/pygpui/pull/1"
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_record_merge.py:382: Failed
+________ test_fetch_pr_metadata_rejects_option_like_selector_before_gh _________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_fetch_pr_metadata_rejects0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1dba93bbb0>
+
+    def test_fetch_pr_metadata_rejects_option_like_selector_before_gh(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        def unexpected(*args: object, **kwargs: object) -> subprocess.CompletedProcess:
+            raise AssertionError("gh must not run for an option-like selector")
+
+        monkeypatch.setattr("tools.ci.record_merge.subprocess.run", unexpected)
+        with pytest.raises(GateError) as caught:
+>           fetch_pr_metadata(tmp_path, "--help")
+
+tools/ci/tests/test_record_merge.py:404:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools/ci/record_merge.py:122: in fetch_pr_metadata
+    result = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = (['gh', 'pr', 'view', '--help', '--json', 'author,baseRefName,headRefName,headRefOid,mergeCommit,mergedAt,number,state,url'],)
+kwargs = {'cwd': PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_fetch_pr_metadata_rejects0'), 'text': True, 'capture_output': True, 'check': False}
+
+    def unexpected(*args: object, **kwargs: object) -> subprocess.CompletedProcess:
+>       raise AssertionError("gh must not run for an option-like selector")
+E       AssertionError: gh must not run for an option-like selector
+
+tools/ci/tests/test_record_merge.py:400: AssertionError
+__________ test_verify_merge_record_fetches_live_metadata_by_default ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_verify_merge_record_fetch0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1dba68d0f0>
+
+    def test_verify_merge_record_fetches_live_metadata_by_default(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        _, merge_sha, metadata = make_merged_repository(tmp_path)
+        create_merge_record(
+            tmp_path,
+            TASK_ID,
+            str(metadata["url"]),
+            merge_sha,
+            MERGE_EVIDENCE,
+            metadata,
+        )
+        calls: list[str] = []
+
+        def fake_fetch(root: Path, pr: str) -> dict[str, object]:
+            calls.append(pr)
+            return metadata
+
+        monkeypatch.setattr("tools.ci.record_merge.fetch_pr_metadata", fake_fetch)
+        record = verify_merge_record(tmp_path, TASK_ID, MERGE_EVIDENCE, merge_sha)
+
+        assert record["merge_sha"] == merge_sha
+>       assert calls == [str(metadata["url"])]
+E       AssertionError: assert [] == ['https://git...ygpui/pull/1']
+E
+E         Right contains one more item: 'https://github.com/example/pygpui/pull/1'
+E         Use -v to get more diff
+
+tools/ci/tests/test_record_merge.py:430: AssertionError
+_____________ test_verify_merge_record_requires_expected_merge_sha _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_verify_merge_record_requi0')
+
+    def test_verify_merge_record_requires_expected_merge_sha(tmp_path: Path) -> None:
+        _, merge_sha, metadata = make_merged_repository(tmp_path)
+        create_merge_record(
+            tmp_path,
+            TASK_ID,
+            str(metadata["url"]),
+            merge_sha,
+            MERGE_EVIDENCE,
+            metadata,
+        )
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_record_merge.py:444: Failed
+________ test_verify_merge_record_rejects_merge_not_reachable_from_main ________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_verify_merge_record_rejec0')
+
+    def test_verify_merge_record_rejects_merge_not_reachable_from_main(
+        tmp_path: Path,
+    ) -> None:
+        base, merge_sha, metadata = make_merged_repository(tmp_path)
+        create_merge_record(
+            tmp_path,
+            TASK_ID,
+            str(metadata["url"]),
+            merge_sha,
+            MERGE_EVIDENCE,
+            metadata,
+        )
+        git(tmp_path, "switch", f"feat/{TASK_ID}-tooling")
+        git(tmp_path, "branch", "-f", "main", base)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_record_merge.py:467: Failed
+___________ test_record_merge_cli_offline_cannot_return_merged_pass ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-39/test_record_merge_cli_offline_0')
+
+    def test_record_merge_cli_offline_cannot_return_merged_pass(tmp_path: Path) -> None:
+        _, merge_sha, metadata = make_merged_repository(tmp_path)
+        create_merge_record(
+            tmp_path,
+            TASK_ID,
+            str(metadata["url"]),
+            merge_sha,
+            MERGE_EVIDENCE,
+            metadata,
+        )
+
+        result = subprocess.run(
+            [
+                python_executable(),
+                str(SCRIPT),
+                "verify",
+                "--repository",
+                str(tmp_path),
+                "--task",
+                TASK_ID,
+                "--record",
+                MERGE_EVIDENCE,
+                "--expected-sha",
+                merge_sha,
+                "--offline",
+            ],
+            cwd=ROOT,
+            check=False,
+            text=True,
+            capture_output=True,
+        )
+
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['/usr/bin/python3', '/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/record_merge.py', 'verify',...ord=evidence/P1-TOOL-BRANCH01/merge.json merge_sha=88e180b7da3b2e6ac37caf642cc35517faad649b mode=offline\n', stderr='').returncode
+
+tools/ci/tests/test_record_merge.py:507: AssertionError
+________ test_red_main_drill_restores_fixture_green_and_archives_hashes ________
+
+    def test_red_main_drill_restores_fixture_green_and_archives_hashes() -> None:
+        fixture = fixture_directory() / "red-main"
+        production = fixture_directory() / "production"
+        make_repository(production)
+        origin_main = add_fake_origin(
+            production, fixture_directory() / "production-origin.git"
+        )
+        before = git(production, "rev-parse", "HEAD")
+
+        result = run_red_main_drill(fixture, production_root=production)
+
+        assert result["fixture"] is True
+        assert result["red_main_sha"] != result["restored_green_sha"]
+        assert result["gate_after_fix"]["status"] == "pass"
+>       assert result["fixture_red_origin_main"] == result["red_main_sha"]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'fixture_red_origin_main'
+
+tools/ci/tests/test_drills.py:38: KeyError
+______________ test_red_main_drill_accepts_existing_empty_fixture ______________
+
+    def test_red_main_drill_accepts_existing_empty_fixture() -> None:
+        fixture = fixture_directory() / "red-main"
+        fixture.mkdir()
+        production = fixture_directory() / "production"
+        make_repository(production)
+
+>       result = run_red_main_drill(fixture, production_root=production)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tools/ci/tests/test_drills.py:77:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools/ci/red_main_drill.py:34: in run_red_main_drill
+    work, remote, baseline = initialize_fixture(fixture, "red_main_drill.py", log)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/ci/fixture_git.py:66: in initialize_fixture
+    fixture.mkdir(parents=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = PosixPath('/tmp/opencode/branch-tools-test-nvh0ed8u/red-main')
+mode = 511, parents = True, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileExistsError: [Errno 17] File exists: '/tmp/opencode/branch-tools-test-nvh0ed8u/red-main'
+
+/usr/lib/python3.14/pathlib/__init__.py:1011: FileExistsError
+=========================== short test summary info ============================
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_boolean_true_independent_evidence[False]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_boolean_true_independent_evidence[None]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_boolean_true_independent_evidence[true]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_boolean_true_independent_evidence[1]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_rejects_missing_independent_evidence
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_rejects_implementation_change_after_reviewed_head
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_rejects_missing_reviewed_head_identity[reviewed_head_commit]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_rejects_missing_reviewed_head_identity[reviewed_head_tree]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_rejects_reviewed_head_tree_mismatch
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_rejects_contradictory_record_roles[review-evidence/P1-TOOL-BRANCH01/review.json-implementer]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_rejects_contradictory_record_roles[test-evidence/P1-TOOL-BRANCH01/independent-test.json-reviewer]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_merged_state_accepts_bound_integrator_record
+FAILED tools/ci/tests/test_record_merge.py::test_record_merge_rejects_unreviewed_implementation_descendant
+FAILED tools/ci/tests/test_record_merge.py::test_record_merge_rejects_pr_head_not_contained_by_merge
+FAILED tools/ci/tests/test_record_merge.py::test_record_merge_rejects_wrong_repository_pr_before_writing
+FAILED tools/ci/tests/test_record_merge.py::test_fetch_pr_metadata_rejects_option_like_selector_before_gh
+FAILED tools/ci/tests/test_record_merge.py::test_verify_merge_record_fetches_live_metadata_by_default
+FAILED tools/ci/tests/test_record_merge.py::test_verify_merge_record_requires_expected_merge_sha
+FAILED tools/ci/tests/test_record_merge.py::test_verify_merge_record_rejects_merge_not_reachable_from_main
+FAILED tools/ci/tests/test_record_merge.py::test_record_merge_cli_offline_cannot_return_merged_pass
+FAILED tools/ci/tests/test_drills.py::test_red_main_drill_restores_fixture_green_and_archives_hashes
+FAILED tools/ci/tests/test_drills.py::test_red_main_drill_accepts_existing_empty_fixture
+======================== 22 failed, 45 passed in 9.01s =========================

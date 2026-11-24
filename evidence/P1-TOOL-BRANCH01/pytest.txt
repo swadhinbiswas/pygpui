@@ -3,15 +3,16 @@ platform linux -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0
 rootdir: /tmp/opencode/pygpui-P1-TOOL-BRANCH01
 configfile: pytest.ini
 plugins: anyio-4.16.0, platformdirs-4.14.5
-collected 95 items
+collected 120 items
 
-tools/ci/tests/test_branch_gate.py .........................             [ 26%]
-tools/ci/tests/test_common.py .....                                      [ 31%]
-tools/ci/tests/test_drills.py .......                                    [ 38%]
-tools/ci/tests/test_record_merge.py ..............                       [ 53%]
-tools/ci/tests/test_register_roles.py ................                   [ 70%]
-tools/ci/tests/test_run_local_gate.py .........                          [ 80%]
-tools/ci/tests/test_tag_point.py .....                                   [ 85%]
+tools/ci/tests/test_branch_gate.py ..................................... [ 30%]
+..                                                                       [ 32%]
+tools/ci/tests/test_common.py .....                                      [ 36%]
+tools/ci/tests/test_drills.py ........                                   [ 43%]
+tools/ci/tests/test_record_merge.py ........................             [ 63%]
+tools/ci/tests/test_register_roles.py ................                   [ 76%]
+tools/ci/tests/test_run_local_gate.py .........                          [ 84%]
+tools/ci/tests/test_tag_point.py .....                                   [ 88%]
 tools/ci/tests/test_verify_roles.py ..............                       [100%]
 
-============================== 95 passed in 3.65s ==============================
+============================= 120 passed in 5.36s ==============================

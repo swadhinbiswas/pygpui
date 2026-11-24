@@ -1,6 +1,6 @@
-# P1-TOOL-BRANCH01 — branch, merge and rollback tooling
+# P1-TOOL-BRANCH01 — attempt 3
 
-Status: **partial** — implementation and author-run verification are complete; independent review/test and Integrator merge are intentionally pending.
+Status: **partial**. R-01 through R-08 are addressed and author-run controls pass. Fresh independent test/review and Integrator merge remain pending.
 
 ## Identity
 
@@ -10,81 +10,74 @@ Status: **partial** — implementation and author-run verification are complete;
 | Branch | `feat/P1-TOOL-BRANCH01-tooling` |
 | Worktree | `/tmp/opencode/pygpui-P1-TOOL-BRANCH01` |
 | Dispatch baseline | `15d29b32a066eeab7f4fdcc9b8a02456c4c0434f` |
-| Initial implementation commit | `cebbb44c29336e0b74aa0acc75686c136bb8e10d` |
-| Bound source commit | `031524fd65d14d5a5818e277ac1bfc28d6e0db5b` |
-| PR opened from commit | `bdf0e39d2d2f474ae273f0efb6728a150a188442` |
-| Bound source tree | `b6d70180cacfcaa8aa76a0e6d2a5aeae94cd7b6e` |
+| Bound source commit | `64ad0559fad5ffcf2f9a60aa028cb8698aaec141` |
+| Bound source tree | `385946388f2d087a709baa871d25f07f76bdae3a` |
 | Branch artifact | `P1-TOOL-BRANCH01-branch` |
-| Artifact SHA-256 | `76d214d68d773084a3fa4e09422c2a19324beff9604d010b830d608aed514503` |
-| Attempt-1 fail artifact | `attempt-1/independent-test.json` SHA-256 `cd60953cac91f9b667d6e58704241b457dc05226f72cb31b5e531fdbec03a3a4` |
+| Artifact SHA-256 | `b52037513ac6b7e80fc202cfd2aa5c729af442807641fb553d84d64dc35908fc` |
 | Approved registry SHA-256 | `bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498` |
-| PR URL | https://github.com/swadhinbiswas/pygpui/pull/1 |
+| PR | https://github.com/swadhinbiswas/pygpui/pull/1 |
 
-Changes are limited to `tools/ci/**`, `tools/session/verify_roles.py`, `tools/session/register_roles.py`, `evidence/P1-TOOL-BRANCH01/**`, and the Orchestrator-approved `.harness/sessions/registry.json` / `.harness/sessions/seed-approval.json` updates. No production `main` push, force-push, self-merge, harness-state edit, ADR edit, or UI feature edit was performed.
+Registered roles remain implementer `ses_df2be4996ffek8O5wu7RwOeubn`, reviewer `ses_df27261c9ffcukQUulA8P0LN89`, tester `ses_df27261c9ffdiy0RA5Ko2oSdxl`, and Integrator `ses_df27261c8ffeJbVXcZMsund3Hf`. The registry and approval were not changed in attempt 3.
 
-## Attempt-2 T-01–T-05 remediation
+## Preserved historical evidence
 
-Attempt-1 independent evidence remains unchanged at `attempt-1/independent-test.json` with `decision=fail` and SHA-256 `cd60953cac91f9b667d6e58704241b457dc05226f72cb31b5e531fdbec03a3a4`. Its adversarial script/log are archived byte-for-byte beside it. The canonical attempt-2 `independent-test.json` is absent.
+- Attempt-1 test fail: `attempt-1/independent-test.json`, SHA-256 `cd60953cac91f9b667d6e58704241b457dc05226f72cb31b5e531fdbec03a3a4`.
+- Attempt-2 test pass: `attempt-2/independent-test.json`, SHA-256 `7d48be25ea27b6724e954ef042ad50e2a01f25c42d82894162ad0887449b17c5`.
+- Attempt-2 review fail: `attempt-2/review.json`, SHA-256 `1e20e25db6550c6088526c06e1be85bf5365aaf9ddd28d1be493e4a410d2dc08`.
+- Exact reviewer adversarial script/log: `attempt-2/reviewer_adversarial.py` SHA-256 `88792de51c9b35fc6bc8b0db4a3c48ecf7225b160163e2748b753d2f893adb05`; `attempt-2/reviewer-adversarial.txt` SHA-256 `a44e671530d7934c39f8352ede6014c2d3e9970b53018f6d85b5b1c21355a5d5`.
 
-The new negative tests failed before the fix (`19 failed, 29 passed`; `tests-first-attempt-2.txt`). After the fix, the same independent adversarial script passed all five probes:
+Canonical attempt-3 `review.json`, `independent-test.json`, and `merge.json` are absent. `branch-evidence.json` has null reviewed-head/review/test identities, `state=implemented`, and `independent_evidence=false`.
 
-```text
-PASS named_branch_ref_must_exist_and_contain_source
-PASS reviewer_role_must_have_explicit_task_binding
-PASS review_record_tree_must_match_branch_artifact
-PASS review_record_branch_must_match_branch_artifact
-PASS configured_missing_ruff_must_return_dependency_exit_69: expected exit=69 actual exit=69
-ADVERSARIAL_SUMMARY={"checks": [...], "failed": [], "passed": true}
-```
+## R-01–R-08 controls
 
-Full output: `adversarial-checks-attempt-2.txt`.
+- **R-01:** pre-merge pass requires `independent_evidence is True`; false, missing, null, string, and integer values reject.
+- **R-02:** review and branch evidence must repeat reviewer-attested `reviewed_head_commit`/`reviewed_head_tree`. The reviewed head must contain the source and be ancestral to the final branch/PR head. Every post-reviewed-head path must be under `evidence/P1-TOOL-BRANCH01/`; implementation changes reject before pre-merge or merged pass.
+- **R-03:** merged verification requires an expected merge SHA, PR head ancestry to the merge commit, merge reachability from `main` or `origin/main`, and live canonical GitHub metadata by default. `--offline` cannot return merged PASS.
+- **R-04:** PR selectors must be canonical GitHub URLs whose owner/repository matches `origin`; option-like, numeric, and wrong-repository selectors reject before `gh`.
+- **R-05:** review/test record roles must be independent-reviewer/tester roles and match assigned sessions.
+- **R-06:** red main is pushed to the fixture remote, verified by `git ls-remote`, cloned, and gated red; restored green is pushed, cloned, and gated green.
+- **R-07:** an existing empty fixture directory is accepted and initialized without traceback.
+- **R-08:** this README is rebuilt from the committed attempt-3 records and logs.
 
-- **T-01:** `refs/heads/<branch>` must exist and contain the reviewed source commit.
-- **T-02:** every non-seed role must carry an explicit matching `task_id`.
-- **T-03/T-04:** review, independent-test, and session-role records must carry the exact artifact `source_tree` and `branch`; fixture record producers now emit both.
-- **T-05:** command execution `OSError`/`FileNotFoundError` becomes `GateError(dependency)` and CLI exit `69` with `LOCAL_GATE_REJECT`, not a traceback.
-
-Registered roles and registry hash `bff3da2e...` were preserved without mutation.
-
-## Implemented controls
-
-- `branch_gate.py` rejects absent reviewer/tester roles, role reuse, author self-review, wrong roles/tasks, missing or non-containing named branch refs, commit/tree/artifact mismatch, missing/contradictory branch/tree fields on bound records, stale evidence hashes, non-pass review/test decisions, and missing Integrator records for merged state.
-- `verify_roles.py` validates the exact approved registry bytes, trusted seed approval, explicit matching `task_id` on every non-seed role, distinct implementer/reviewer/tester sessions, and a distinct Integrator when assigned.
-- `register_roles.py` appends task-bound implementer/reviewer/tester/Integrator records in one locked, all-or-nothing update; preserves every existing record and seed-history entry; refreshes the approval to the exact new registry bytes; and rejects duplicate/conflicting roles, session reuse, wrong task binding, untrusted approvers, non-append-only registries, and hash mismatches.
-- `record_merge.py` creates append-only canonical records only after trusted pre-merge evidence and live `gh pr view` metadata agree on PR, branch, head commit, merge commit and merge into `main`. It supports both a build task's canonical `merge.json` and the authoritative `P1-INT01` Integrator-owned output. `verify` rechecks local bindings and, by default, GitHub metadata.
-- `tag_point.py` creates annotated tags and rejects existing/moved tags or mismatched record identity.
-- `red_main_drill.py` and `rollback_drill.py` accept only absent/empty absolute fixture paths under `/tmp/opencode`, use a fixture-local bare remote, snapshot production refs/remotes read-only, and fail if production state changes.
-- `run_local_gate.py` runs Ruff format, Ruff lint, both test suites, and graph validation with exit codes `0`, `10`, `11`, `12`, `13`, or `69` for a missing/unexecutable Ruff dependency.
-
-Canonical identity is enforced as task ID + canonical output path + record path. Commit/artifact binding uses the full source commit, Git tree, branch, task and canonical branch-evidence output. Review, test, session-role and merge records must repeat the same identity and exact file hashes. The post-change binding recheck passed; see `branch-evidence-binding.txt`.
-
-## Exact author-run commands and output
-
-Full output is preserved in the linked files.
+## Exact author-run outputs
 
 ### Tests-first
 
 ```text
-$ python3 -m pytest tools/ci/tests
-collected 0 items / 7 errors
-ModuleNotFoundError: No module named 'tools.ci.common'
+$ python3 -m pytest tools/ci/tests/test_branch_gate.py tools/ci/tests/test_record_merge.py tools/ci/tests/test_drills.py
+22 failed, 45 passed in 9.01s
 ```
 
-This intentional pre-implementation failure is preserved in `tests-first.txt`.
+Evidence: `tests-first-attempt-3.txt`.
 
-The targeted role-registration follow-up also began with a failing test:
+### Reviewer probes
+
+The exact archived reviewer script was rerun unchanged. It rejected R-01 and R-05, then failed closed at R-02 with:
 
 ```text
-$ python3 -m pytest tools/ci/tests/test_register_roles.py
-collected 0 items / 1 error
-ModuleNotFoundError: No module named 'tools.session.register_roles'
+REJECTED independent_evidence_false: GateError('branch evidence independent_evidence must be boolean true')
+REJECTED contradictory_record_roles: GateError('review record role is not an independent reviewer')
+tools.ci.common.GateError: post-review implementation changes are forbidden: ['.harness/sessions/registry.json', '.harness/sessions/seed-approval.json', 'fixture.txt']
 ```
 
-Evidence: `tests-first-register-roles.txt`.
+That script does not catch expected exceptions for its later direct-call probes, so it exits `1` at the first expected R-02 rejection instead of printing a final summary. It reported no accepted bypass. Exact output: `reviewer-adversarial-attempt-3.txt`.
 
-### Formatting and lint
+A clearly labeled author-run guarded probe then exercised all seven control areas:
 
-Ruff `0.17.6` was installed outside the repository at `/tmp/opencode/uv-tools/ruff/bin/ruff`.
+```text
+PASS R-01-independent-flag
+PASS R-05-record-roles
+PASS R-02-unreviewed-descendant
+PASS R-03-offline-forged-merge
+PASS R-04-wrong-repository
+PASS R-06-remote-red-green: pushes=3
+PASS R-07-existing-empty: accepted
+AUTHOR_REVIEWER_PROBES_SUMMARY={"author_run": true, "failed": [], "independent_evidence": false, "passed": true, ...}
+```
+
+Evidence: `attempt-3/reviewer-probes-author.py`, `reviewer-probes-author-attempt-3.txt`. This is remediation evidence, not independent certification.
+
+### Format, lint, tests, graph
 
 ```text
 $ /tmp/opencode/uv-tools/ruff/bin/ruff format --check tools
@@ -92,148 +85,67 @@ $ /tmp/opencode/uv-tools/ruff/bin/ruff format --check tools
 
 $ /tmp/opencode/uv-tools/ruff/bin/ruff check tools
 All checks passed!
-```
 
-Evidence: `fmt.txt`, `lint.txt`.
-
-### Task test suite
-
-```text
 $ python3 -m pytest tools/ci/tests
-collected 76 items
-95 passed in 3.65s
-```
+120 passed in 5.36s
 
-Evidence: `pytest.txt`.
-
-### Root harness suite
-
-```text
 $ python3 -m pytest -q
-88 passed, 18 subtests passed in 12.82s
-```
+88 passed, 18 subtests passed in 12.75s
 
-Evidence: `root-pytest.txt`.
-
-### Full local gate
-
-```text
 $ PYGPUI_RUFF=/tmp/opencode/uv-tools/ruff/bin/ruff python3 tools/ci/run_local_gate.py --mode full
-20 files already formatted
-LOCAL_GATE_STEP=PASS step=fmt exit=0
-All checks passed!
-LOCAL_GATE_STEP=PASS step=lint exit=0
-183 passed, 18 subtests passed in 21.88s
-LOCAL_GATE_STEP=PASS step=tests exit=0
-JSON_PARSE=PASS
-...
-POSTMERGE_IDENTITY=PASS task+output+record
-...
+208 passed, 18 subtests passed in 26.58s
 VALIDATION=PASS
-LOCAL_GATE_STEP=PASS step=graph exit=0
 LOCAL_GATE=PASS steps=fmt,lint,tests,graph
 ```
 
-Evidence: `local-gate.txt`. Graph-only output is in `graph-validation.txt`.
+Evidence: `fmt.txt`, `lint.txt`, `pytest.txt`, `root-pytest.txt`, `local-gate.txt`, `graph-validation.txt`.
 
-### Tool self-tests
+### Self-tests
 
-Every command exited zero.
+Every command exited zero:
 
 ```text
-$ python3 tools/ci/branch_gate.py --self-test
-BRANCH_GATE_SELF_TEST=PASS
-
-$ python3 tools/ci/record_merge.py --self-test
-RECORD_MERGE_SELF_TEST=PASS
-
-$ python3 tools/ci/red_main_drill.py --self-test
-RED_MAIN_DRILL_SELF_TEST=PASS
-
-$ python3 tools/ci/rollback_drill.py --self-test
-ROLLBACK_DRILL_SELF_TEST=PASS
-
-$ python3 tools/ci/tag_point.py --self-test
-TAG_POINT_SELF_TEST=PASS
-
-$ python3 tools/ci/run_local_gate.py --self-test
-LOCAL_GATE_SELF_TEST=PASS
-
-$ python3 tools/session/verify_roles.py --self-test
-SESSION_ROLES_SELF_TEST=PASS
-
-$ python3 tools/session/register_roles.py --self-test
-REGISTER_ROLES_SELF_TEST=PASS
-
-$ python3 .harness/scripts/seed_session_registry.py --self-test
-SESSION_SEED_SELF_TEST=PASS
-
-$ python3 .harness/scripts/seed_session_registry.py --verify
 SESSION_SEED_VERIFY=PASS
+SESSION_SEED_SELF_TEST=PASS
+BRANCH_GATE_SELF_TEST=PASS
+RECORD_MERGE_SELF_TEST=PASS
+REGISTER_ROLES_SELF_TEST=PASS
+SESSION_ROLES_SELF_TEST=PASS
+RED_MAIN_DRILL_SELF_TEST=PASS
+ROLLBACK_DRILL_SELF_TEST=PASS
+TAG_POINT_SELF_TEST=PASS
+LOCAL_GATE_SELF_TEST=PASS
 ```
 
-The local-gate self-test deliberately prints one expected `LOCAL_GATE=FAIL step=fmt exit=1 gate_exit=10` before its final PASS to prove fail-fast behavior. Individual outputs are in `*-self-test.txt` and `seed-verify.txt`.
+The local-gate self-test deliberately prints one expected fail-fast fixture line before its PASS.
 
-## Disposable fixture drills
-
-### Red main
+### Fresh fixture drills
 
 ```text
-$ python3 tools/ci/red_main_drill.py --fixture /tmp/opencode/red-main-attempt-2
-RED_MAIN_DRILL=PASS fixture=/tmp/opencode/red-main-attempt-2 red_main=16e398557009d1bdbbba4b18fe279ea67d45ab3d restored_green=b2b23bfd30734a1d9fdec0e14d81c65842cb2c59 production_unchanged=true
+$ python3 tools/ci/red_main_drill.py --fixture /tmp/opencode/red-main-attempt-3
+RED_MAIN_DRILL=PASS fixture=/tmp/opencode/red-main-attempt-3 red_main=afbab3d6830079036774374443e9c83cfa5c8e6d restored_green=1ebe438876472342d8c2fbeff5dcc9cf529ea7a0 production_unchanged=true
+
+$ python3 tools/ci/rollback_drill.py --fixture /tmp/opencode/rollback-attempt-3 --tag phase1/contracts-premerge
+ROLLBACK_DRILL=PASS fixture=/tmp/opencode/rollback-attempt-3 tag=phase1/contracts-premerge revert=c00b7b311746f05e5911b25da001220e413c8a1f revert_of_revert=751f3c56c3431764a85bb9fd45ac8b48bfae974d restored_green=b2d5e2aafc2993e7d218810f0dd1cd8b6094e0f1 production_unchanged=true
 ```
 
-The fixture gate failed on red main (exit `1`) and passed after restoration (exit `0`). Fixture PRs are explicitly marked simulated. Durable copies: `attempt-2/red-main/archive.json` and `attempt-2/red-main/commands.txt`.
-
-### Rollback
-
-```text
-$ python3 tools/ci/rollback_drill.py --fixture /tmp/opencode/rollback-attempt-2 --tag phase1/contracts-premerge
-ROLLBACK_DRILL=PASS fixture=/tmp/opencode/rollback-attempt-2 tag=phase1/contracts-premerge revert=6725cac26edcaaccae42daf1d1c155584aab5f40 revert_of_revert=949cc035fd3dca36872f00b432e22f7ab830c202 restored_green=3db9beb3f26e5599a120a48b0b257d9c0729d75b production_unchanged=true
-```
-
-Archived sequence:
-
-1. Annotated tag at `5f44faf8575fb6d8d75ab872c2904754bd8a85ed`.
-2. Simulated reviewed fixture merge `969da8492b339e25fa0818b8a6d2175b357c7f17`; full fixture gate passed.
-3. Injected failure `985d1b1e36073e1fc1837f7be1fe79305ef52848`; gate failed.
-4. Revert `6725cac26edcaaccae42daf1d1c155584aab5f40`; gate passed.
-5. Revert-of-revert `949cc035fd3dca36872f00b432e22f7ab830c202`; gate failed as expected.
-6. Simulated reviewed re-merge restored green at `3db9beb3f26e5599a120a48b0b257d9c0729d75b`; full fixture gate passed.
-
-The fixture full gate checks green state, baseline presence, `git diff --check`, and `git fsck --no-dangling`. Fixture PR/review records are simulations, not independent evidence. Durable copies: `attempt-2/rollback/archive.json`, `attempt-2/rollback/commands.txt`, and `attempt-2/rollback/tag-record.json`.
+Red-main remote state was `afbab3d...` with a cloned remote gate failure, then `1ebe438...` with a cloned remote gate pass. Three pushes were archived. Rollback archived tag `867cea8501b63a76f53877cb1538aef299ecc02c`, reviewed merge `7363e5f6711fea959c05d61176d87699088e640c`, injected failure `9a5e5177832f43c0471b1a215c78db67d9285c65`, revert, revert-of-revert, re-merge, and restored green. Durable copies are under `attempt-3/red-main/**` and `attempt-3/rollback/**`.
 
 ### Production main integrity
 
-Before and after both drills:
-
 ```text
 $ git ls-remote origin refs/heads/main
-75fb21736be9d32055522ee2f0c403f32858b1ba	refs/heads/main
+88417230087ffaa09f0565ea5d4bbf72f34d1e44	refs/heads/main
 
 $ git rev-parse origin/main
-75fb21736be9d32055522ee2f0c403f32858b1ba
+88417230087ffaa09f0565ea5d4bbf72f34d1e44
 ```
 
-Both fixture archives also contain identical production before/after snapshots, including `refs/remotes/origin/main`. Evidence: `production-main-after.txt`, `production-origin-main-after.txt`.
+Both values were identical before and after the drills. Evidence: `production-main-after.txt`, `production-origin-main-after.txt`.
 
-## Independent gates intentionally skipped
-
-Orchestrator used `register_roles.py` to append the real task-bound roles. The registry approval now verifies at SHA-256 `bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498`.
-
-| Role | Session |
-|---|---|
-| Implementer | `ses_df2be4996ffek8O5wu7RwOeubn` |
-| Reviewer | `ses_df27261c9ffcukQUulA8P0LN89` |
-| Tester | `ses_df27261c9ffdiy0RA5Ko2oSdxl` |
-| Integrator | `ses_df27261c8ffeJbVXcZMsund3Hf` |
-
-`session-roles.json` says `status: assigned` and carries the exact branch, source commit/tree, artifact, registry, and role IDs. `branch-evidence.json` references its exact hash but remains `state: implemented` with `independent_evidence: false` and null review/test hashes for the new source. Attempt-1 fail evidence is archived unchanged; no independent pass was inferred from role registration or the author rerun.
+## Current independent-gate disposition
 
 ```text
-$ python3 .harness/scripts/seed_session_registry.py --verify
-SESSION_SEED_VERIFY=PASS
-
 $ python3 tools/ci/branch_gate.py verify --task P1-TOOL-BRANCH01 --state independently_verified --evidence evidence/P1-TOOL-BRANCH01/branch-evidence.json
 BRANCH_GATE_REJECT code=state message=branch evidence is not independently_verified
 (exit 3)
@@ -243,11 +155,11 @@ SESSION_ROLES_REJECT code=state message=branch evidence is not independently_ver
 (exit 3)
 ```
 
-Evidence: `seed-verify.txt`, `branch-gate-verify-attempt-2.txt`, `verify-roles-attempt-2.txt`, `branch-evidence-binding.txt`. `review.json`, `independent-test.json`, and `merge.json` remain deliberately absent.
+Evidence: `branch-gate-verify-attempt-3.txt`, `verify-roles-attempt-3.txt`, `branch-evidence-binding.txt`.
 
-### Exact independent-session verification commands
+## Independent retest commands
 
-Independent sessions should first verify the approved registry and rerun the author controls against bound source `031524fd65d14d5a5818e277ac1bfc28d6e0db5b` on the final PR head recorded in the attempt-2 handoff:
+Run against the final PR head recorded in the attempt-3 handoff:
 
 ```bash
 python3 .harness/scripts/seed_session_registry.py --verify
@@ -257,35 +169,28 @@ python3 tools/ci/branch_gate.py --self-test
 python3 tools/ci/record_merge.py --self-test
 python3 tools/session/register_roles.py --self-test
 python3 tools/session/verify_roles.py --self-test
-python3 /tmp/opencode/P1-TOOL-BRANCH01-independent-ses_df27261c9ffdiy0RA5Ko2oSdxl/adversarial_checks.py
-python3 tools/ci/red_main_drill.py --fixture /tmp/opencode/red-main-attempt-2-independent
-python3 tools/ci/rollback_drill.py --fixture /tmp/opencode/rollback-attempt-2-independent --tag phase1/contracts-premerge
+python3 /tmp/opencode/P1-TOOL-BRANCH01-review-ses_df27261c9ffcukQUulA8P0LN89/reviewer_adversarial.py
+python3 tools/ci/red_main_drill.py --fixture /tmp/opencode/red-main-attempt-3-independent
+python3 tools/ci/rollback_drill.py --fixture /tmp/opencode/rollback-attempt-3-independent --tag phase1/contracts-premerge
 ```
 
-After the reviewer and tester have written canonical `review.json` and `independent-test.json`, and the branch evidence has been assembled with `state: independently_verified` plus their exact hashes, run:
+The archived reviewer script is expected to fail closed by raising at the first fixed bypass; the independent reviewer should capture that as rejection or use the guarded probe pattern rather than treating an expected `GateError` as a harness failure.
+
+Fresh review/test records must bind source `64ad0559fad5ffcf2f9a60aa028cb8698aaec141`, tree `385946388f2d087a709baa871d25f07f76bdae3a`, artifact `b52037513ac6b7e80fc202cfd2aa5c729af442807641fb553d84d64dc35908fc`, registry `bff3da2e...`, named branch, and exact roles. The reviewer must additionally attest `reviewed_head_commit`/`reviewed_head_tree`; only canonical task-evidence commits may follow that head.
+
+After fresh records exist and branch evidence is assembled with `state=independently_verified` and `independent_evidence=true`:
 
 ```bash
 python3 tools/ci/branch_gate.py verify --task P1-TOOL-BRANCH01 --state independently_verified --evidence evidence/P1-TOOL-BRANCH01/branch-evidence.json
 python3 tools/session/verify_roles.py --task P1-TOOL-BRANCH01 --evidence evidence/P1-TOOL-BRANCH01/branch-evidence.json
 ```
 
-Both commands must exit zero before Integrator merge. The author must not create the independent review/test records.
+Merged verification additionally requires the expected merge SHA and live GitHub metadata; offline merged PASS is prohibited.
 
-## D11–D17 relevant closure
+## Residual risks
 
-- **D11:** the existing seed self-test/verify was rerun; the registered role append preserves seed history and its approval matches exact registry bytes (`bff3da2e...`). `register_roles.py` has duplicate/conflict/untrusted/non-append-only/hash-mismatch negatives.
-- **D12:** CLI tools use single-valued argparse options; canonical task/output/record flags are validated again in code.
-- **D13:** session roles are checked against the exact approved registry and task, not asserted by evidence alone.
-- **D14:** merge recording requires live canonical `gh pr view` metadata; fixture PRs are never accepted as production PR evidence.
-- **D15:** merge task/output/record identity is canonical, including the special Integrator-owned `P1-INT01` record path.
-- **D16:** no release-artifact path is introduced by this task.
-- **D17:** no ignored-`dist` path is introduced by this task.
-
-## Residual risks and receiver actions
-
-1. Distinct task-bound roles are registered and the approval hash verifies. Independent sessions must still run the exact commands above, write their own canonical evidence, and pass both independent gates before merge.
-2. Reviewer and tester must bind source `031524fd65d14d5a5818e277ac1bfc28d6e0db5b`, tree `b6d70180cacfcaa8aa76a0e6d2a5aeae94cd7b6e`, artifact `76d214d68d773084a3fa4e09422c2a19324beff9604d010b830d608aed514503`, the named branch, and registry `bff3da2e...` in canonical `review.json` and `independent-test.json`; the author must not self-certify.
-3. Integrator must merge the PR and run the canonical `record_merge.py` command. Merge-commit ancestry is required; squash merges are intentionally unsupported until a separate policy/evidence design exists.
-4. Ruff is an external local dependency. The exact tested executable was outside the repository; a clean runner must install Ruff or set `PYGPUI_RUFF`.
-5. The session trust root is the approved local registry/approval file pair, not a cryptographic signature. The later registry task owns stronger append-only infrastructure.
-6. Fixture drills prove control flow and production-ref isolation, not independent human review or production CI readiness.
+1. Attempt 3 is the last routine fix round. Fresh independent test and review are still mandatory; author probes are not certification.
+2. The exact reviewer script lacks expected-exception guards for R-02/R-03/R-04 and therefore aborts on the first correct rejection. This limitation is preserved and disclosed rather than worked around in production code.
+3. Ruff remains an external dependency at `/tmp/opencode/uv-tools/ruff/bin/ruff`.
+4. The trust root remains the approved local registry/approval pair; the later registry task owns stronger infrastructure.
+5. No merge, direct/force push to `main`, or independent pass evidence was produced.

@@ -1,0 +1,14 @@
+REJECTED independent_evidence_false: GateError('branch evidence independent_evidence must be boolean true')
+REJECTED contradictory_record_roles: GateError('review record role is not an independent reviewer')
+Traceback (most recent call last):
+  File "/tmp/opencode/P1-TOOL-BRANCH01-review-ses_df27261c9ffcukQUulA8P0LN89/reviewer_adversarial.py", line 95, in <module>
+    verify_premerge(root, TASK_ID, BRANCH_EVIDENCE)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/evidence.py", line 344, in verify_premerge
+    verify_reviewed_head_delta(root, verified, tip)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/evidence.py", line 157, in verify_reviewed_head_delta
+    raise GateError(
+    ...<2 lines>...
+    )
+tools.ci.common.GateError: post-review implementation changes are forbidden: ['.harness/sessions/registry.json', '.harness/sessions/seed-approval.json', 'fixture.txt']

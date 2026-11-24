@@ -1,0 +1,1 @@
+RED_MAIN_DRILL=PASS fixture=/tmp/opencode/red-main-attempt-3 red_main=afbab3d6830079036774374443e9c83cfa5c8e6d restored_green=1ebe438876472342d8c2fbeff5dcc9cf529ea7a0 production_unchanged=true
