@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "project": "pygpui",
+  "updated_at": "2026-11-24",
+  "current_phase": 0,
+  "tasks": [
+    {
+      "id": "H-001",
+      "title": "Bootstrap repository and file-backed harness",
+      "owner_role": "Orchestrator",
+      "deps": [],
+      "status": "done",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "STATE.md, TASKS.json, LOG.md, OPEN_QUESTIONS.md, PROCESS.md and Phase 0 question/handoff files exist",
+        "TASKS.json parses as JSON and every dependency references an existing task id",
+        "No feature implementation files exist"
+      ],
+      "evidence_links": [
+        ".harness/STATE.md",
+        ".harness/TASKS.json",
+        ".harness/OPEN_QUESTIONS.md",
+        ".harness/PROCESS.md"
+      ]
+    },
+    {
+      "id": "P0-R01A",
+      "title": "Research GPUI internals and clean-room boundaries",
+      "owner_role": "Researcher-Prior-Art",
+      "deps": ["H-001"],
+      "status": "in_progress",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "Assigned RESEARCH file contains question, dated primary sources, findings, confidence, contradictions and recommendation",
+        "Each decision-driving claim is labelled verified, plausible or unverified",
+        "Handoff follows Part 3 schema and LOG.md contains an action line"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-R01B",
+      "title": "Research cross-framework retained/immediate rendering models",
+      "owner_role": "Researcher-Prior-Art",
+      "deps": ["H-001"],
+      "status": "in_progress",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "Assigned RESEARCH file compares at least Slint, Iced and one additional relevant framework using dated sources",
+        "Each decision-driving claim is labelled verified, plausible or unverified",
+        "Handoff follows Part 3 schema and LOG.md contains an action line"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-R02A",
+      "title": "Research core Rust rendering/layout/text dependencies",
+      "owner_role": "Researcher-Libs",
+      "deps": ["H-001"],
+      "status": "in_progress",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "Assigned RESEARCH file records candidate versions, licenses, maintenance evidence, platform gaps and known bugs for winit, wgpu, taffy, cosmic-text, accesskit and rustc-hash/slotmap",
+        "Every recommended dependency has a dated primary source",
+        "Handoff follows Part 3 schema and LOG.md contains an action line"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-R02B",
+      "title": "Research PyO3, maturin, abi3 and strict typing constraints",
+      "owner_role": "Researcher-Libs",
+      "deps": ["H-001"],
+      "status": "in_progress",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "Assigned RESEARCH file evaluates PyO3, maturin and relevant async/GIL integration against macOS, Windows and Linux abi3 wheels",
+        "mypy --strict public API strategy is supported by concrete tooling evidence",
+        "Each decision-driving claim is labelled verified, plausible or unverified"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-R03A",
+      "title": "Research FFI/GIL and per-frame rendering cost models",
+      "owner_role": "Researcher-Perf",
+      "deps": ["H-001"],
+      "status": "in_progress",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "Assigned RESEARCH file explains where GIL transitions occur and proposes an event-only FFI boundary",
+        "Includes evidence for tree diffing, batching/instancing, text atlas and animation/scroll costs",
+        "Performance statements are estimates or measurements, never unlabelled assertions"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-R03B",
+      "title": "Design reproducible performance benchmark protocol",
+      "owner_role": "Researcher-Perf",
+      "deps": ["H-001"],
+      "status": "in_progress",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "Assigned RESEARCH file defines workloads, warmup, sample counts, statistics, hardware disclosure and pass/fail commands for all requested targets",
+        "Protocol distinguishes headless frame cost from real display cadence and defines input-to-frame measurement",
+        "Includes baseline capture and greater-than-10-percent regression detection"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-R04A",
+      "title": "Research desktop platform rendering and windowing constraints",
+      "owner_role": "Researcher-Platform",
+      "deps": ["H-001"],
+      "status": "in_progress",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "Assigned RESEARCH file covers Wayland/X11, Windows DX12/Vulkan and macOS Metal/HiDPI constraints with dated primary sources",
+        "Identifies platform-specific risks for wgpu and winit",
+        "Includes conservative recommendations for initial supported platforms"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-R04B",
+      "title": "Research IME, accessibility and cross-platform distribution edge cases",
+      "owner_role": "Researcher-Platform",
+      "deps": ["H-001"],
+      "status": "in_progress",
+      "attempt_count": 1,
+      "acceptance_criteria": [
+        "Assigned RESEARCH file covers IME lifecycle, AccessKit integration and keyboard/focus edge cases",
+        "Records wheel/CI/signing constraints for macOS, Windows and Linux without assuming unavailable infrastructure",
+        "Each decision-driving claim is labelled verified, plausible or unverified"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-SK01",
+      "title": "Falsify and classify combined Phase 0 research",
+      "owner_role": "Skeptic",
+      "deps": ["P0-R01A", "P0-R01B", "P0-R02A", "P0-R02B", "P0-R03A", "P0-R03B", "P0-R04A", "P0-R04B"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "acceptance_criteria": [
+        "REVIEWS/phase-0-research-skeptic.md cites each research file and identifies stale, contradictory or unsupported claims",
+        "Every architecture-driving claim has a final verified/plausible/unverified disposition",
+        "Round 2 requests are specific and only issued where the decision could change",
+        "No plausible or unverified claim silently drives an ADR"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-AR01",
+      "title": "Draft accepted architecture decision records",
+      "owner_role": "Architect",
+      "deps": ["P0-SK01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "acceptance_criteria": [
+        "DECISIONS contains ADRs for runtime ownership, Python/Rust boundary, rendering pipeline, public API, dependency baseline, platform baseline, benchmark gate and licensing",
+        "Each ADR lists context, decision, alternatives rejected, consequences, status and evidence links",
+        "No ADR relies on an unverified claim without an explicit uncertainty record"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-PL01",
+      "title": "Produce Phase 1 machine-checkable task graph",
+      "owner_role": "Planner",
+      "deps": ["P0-AR01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "acceptance_criteria": [
+        "Phase 1 tasks in TASKS.json have owners, deps, status, acceptance criteria, evidence links and attempt counts",
+        "Acceptance criteria name tests, benchmark thresholds or commands that exit zero",
+        "At least one thin end-to-end demoable vertical slice precedes broader framework work"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-RT01",
+      "title": "Red-team the Phase 0 ADRs and Phase 1 plan",
+      "owner_role": "Red-Team-Planner",
+      "deps": ["P0-PL01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "acceptance_criteria": [
+        "REVIEWS/phase-0-plan-red-team.md checks dependencies, hidden coupling, estimates, rollback and acceptance-criteria quality",
+        "Findings are severity-tagged with exact file/task references",
+        "Report ends with zero blocking issues or an explicit list requiring revision"
+      ],
+      "evidence_links": []
+    },
+    {
+      "id": "P0-AP01",
+      "title": "Approve Phase 0 gate and authorize Phase 1",
+      "owner_role": "Orchestrator",
+      "deps": ["P0-RT01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "acceptance_criteria": [
+        "STATE.md records gate evidence and approved next phase",
+        "Every blocking red-team finding is resolved or has an explicit bounded exception",
+        "No Phase 1 build task starts before this task is marked done"
+      ],
+      "evidence_links": []
+    }
+  ]
+}
