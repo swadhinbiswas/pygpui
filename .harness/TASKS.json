@@ -212,8 +212,8 @@
       "title": "Produce Phase 1 machine-checkable task graph",
       "owner_role": "Planner",
       "deps": ["P0-AR01"],
-      "status": "done",
-      "attempt_count": 1,
+      "status": "in_progress",
+      "attempt_count": 2,
       "acceptance_criteria": [
         "Phase 1 tasks in TASKS.json have owners, deps, status, acceptance criteria, evidence links and attempt counts",
         "Acceptance criteria name tests, benchmark thresholds or commands that exit zero",
@@ -225,7 +225,8 @@
         ".harness/PLANS/phase-1-vertical-slice.md",
         ".harness/TASKS.json",
         ".harness/HANDOFFS/planner-to-red-team-P0-PL01-1.md",
-        "evidence/P0-PL01/validation.txt"
+        "evidence/P0-PL01/validation.txt",
+        ".harness/REVIEWS/phase-0-plan-red-team.md"
       ]
     },
     {
@@ -233,14 +234,17 @@
       "title": "Red-team the Phase 0 ADRs and Phase 1 plan",
       "owner_role": "Red-Team-Planner",
       "deps": ["P0-PL01"],
-      "status": "in_progress",
+      "status": "blocked",
       "attempt_count": 1,
       "acceptance_criteria": [
         "REVIEWS/phase-0-plan-red-team.md checks dependencies, hidden coupling, estimates, rollback and acceptance-criteria quality",
         "Findings are severity-tagged with exact file/task references",
         "Report ends with zero blocking issues or an explicit list requiring revision"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/REVIEWS/phase-0-plan-red-team.md",
+        ".harness/HANDOFFS/red-team-planner-to-orchestrator-P0-RT01-1.md"
+      ]
     },
     {
       "id": "P0-AP01",
