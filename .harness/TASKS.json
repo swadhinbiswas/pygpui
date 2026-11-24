@@ -166,23 +166,26 @@
       "title": "Falsify and classify combined Phase 0 research",
       "owner_role": "Skeptic",
       "deps": ["P0-R01A", "P0-R01B", "P0-R02A", "P0-R02B", "P0-R03A", "P0-R03B", "P0-R04A", "P0-R04B"],
-      "status": "blocked",
-      "attempt_count": 0,
+      "status": "done",
+      "attempt_count": 1,
       "acceptance_criteria": [
         "REVIEWS/phase-0-research-skeptic.md cites each research file and identifies stale, contradictory or unsupported claims",
         "Every architecture-driving claim has a final verified/plausible/unverified disposition",
         "Round 2 requests are specific and only issued where the decision could change",
         "No plausible or unverified claim silently drives an ADR"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/REVIEWS/phase-0-research-skeptic.md",
+        ".harness/HANDOFFS/skeptic-to-orchestrator-P0-SK01-1.md"
+      ]
     },
     {
       "id": "P0-AR01",
       "title": "Draft accepted architecture decision records",
       "owner_role": "Architect",
       "deps": ["P0-SK01"],
-      "status": "blocked",
-      "attempt_count": 0,
+      "status": "in_progress",
+      "attempt_count": 1,
       "acceptance_criteria": [
         "DECISIONS contains ADRs for runtime ownership, Python/Rust boundary, rendering pipeline, public API, dependency baseline, platform baseline, benchmark gate and licensing",
         "Each ADR lists context, decision, alternatives rejected, consequences, status and evidence links",

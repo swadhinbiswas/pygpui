@@ -14,7 +14,7 @@ WHAT I DID NOT DO / SKIPPED, AND WHY: Skeptic review is blocked until all eight 
 
 OPEN RISKS & SURPRISES: Researchers may disagree on dependency versions, supported platforms, performance feasibility or GIL guarantees. Those disagreements are outputs to resolve, not inconsistencies to hide.
 
-EXACT NEXT STEP: Read `.harness/STATE.md`, this handoff, `.harness/RESEARCH/PHASE0-MANIFEST.md`, all eight listed research files and all eight listed handoffs; write `.harness/REVIEWS/phase-0-research-skeptic.md` with claim-level dispositions and any decision-changing Round 2 requests, then append one action line to `LOG.md` and write `.harness/HANDOFFS/skeptic-to-architect-P0-SK01-1.md`.
+EXACT NEXT STEP: Read `.harness/STATE.md`, this handoff, `.harness/RESEARCH/PHASE0-MANIFEST.md`, all eight listed research files and all eight listed handoffs; write `.harness/REVIEWS/phase-0-research-skeptic.md` with claim-level dispositions and any decision-changing Round 2 requests, then append one action line to `LOG.md` and write `.harness/HANDOFFS/skeptic-to-orchestrator-P0-SK01-1.md`.
 
 FILES THE RECEIVER MUST READ (ordered, max 7):
 1. `.harness/STATE.md`

@@ -3,7 +3,7 @@
 Last updated: 2026-11-24
 Owner: Orchestrator
 Phase: 0 — Discovery & Decisions
-Active loop: Loop A — Research
+Active loop: Loop B — ADRs and Plan
 Repository status: Empty workspace bootstrapped on Git `main`; no feature code exists. Local toolchain observed: Python 3.14.10, rustc 1.100.0, cargo 1.100.0.
 
 ## Current objective
@@ -26,10 +26,11 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - Validated and accepted P0-R03B: deterministic scenes, strict headless/presented/input/idle gates, native callback counters, immutable baselines and ABBA regression rules are documented; all targets remain unverified.
 - Validated and accepted P0-R04A after handoff normalization: explicit OS/backend masks, winit/wgpu constraints, known stable-release defects and platform test gates are documented; no platform is claimed verified.
 - Validated and accepted P0-R02A: exact dependency pins, three-target resolver evidence, Linux compile evidence, reproduced Taffy failures and licensing/soundness/MSRV risks are documented.
+- Accepted P0-SK01: Skeptic reproduced key evidence, reconciled all cross-stream conflicts, recorded binding corrections and conservative defaults, and requested no Round 2.
 
 ## Active work
 
-Research progress: 8 of 8 Round 1 outputs accepted. Next: commit the evidence batch and dispatch Skeptic over the combined findings.
+Research progress: 8 of 8 Round 1 outputs accepted and committed as `cc378c2`. Skeptic review is accepted. Architect is now drafting ADRs from the verified decision set; Planner and Red-Team-Planner remain blocked behind accepted ADRs.
 
 - RQ-01: prior-art architecture and clean-room boundaries.
 - RQ-02: Rust/Python dependency, version, license, and maintenance selection.
@@ -46,9 +47,9 @@ All eight researchers are Round 1 and may run concurrently. Their permitted writ
 
 ## Next 3 actions
 
-1. Collect and validate all eight Round 1 research handoffs; dispatch targeted Round 2 only for decision-driving claims marked plausible or unverified.
-2. Dispatch Skeptic to falsify the combined findings, check source freshness, and issue a claim-by-claim disposition.
-3. Dispatch Architect to draft ADRs from verified findings, then Planner and Red-Team-Planner to produce and challenge the Phase 1 task graph.
+1. Architect drafts the required ADR set from Skeptic §6, preserving every correction and gate in Skeptic §§5–8.
+2. Planner converts accepted ADRs into a Phase 1 task graph with at least one thin end-to-end vertical slice.
+3. Red-Team-Planner challenges dependencies, coupling, estimates, rollback and machine-checkable acceptance criteria.
 
 ## Phase 0 exit gate
 

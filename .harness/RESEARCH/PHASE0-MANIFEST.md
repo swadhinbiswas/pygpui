@@ -30,4 +30,6 @@ These are cross-stream differences to resolve, not accepted conclusions:
 
 ## Skeptic disposition summary
 
-Pending. Skeptic must produce `.harness/REVIEWS/phase-0-research-skeptic.md` and list any targeted Round 2 tasks. Orchestrator owns status updates to this manifest and `TASKS.json`.
+In progress at committed Round 1 baseline `cc378c2`. Skeptic must produce `.harness/REVIEWS/phase-0-research-skeptic.md` and list any targeted Round 2 tasks. Orchestrator owns status updates to this manifest and `TASKS.json`.
+
+Skeptic completed at attempt 1 with no Round 2 requests. Its report is accepted as the binding disposition for ADR drafting; all corrections and conservative defaults in that report remain mandatory.
