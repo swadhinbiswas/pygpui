@@ -184,22 +184,25 @@
       "title": "Draft accepted architecture decision records",
       "owner_role": "Architect",
       "deps": ["P0-SK01"],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
         "DECISIONS contains ADRs for runtime ownership, Python/Rust boundary, rendering pipeline, public API, dependency baseline, platform baseline, benchmark gate and licensing",
         "Each ADR lists context, decision, alternatives rejected, consequences, status and evidence links",
         "No ADR relies on an unverified claim without an explicit uncertainty record"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/DECISIONS/README.md",
+        ".harness/HANDOFFS/architect-to-planner-P0-AR01-1.md"
+      ]
     },
     {
       "id": "P0-PL01",
       "title": "Produce Phase 1 machine-checkable task graph",
       "owner_role": "Planner",
       "deps": ["P0-AR01"],
-      "status": "blocked",
-      "attempt_count": 0,
+      "status": "in_progress",
+      "attempt_count": 1,
       "acceptance_criteria": [
         "Phase 1 tasks in TASKS.json have owners, deps, status, acceptance criteria, evidence links and attempt counts",
         "Acceptance criteria name tests, benchmark thresholds or commands that exit zero",

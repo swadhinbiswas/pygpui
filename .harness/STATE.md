@@ -27,10 +27,11 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - Validated and accepted P0-R04A after handoff normalization: explicit OS/backend masks, winit/wgpu constraints, known stable-release defects and platform test gates are documented; no platform is claimed verified.
 - Validated and accepted P0-R02A: exact dependency pins, three-target resolver evidence, Linux compile evidence, reproduced Taffy failures and licensing/soundness/MSRV risks are documented.
 - Accepted P0-SK01: Skeptic reproduced key evidence, reconciled all cross-stream conflicts, recorded binding corrections and conservative defaults, and requested no Round 2.
+- Accepted P0-AR01: ten immutable ADRs define the runtime, snapshot-first Counter slice, API/crate boundaries, exact pins, platform gates, input/a11y ownership, abi3/typing/release policy, benchmark gates, clean-room policy and Apache-2.0 project license.
 
 ## Active work
 
-Research progress: 8 of 8 Round 1 outputs accepted and committed as `cc378c2`. Skeptic review is accepted. Architect is now drafting ADRs from the verified decision set; Planner and Red-Team-Planner remain blocked behind accepted ADRs.
+Research progress: 8 of 8 Round 1 outputs accepted and committed as `cc378c2`. Skeptic review is accepted. Ten ADRs are accepted. Planner is now converting them and every `ARxx-Gn` gate into a dependency-ordered Phase 1 task graph; Red-Team-Planner remains blocked behind that plan.
 
 - RQ-01: prior-art architecture and clean-room boundaries.
 - RQ-02: Rust/Python dependency, version, license, and maintenance selection.
