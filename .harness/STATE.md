@@ -50,7 +50,7 @@ Begin Wave 0/1 foundational implementation: governance records, trusted registry
 
 ## Active work
 
-`P1-TOOL-BRANCH01` attempt 1 was independently rejected for T-01–T-05. Build attempt 2 is fixing branch-ref ancestry, task-bound roles, bound-record tree/branch identity, and missing-Ruff exit handling. Reviewer and Integrator remain blocked.
+`P1-TOOL-BRANCH01` attempt 2 is on PR #1 at head `a1aae471d699ea10df2b75d34d477428ccb3a66b`; T-01–T-05 author verification passes. Independent Test-Engineer attempt 2 is active; Reviewer and Integrator remain blocked.
 
 ## Blocked
 
