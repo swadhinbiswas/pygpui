@@ -50,7 +50,7 @@ Begin Wave 0/1 foundational implementation: governance records, trusted registry
 
 ## Active work
 
-`P1-TOOL-BRANCH01` attempt 3 is on PR #1 at head `cfd8a2d5f976741400706be9fe61dfe65a76e423`; R-01–R-08 author verification passes. Independent Test-Engineer attempt 3 is active; Reviewer and Integrator remain blocked.
+`P1-TOOL-BRANCH01` attempt 3 passed independent testing on PR #1 head `058b53ea1811c79b8a20c6f37774f9655d74bf4f`. Independent Reviewer attempt 2 is active; Integrator merge remains blocked.
 
 ## Blocked
 
