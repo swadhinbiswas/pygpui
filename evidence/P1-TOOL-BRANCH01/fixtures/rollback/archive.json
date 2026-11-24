@@ -1,6 +1,6 @@
 {
   "fixture": true,
-  "fixture_origin_main": "42c88e5d637c16f230d0b78f46285c66fbbefe05",
+  "fixture_origin_main": "f1ba85f20fcbdc89fe4de29036ff6f86ca5148cc",
   "fixture_remote": "/tmp/opencode/rollback-fixture/origin.git",
   "gate_after_remerge": {
     "exit_code": 0,
@@ -21,9 +21,9 @@
     "stdout": ""
   },
   "independent_evidence": false,
-  "injected_failure_sha": "25eecc6d4d361ec12b2a373e3e11ecfabd6924ab",
+  "injected_failure_sha": "7fd55b3aaa81c59a425bb45cafa7532f0bcaf0b1",
   "production_after": {
-    "head": "15d29b32a066eeab7f4fdcc9b8a02456c4c0434f",
+    "head": "9b303160cfe4c6ab3e998423fbc33967a6286957",
     "main_refs": [
       "refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f"
     ],
@@ -34,7 +34,7 @@
     "root": "/tmp/opencode/pygpui-P1-TOOL-BRANCH01"
   },
   "production_before": {
-    "head": "15d29b32a066eeab7f4fdcc9b8a02456c4c0434f",
+    "head": "9b303160cfe4c6ab3e998423fbc33967a6286957",
     "main_refs": [
       "refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f"
     ],
@@ -49,40 +49,40 @@
     {
       "fixture": true,
       "kind": "reviewed-contract-merge",
-      "merge_sha": "b59b937269789b6b604989dc72a3cc7bc4ca4c01",
+      "merge_sha": "8c44013545f70d1b47c5345c8634279c1d1d3fad",
       "review": "simulated-two-parent-fixture-merge"
     },
     {
       "fixture": true,
       "kind": "revert",
-      "merge_sha": "8405be01ef2d2b2f561fd61253876f32f95a445e",
+      "merge_sha": "6e3b368400efe5dc5619feb409503bb6e8af1f53",
       "review": "simulated-fixture-revert"
     },
     {
       "fixture": true,
       "kind": "remerge-restoration",
-      "merge_sha": "42c88e5d637c16f230d0b78f46285c66fbbefe05",
+      "merge_sha": "f1ba85f20fcbdc89fe4de29036ff6f86ca5148cc",
       "review": "simulated-two-parent-fixture-merge"
     }
   ],
-  "remerge_commit": "7b59788cb8e30864122d53cf6cfbab40c6ae6528",
-  "remerge_sha": "42c88e5d637c16f230d0b78f46285c66fbbefe05",
-  "restored_green_sha": "42c88e5d637c16f230d0b78f46285c66fbbefe05",
-  "revert_of_revert_sha": "194b9c18646678563853215618684918aa5c4c19",
-  "revert_sha": "8405be01ef2d2b2f561fd61253876f32f95a445e",
+  "remerge_commit": "bf4b304853ee3672a90e398a2607710d690db105",
+  "remerge_sha": "f1ba85f20fcbdc89fe4de29036ff6f86ca5148cc",
+  "restored_green_sha": "f1ba85f20fcbdc89fe4de29036ff6f86ca5148cc",
+  "revert_of_revert_sha": "0c118437c9951539d809aa29558b0e7c8ef0828f",
+  "revert_sha": "6e3b368400efe5dc5619feb409503bb6e8af1f53",
   "review_mode": "simulated-two-parent-fixture-merges",
-  "reviewed_merge_sha": "b59b937269789b6b604989dc72a3cc7bc4ca4c01",
+  "reviewed_merge_sha": "8c44013545f70d1b47c5345c8634279c1d1d3fad",
   "schema_version": 1,
   "tag": "phase1/contracts-premerge",
-  "tag_commit": "6ebc96c9f5075c5fb2177ec0f1bf5a108f6a8b8c",
+  "tag_commit": "010cea56b6c472470df4485fe4a980107b85e567",
   "tag_record": {
     "annotated": true,
-    "commit": "6ebc96c9f5075c5fb2177ec0f1bf5a108f6a8b8c",
+    "commit": "010cea56b6c472470df4485fe4a980107b85e567",
     "record_path": "evidence/tag-record.json",
     "ref": "refs/tags/phase1/contracts-premerge",
     "schema_version": 1,
     "tag": "phase1/contracts-premerge",
-    "tag_object_sha": "f9d1585532bee9827c9868c795d6338d6c64279b"
+    "tag_object_sha": "fd8ad732d2b664912bb93e1a80cafe18d98033c1"
   },
   "tags": [
     "phase1/contracts-premerge"

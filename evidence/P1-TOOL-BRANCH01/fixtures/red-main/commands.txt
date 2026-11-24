@@ -11,12 +11,13 @@ origin	https://github.com/swadhinbiswas/pygpui.git (push)
 
 $ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git for-each-ref '--format=%(refname) %(objectname)' refs/remotes/
 exit=0
+refs/remotes/origin/feat/P1-TOOL-BRANCH01-tooling 9b303160cfe4c6ab3e998423fbc33967a6286957
 refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f
 
 
 $ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git rev-parse HEAD
 exit=0
-15d29b32a066eeab7f4fdcc9b8a02456c4c0434f
+9b303160cfe4c6ab3e998423fbc33967a6286957
 
 
 $ (cwd=/tmp/opencode/red-main-fixture) git init --bare --initial-branch=main /tmp/opencode/red-main-fixture/origin.git
@@ -47,7 +48,7 @@ exit=0
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git commit -m 'test: disposable green baseline'
 exit=0
-[main (root-commit) 6ebc96c] test: disposable green baseline
+[main (root-commit) 010cea5] test: disposable green baseline
  3 files changed, 8 insertions(+)
  create mode 100644 baseline.txt
  create mode 100755 full-gate.sh
@@ -56,7 +57,7 @@ exit=0
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse HEAD
 exit=0
-6ebc96c9f5075c5fb2177ec0f1bf5a108f6a8b8c
+010cea56b6c472470df4485fe4a980107b85e567
 
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git push -u origin main
@@ -73,13 +74,13 @@ Switched to a new branch 'fixture/red-main'
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git commit -am 'test: inject fixture red main'
 exit=0
-[fixture/red-main 939f07c] test: inject fixture red main
+[fixture/red-main 8b7dadc] test: inject fixture red main
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse HEAD
 exit=0
-939f07cc530c17ca60e93786d70afb134cfe82a4
+8b7dadc9d677d3b57762fd39c8e11ea01d7f7c1c
 
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git switch main
@@ -97,7 +98,7 @@ Merge made by the 'ort' strategy.
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse HEAD
 exit=0
-cf4669c26aa48f2fe704e504194de2ffc5549ca9
+af756be3e9fe6829bb0f096c8e499bea85cbbee3
 
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) ./full-gate.sh
@@ -111,13 +112,13 @@ Switched to a new branch 'fixture/restore-main'
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git commit -am 'test: restore fixture green main'
 exit=0
-[fixture/restore-main 65ba10a] test: restore fixture green main
+[fixture/restore-main 12c08af] test: restore fixture green main
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse HEAD
 exit=0
-65ba10a96b74566f80325fc5c6fe04ebfe8f6130
+12c08afb302a601d65ecfe6933705f844511406c
 
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git switch main
@@ -136,7 +137,7 @@ Merge made by the 'ort' strategy.
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse HEAD
 exit=0
-a4bcc15133a833f4b34bbcaf69a70d51fda7aa50
+23714a509dfbfb4eb23c75e57092b52bdb08c518
 
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) ./full-gate.sh
@@ -147,11 +148,11 @@ $ (cwd=/tmp/opencode/red-main-fixture/work) git push origin main
 exit=0
 
 To /tmp/opencode/red-main-fixture/origin.git
-   6ebc96c..a4bcc15  main -> main
+   010cea5..23714a5  main -> main
 
 $ (cwd=/tmp/opencode/red-main-fixture/work) git rev-parse origin/main
 exit=0
-a4bcc15133a833f4b34bbcaf69a70d51fda7aa50
+23714a509dfbfb4eb23c75e57092b52bdb08c518
 
 
 $ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git rev-parse --show-toplevel
@@ -167,9 +168,10 @@ origin	https://github.com/swadhinbiswas/pygpui.git (push)
 
 $ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git for-each-ref '--format=%(refname) %(objectname)' refs/remotes/
 exit=0
+refs/remotes/origin/feat/P1-TOOL-BRANCH01-tooling 9b303160cfe4c6ab3e998423fbc33967a6286957
 refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f
 
 
 $ (cwd=/tmp/opencode/pygpui-P1-TOOL-BRANCH01) git rev-parse HEAD
 exit=0
-15d29b32a066eeab7f4fdcc9b8a02456c4c0434f
+9b303160cfe4c6ab3e998423fbc33967a6286957

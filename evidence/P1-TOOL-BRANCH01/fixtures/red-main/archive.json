@@ -1,7 +1,7 @@
 {
-  "baseline_sha": "6ebc96c9f5075c5fb2177ec0f1bf5a108f6a8b8c",
+  "baseline_sha": "010cea56b6c472470df4485fe4a980107b85e567",
   "fixture": true,
-  "fixture_origin_main": "a4bcc15133a833f4b34bbcaf69a70d51fda7aa50",
+  "fixture_origin_main": "23714a509dfbfb4eb23c75e57092b52bdb08c518",
   "fixture_remote": "/tmp/opencode/red-main-fixture/origin.git",
   "gate_after_fix": {
     "exit_code": 0,
@@ -18,7 +18,7 @@
   "independent_evidence": false,
   "pause_unrelated_merges": true,
   "production_after": {
-    "head": "15d29b32a066eeab7f4fdcc9b8a02456c4c0434f",
+    "head": "9b303160cfe4c6ab3e998423fbc33967a6286957",
     "main_refs": [
       "refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f"
     ],
@@ -29,7 +29,7 @@
     "root": "/tmp/opencode/pygpui-P1-TOOL-BRANCH01"
   },
   "production_before": {
-    "head": "15d29b32a066eeab7f4fdcc9b8a02456c4c0434f",
+    "head": "9b303160cfe4c6ab3e998423fbc33967a6286957",
     "main_refs": [
       "refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f"
     ],
@@ -44,19 +44,19 @@
     {
       "fixture": true,
       "kind": "red-main-injection",
-      "merge_sha": "cf4669c26aa48f2fe704e504194de2ffc5549ca9",
+      "merge_sha": "af756be3e9fe6829bb0f096c8e499bea85cbbee3",
       "review": "simulated-two-parent-fixture-merge"
     },
     {
       "fixture": true,
       "kind": "restoration",
-      "merge_sha": "a4bcc15133a833f4b34bbcaf69a70d51fda7aa50",
+      "merge_sha": "23714a509dfbfb4eb23c75e57092b52bdb08c518",
       "review": "simulated-two-parent-fixture-merge"
     }
   ],
-  "red_commit": "939f07cc530c17ca60e93786d70afb134cfe82a4",
-  "red_main_sha": "cf4669c26aa48f2fe704e504194de2ffc5549ca9",
-  "restore_commit": "65ba10a96b74566f80325fc5c6fe04ebfe8f6130",
-  "restored_green_sha": "a4bcc15133a833f4b34bbcaf69a70d51fda7aa50",
+  "red_commit": "8b7dadc9d677d3b57762fd39c8e11ea01d7f7c1c",
+  "red_main_sha": "af756be3e9fe6829bb0f096c8e499bea85cbbee3",
+  "restore_commit": "12c08afb302a601d65ecfe6933705f844511406c",
+  "restored_green_sha": "23714a509dfbfb4eb23c75e57092b52bdb08c518",
   "schema_version": 1
 }
