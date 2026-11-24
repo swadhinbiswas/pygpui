@@ -105,6 +105,43 @@ def add_fake_origin(root: Path, remote: Path) -> str:
     return main_sha
 
 
+def write_seed_registry(root: Path, orchestrator_id: str = "orchestrator-1") -> str:
+    registry = {
+        "append_only": True,
+        "schema_version": 1,
+        "seed_history": [
+            {
+                "approver_session_id": orchestrator_id,
+                "registry_sha256": "0" * 64,
+            }
+        ],
+        "sessions": {
+            orchestrator_id: {
+                "role": "orchestrator",
+                "trusted": True,
+                "seed": True,
+            }
+        },
+        "trust_root": "orchestrator",
+    }
+    registry_bytes = (json.dumps(registry, indent=2, sort_keys=True) + "\n").encode(
+        "utf-8"
+    )
+    digest = sha256_bytes(registry_bytes)
+    write_json(
+        root / APPROVAL_PATH,
+        {
+            "approver_session_id": orchestrator_id,
+            "registry_sha256": digest,
+            "schema_version": 1,
+            "scope": "phase1-session-registry-bootstrap",
+        },
+    )
+    (root / REGISTRY_PATH).parent.mkdir(parents=True, exist_ok=True)
+    (root / REGISTRY_PATH).write_bytes(registry_bytes)
+    return digest
+
+
 def write_registry(root: Path, role_sessions: dict[str, str] | None = None) -> str:
     roles = role_sessions or {
         "implementer_session_id": "implementer-1",
