@@ -5,7 +5,7 @@ LOCAL_GATE_STEP=PASS step=lint exit=0
 ........................................................................ [ 43%]
 ...................................................... [ 76%]
 ......................................                                   [100%]
-164 passed, 18 subtests passed in 21.32s
+164 passed, 18 subtests passed in 20.02s
 LOCAL_GATE_STEP=PASS step=tests exit=0
 JSON_PARSE=PASS
 UNIQUE_IDS=PASS total=88 unique=88

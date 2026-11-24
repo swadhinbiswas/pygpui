@@ -6,19 +6,19 @@
   "independent_evidence": false,
   "branch": "feat/P1-TOOL-BRANCH01-tooling",
   "base_commit": "15d29b32a066eeab7f4fdcc9b8a02456c4c0434f",
-  "source_commit": "71b344f324f0f2b438edc3e12a1f59ecfc9aa1e0",
-  "source_tree": "e78d1e0f9f0dcd2da0009211e8489d62c8a9a0e8",
+  "source_commit": "841fb384d08f7d598c2e0ab8242cfe0643bb5d14",
+  "source_tree": "a59b49f159b46204a5ffaf6c111b3b44f6fff9d8",
   "artifact_id": "P1-TOOL-BRANCH01-branch",
-  "artifact_sha256": "d51d25ace0e953dccf5637e760f271eb7bae1cf2f2696e4e238a187d8929e897",
-  "registry_sha256": "186313d1fdb4a95bad97ff50de553ce48d6cfcd8f6707b246a1b93a6fdbdc417",
+  "artifact_sha256": "5c8926a78f52b9f6b8df679ac66c62eee238ebb4dc03602abdd9b3fbe333e5cf",
+  "registry_sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498",
   "registry": {
     "path": ".harness/sessions/registry.json",
-    "sha256": "186313d1fdb4a95bad97ff50de553ce48d6cfcd8f6707b246a1b93a6fdbdc417"
+    "sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498"
   },
-  "implementer_session_id": null,
-  "reviewer_session_id": null,
-  "tester_session_id": null,
-  "integrator_session_id": null,
+  "implementer_session_id": "ses_df2be4996ffek8O5wu7RwOeubn",
+  "reviewer_session_id": "ses_df27261c9ffcukQUulA8P0LN89",
+  "tester_session_id": "ses_df27261c9ffdiy0RA5Ko2oSdxl",
+  "integrator_session_id": "ses_df27261c8ffeJbVXcZMsund3Hf",
   "review": {
     "path": "evidence/P1-TOOL-BRANCH01/review.json",
     "sha256": null
@@ -29,7 +29,7 @@
   },
   "session_roles": {
     "path": "evidence/P1-TOOL-BRANCH01/session-roles.json",
-    "sha256": null
+    "sha256": "f31d537c309a9049ef7afce32abc84b372c3a38808b995617b899ce42d60ba63"
   },
-  "blocked_reason": "Author-run implementation and self-tests exist. register_roles.py is available, but no real roles have been registered. Independent reviewer/tester sessions and an Integrator merge record are intentionally absent pending Orchestrator registration and independent verification."
+  "blocked_reason": "Distinct task-bound roles are registered and the registry approval verifies. Independent review/test evidence and the Integrator merge record are intentionally absent; state remains implemented and independent_evidence remains false."
 }

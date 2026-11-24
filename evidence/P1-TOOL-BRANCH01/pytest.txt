@@ -14,4 +14,4 @@ tools/ci/tests/test_run_local_gate.py ........                           [ 80%]
 tools/ci/tests/test_tag_point.py .....                                   [ 86%]
 tools/ci/tests/test_verify_roles.py ..........                           [100%]
 
-============================== 76 passed in 3.49s ==============================
+============================== 76 passed in 2.96s ==============================

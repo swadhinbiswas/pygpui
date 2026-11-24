@@ -11,14 +11,15 @@ Status: **partial** — implementation and author-run verification are complete;
 | Worktree | `/tmp/opencode/pygpui-P1-TOOL-BRANCH01` |
 | Dispatch baseline | `15d29b32a066eeab7f4fdcc9b8a02456c4c0434f` |
 | Initial implementation commit | `cebbb44c29336e0b74aa0acc75686c136bb8e10d` |
-| Bound source commit | `71b344f324f0f2b438edc3e12a1f59ecfc9aa1e0` |
+| Bound source commit | `841fb384d08f7d598c2e0ab8242cfe0643bb5d14` |
 | PR opened from commit | `bdf0e39d2d2f474ae273f0efb6728a150a188442` |
-| Bound source tree | `e78d1e0f9f0dcd2da0009211e8489d62c8a9a0e8` |
+| Bound source tree | `a59b49f159b46204a5ffaf6c111b3b44f6fff9d8` |
 | Branch artifact | `P1-TOOL-BRANCH01-branch` |
-| Artifact SHA-256 | `d51d25ace0e953dccf5637e760f271eb7bae1cf2f2696e4e238a187d8929e897` |
+| Artifact SHA-256 | `5c8926a78f52b9f6b8df679ac66c62eee238ebb4dc03602abdd9b3fbe333e5cf` |
+| Approved registry SHA-256 | `bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498` |
 | PR URL | https://github.com/swadhinbiswas/pygpui/pull/1 |
 
-Only `tools/ci/**`, `tools/session/verify_roles.py`, `tools/session/register_roles.py`, and `evidence/P1-TOOL-BRANCH01/**` were changed. No production `main` push, force-push, self-merge, harness-state edit, ADR edit, or UI feature edit was performed.
+Changes are limited to `tools/ci/**`, `tools/session/verify_roles.py`, `tools/session/register_roles.py`, `evidence/P1-TOOL-BRANCH01/**`, and the Orchestrator-approved `.harness/sessions/registry.json` / `.harness/sessions/seed-approval.json` updates. No production `main` push, force-push, self-merge, harness-state edit, ADR edit, or UI feature edit was performed.
 
 ## Implemented controls
 
@@ -75,7 +76,7 @@ Evidence: `fmt.txt`, `lint.txt`.
 ```text
 $ python3 -m pytest tools/ci/tests
 collected 76 items
-76 passed in 3.49s
+76 passed in 2.96s
 ```
 
 Evidence: `pytest.txt`.
@@ -84,7 +85,7 @@ Evidence: `pytest.txt`.
 
 ```text
 $ python3 -m pytest -q
-88 passed, 18 subtests passed in 17.94s
+88 passed, 18 subtests passed in 12.66s
 ```
 
 Evidence: `root-pytest.txt`.
@@ -97,7 +98,7 @@ $ PYGPUI_RUFF=/tmp/opencode/uv-tools/ruff/bin/ruff python3 tools/ci/run_local_ga
 LOCAL_GATE_STEP=PASS step=fmt exit=0
 All checks passed!
 LOCAL_GATE_STEP=PASS step=lint exit=0
-164 passed, 18 subtests passed in 21.32s
+164 passed, 18 subtests passed in 20.02s
 LOCAL_GATE_STEP=PASS step=tests exit=0
 JSON_PARSE=PASS
 ...
@@ -193,9 +194,21 @@ Both fixture archives also contain identical production before/after snapshots, 
 
 ## Independent gates intentionally skipped
 
-The authoritative registry still contains only the seed Orchestrator. No implementer, reviewer, tester, or Integrator session was registered in it. `branch-evidence.json` therefore says `state: implemented`, and `session-roles.json` says `status: pending` with null role IDs. The new `register_roles.py` tool was exercised against a disposable copy of the real seed, using only the known implementer ID; the authoritative registry/approval hashes remain unchanged.
+Orchestrator used `register_roles.py` to append the real task-bound roles. The registry approval now verifies at SHA-256 `bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498`.
+
+| Role | Session |
+|---|---|
+| Implementer | `ses_df2be4996ffek8O5wu7RwOeubn` |
+| Reviewer | `ses_df27261c9ffcukQUulA8P0LN89` |
+| Tester | `ses_df27261c9ffdiy0RA5Ko2oSdxl` |
+| Integrator | `ses_df27261c8ffeJbVXcZMsund3Hf` |
+
+`session-roles.json` now says `status: assigned`. `branch-evidence.json` references the exact registry and role-assignment hashes but remains `state: implemented` with `independent_evidence: false`. No independent result was inferred from role registration.
 
 ```text
+$ python3 .harness/scripts/seed_session_registry.py --verify
+SESSION_SEED_VERIFY=PASS
+
 $ python3 tools/ci/branch_gate.py verify --task P1-TOOL-BRANCH01 --state independently_verified --evidence evidence/P1-TOOL-BRANCH01/branch-evidence.json
 BRANCH_GATE_REJECT code=state message=branch evidence is not independently_verified
 (exit 3)
@@ -205,40 +218,36 @@ SESSION_ROLES_REJECT code=state message=branch evidence is not independently_ver
 (exit 3)
 ```
 
-Evidence: `branch-gate-verify.txt`, `verify-roles.txt`. `review.json`, `independent-test.json`, and `merge.json` are deliberately absent until independent sessions act.
+Evidence: `seed-verify.txt`, `branch-gate-verify.txt`, `verify-roles.txt`, `branch-evidence-binding.txt`. `review.json`, `independent-test.json`, and `merge.json` remain deliberately absent.
 
-### Append-only role registration
+### Exact independent-session verification commands
 
-Disposable real-seed fixture command:
-
-```text
-$ python3 tools/session/register_roles.py --repository /tmp/opencode/register-roles-seed-fixture-followup --task P1-TOOL-BRANCH01 --approver orchestrator-main-a433d68 --assign implementer=ses_df2be4996ffek8O5wu7RwOeubn
-ROLE_REGISTER=PASS task=P1-TOOL-BRANCH01 approver=orchestrator-main-a433d68 roles=implementer registry_sha256=a6ce83197730a71c99446a14eb46d5b9483186043b5d6835ccade447a9f9cdb5
-
-$ python3 .harness/scripts/seed_session_registry.py --verify --output /tmp/opencode/register-roles-seed-fixture-followup/.harness/sessions/registry.json --approval /tmp/opencode/register-roles-seed-fixture-followup/.harness/sessions/seed-approval.json
-SESSION_SEED_VERIFY=PASS
-```
-
-Evidence: `register-roles-seed-fixture.txt`, `register-roles-seed-fixture-verify.txt`. The authoritative registry remains at SHA-256 `186313d1fdb4a95bad97ff50de553ce48d6cfcd8f6707b246a1b93a6fdbdc417`.
-
-Exact later command for Orchestrator, after replacing the three independent-session placeholders with registered IDs:
+Independent sessions should first verify the approved registry and rerun the author controls on PR head `e2033cfd888c2f4cf3c92544a4d999c3245ef7da`:
 
 ```bash
-python3 tools/session/register_roles.py \
-  --repository . \
-  --task P1-TOOL-BRANCH01 \
-  --approver orchestrator-main-a433d68 \
-  --assign implementer=ses_df2be4996ffek8O5wu7RwOeubn \
-  --assign reviewer=<REVIEWER_SESSION_ID> \
-  --assign tester=<TESTER_SESSION_ID> \
-  --assign integrator=<INTEGRATOR_SESSION_ID>
+python3 .harness/scripts/seed_session_registry.py --verify
+python3 -m pytest tools/ci/tests
+PYGPUI_RUFF=/tmp/opencode/uv-tools/ruff/bin/ruff python3 tools/ci/run_local_gate.py --mode full
+python3 tools/ci/branch_gate.py --self-test
+python3 tools/ci/record_merge.py --self-test
+python3 tools/session/register_roles.py --self-test
+python3 tools/session/verify_roles.py --self-test
+python3 tools/ci/red_main_drill.py --fixture /tmp/opencode/red-main-independent
+python3 tools/ci/rollback_drill.py --fixture /tmp/opencode/rollback-independent --tag phase1/contracts-premerge
 ```
 
-This is one atomic append. Re-running it after those roles exist is rejected rather than replacing records. If the implementer is registered separately, omit that `--assign` from the later independent-role command.
+After the reviewer and tester have written canonical `review.json` and `independent-test.json`, and the branch evidence has been assembled with `state: independently_verified` plus their exact hashes, run:
+
+```bash
+python3 tools/ci/branch_gate.py verify --task P1-TOOL-BRANCH01 --state independently_verified --evidence evidence/P1-TOOL-BRANCH01/branch-evidence.json
+python3 tools/session/verify_roles.py --task P1-TOOL-BRANCH01 --evidence evidence/P1-TOOL-BRANCH01/branch-evidence.json
+```
+
+Both commands must exit zero before Integrator merge. The author must not create the independent review/test records.
 
 ## D11–D17 relevant closure
 
-- **D11:** the existing seed self-test/verify was rerun; registry approval matches exact bytes (`186313d1...`). `register_roles.py` preserves seed history and refreshes approval to exact appended registry bytes, with duplicate/conflict/untrusted/non-append-only/hash-mismatch negatives.
+- **D11:** the existing seed self-test/verify was rerun; the registered role append preserves seed history and its approval matches exact registry bytes (`bff3da2e...`). `register_roles.py` has duplicate/conflict/untrusted/non-append-only/hash-mismatch negatives.
 - **D12:** CLI tools use single-valued argparse options; canonical task/output/record flags are validated again in code.
 - **D13:** session roles are checked against the exact approved registry and task, not asserted by evidence alone.
 - **D14:** merge recording requires live canonical `gh pr view` metadata; fixture PRs are never accepted as production PR evidence.
@@ -248,7 +257,7 @@ This is one atomic append. Re-running it after those roles exist is rejected rat
 
 ## Residual risks and receiver actions
 
-1. Orchestrator must run the exact `register_roles.py` command above to append distinct task-bound implementer/reviewer/tester/Integrator sessions and refresh the seed approval hash. Until then independent gates remain blocked by design.
+1. Distinct task-bound roles are registered and the approval hash verifies. Independent sessions must still run the exact commands above, write their own canonical evidence, and pass both independent gates before merge.
 2. Reviewer and tester must bind the same source commit/tree/artifact and write canonical `review.json` and `independent-test.json`; the author must not self-certify.
 3. Integrator must merge the PR and run the canonical `record_merge.py` command. Merge-commit ancestry is required; squash merges are intentionally unsupported until a separate policy/evidence design exists.
 4. Ruff is an external local dependency. The exact tested executable was outside the repository; a clean runner must install Ruff or set `PYGPUI_RUFF`.

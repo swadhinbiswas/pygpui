@@ -3,13 +3,13 @@
   "task_id": "P1-TOOL-BRANCH01",
   "record_path": "evidence/P1-TOOL-BRANCH01/session-roles.json",
   "registry_path": ".harness/sessions/registry.json",
-  "registry_sha256": "186313d1fdb4a95bad97ff50de553ce48d6cfcd8f6707b246a1b93a6fdbdc417",
-  "status": "pending",
+  "registry_sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498",
+  "status": "assigned",
   "independent_evidence": false,
   "registration_tool": "tools/session/register_roles.py",
-  "implementer_session_id": null,
-  "reviewer_session_id": null,
-  "tester_session_id": null,
-  "integrator_session_id": null,
-  "blocked_reason": "Orchestrator has not registered task-bound implementer, reviewer, tester, or Integrator sessions. The append-only registration tool is implemented and tested; no roles are inferred or fabricated."
+  "implementer_session_id": "ses_df2be4996ffek8O5wu7RwOeubn",
+  "reviewer_session_id": "ses_df27261c9ffcukQUulA8P0LN89",
+  "tester_session_id": "ses_df27261c9ffdiy0RA5Ko2oSdxl",
+  "integrator_session_id": "ses_df27261c8ffeJbVXcZMsund3Hf",
+  "blocked_reason": "Orchestrator registered distinct task-bound roles and the registry approval verifies. Independent review/test evidence and the Integrator merge record are intentionally absent; state remains implemented and independent_evidence remains false."
 }
