@@ -50,7 +50,7 @@ Begin Wave 0/1 foundational implementation: governance records, trusted registry
 
 ## Active work
 
-`P1-TOOL-BRANCH01` implementation is complete on PR #1 at head `f106b5e8de7385a53dfc8a3c138147139a36e767`. Distinct roles are registered and hash-bound. Independent Test-Engineer verification is active; Reviewer and Integrator steps follow.
+`P1-TOOL-BRANCH01` attempt 1 was independently rejected for T-01–T-05. Build attempt 2 is fixing branch-ref ancestry, task-bound roles, bound-record tree/branch identity, and missing-Ruff exit handling. Reviewer and Integrator remain blocked.
 
 ## Blocked
 
