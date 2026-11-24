@@ -22,7 +22,7 @@ class GraphValidatorSemanticTests(unittest.TestCase):
         cls.data = json.loads((ROOT / ".harness" / "TASKS.json").read_text())
         cls.plan = (ROOT / ".harness" / "PLANS" / "phase-1-vertical-slice.md").read_text()
         cls.baseline = VALIDATOR._load_baseline(ROOT, "5ce026d")
-        cls.history_baseline = VALIDATOR._load_baseline(ROOT, "b9a8504")
+        cls.history_baseline = VALIDATOR._load_baseline(ROOT, "4e307b2")
 
     def assert_invalid(self, mutate_data=None, mutate_plan=None) -> None:
         data = copy.deepcopy(self.data)
@@ -150,6 +150,66 @@ class GraphValidatorSemanticTests(unittest.TestCase):
     def test_owner_notice_missing_is_rejected(self) -> None:
         self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LICENSE-CLOSE01")["deps"].remove("P1-OWNER-NOTICE01"))
 
+    def test_d1_duplicate_result_path_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["gate_results"][1].update(path=next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["gate_results"][0]["path"]))
+
+    def test_d1_aggregate_self_overwrite_is_rejected(self) -> None:
+        def mutate(d):
+            task = next(t for t in d["tasks"] if t["id"] == "P1-TST01")
+            for index, criterion in enumerate(task["acceptance_criteria"]):
+                if "tools/gates/aggregate.py --gate AR02-G1" in criterion:
+                    task["acceptance_criteria"][index] = criterion.replace(
+                        "--output evidence/P1-TST01/AR02-G1.json",
+                        "--output evidence/P1-PROTO01/AR02-G1.schema.json",
+                    )
+                    break
+        self.assert_invalid(mutate)
+
+    def test_d1_validation_before_creation_is_rejected(self) -> None:
+        def mutate(d):
+            task = next(t for t in d["tasks"] if t["id"] == "P1-TST01")
+            validate_index = next(i for i, c in enumerate(task["acceptance_criteria"]) if "validate_result.py" in c and "AR02-G1.json" in c)
+            create_index = next(i for i, c in enumerate(task["acceptance_criteria"]) if "aggregate.py --gate AR02-G1" in c)
+            task["acceptance_criteria"][validate_index], task["acceptance_criteria"][create_index] = task["acceptance_criteria"][create_index], task["acceptance_criteria"][validate_index]
+        self.assert_invalid(mutate)
+
+    def test_d1_pr_audit_outputs_are_distinct(self) -> None:
+        task = next(t for t in self.data["tasks"] if t["id"] == "P1-PR-AUDIT01")
+        paths = [r["path"] for r in task["gate_results"] if r["gate_id"] in {"AR09-G1", "AR10-G3"}]
+        self.assertEqual(2, len(set(paths)))
+
+    def test_d2_control_code_producer_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-SESSION-REGISTRY01").update(workflow="control", completion_state="recorded"))
+
+    def test_d2_gate_schema_control_producer_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-GATE-SCHEMA01").update(workflow="control", completion_state="recorded"))
+
+    def test_d3_missing_enforcement_subgate_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: d["gate_model"]["AR09-G1"].update(required_sub_gates=["AR09-G1.repository-evidence"]))
+
+    def test_d3_missing_enforcement_command_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"].__setitem__(slice(None), [c for c in next(t for t in d["tasks"] if t["id"] == "P1-PR-AUDIT01")["acceptance_criteria"] if "pr_audit_gate.py" not in c]))
+
+    def test_d4_audit_before_fetch_is_rejected(self) -> None:
+        def mutate(d):
+            task = next(t for t in d["tasks"] if t["id"] == "P1-LIC02")
+            fetch = next(c for c in task["acceptance_criteria"] if "gh release download" in c)
+            task["acceptance_criteria"].remove(fetch)
+            task["acceptance_criteria"].append(fetch)
+        self.assert_invalid(mutate)
+
+    def test_d4_audit_against_non_downloaded_path_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LICENSE-CLOSE01")["acceptance_criteria"].__setitem__(slice(None), [c.replace("evidence/P1-LICENSE-CLOSE01/downloads/**", "somewhere-else/**") if "audit_artifacts.py" in c else c for c in next(t for t in d["tasks"] if t["id"] == "P1-LICENSE-CLOSE01")["acceptance_criteria"]]))
+
+    def test_d5_dist_wildcard_bypass_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"].append("python3 tools/release/audit_artifacts.py --artifacts dist/release/*.whl exits zero"))
+
+    def test_d5_dist_local_wildcard_bypass_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-LIC02")["acceptance_criteria"].append("python3 tools/release/audit_artifacts.py --artifacts dist/local/*.whl exits zero"))
+
+    def test_d6_unbound_approval_is_rejected(self) -> None:
+        self.assert_invalid(lambda d: next(t for t in d["tasks"] if t["id"] == "P1-READY-CERT01")["sub_gates"][0].pop("approval_registry"))
+
 
 class GateResultSchemaTests(unittest.TestCase):
     @classmethod
@@ -164,11 +224,14 @@ class GateResultSchemaTests(unittest.TestCase):
             "evidence_type": "user-approval",
             "evidence": [{"path": "evidence/P1-READY-CERT01/approval.json", "sha256": "a" * 64}],
             "source_commit": "b" * 40,
-            "lockfile_sha256": "c" * 64,
+            "lockfile": {"state": "not_applicable", "reason": "approval precedes production lockfile"},
             "toolchain": "rustc 1.100.0",
             "reviewer_session_id": "reviewer-1",
             "tester_session_id": "tester-1",
             "approver_session_id": "approver-1",
+            "approval_artifact": {"path": "evidence/P1-READY-CERT01/approval.json", "sha256": "d" * 64},
+            "approval_registry": {"path": ".harness/sessions/registry.json", "sha256": "e" * 64},
+            "approval_scope": "performance-certification",
             "aggregator": False,
         }
 
@@ -191,6 +254,24 @@ class GateResultSchemaTests(unittest.TestCase):
     def test_missing_evidence_type_fails(self) -> None:
         record = dict(self.valid)
         record.pop("evidence_type")
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(record, self.schema)
+
+    def test_approval_without_artifact_or_registry_fails(self) -> None:
+        record = dict(self.valid)
+        record.pop("approval_artifact")
+        record.pop("approval_registry")
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(record, self.schema)
+
+    def test_prelock_not_applicable_without_hash_is_valid(self) -> None:
+        record = dict(self.valid)
+        record["lockfile"] = {"state": "not_applicable", "reason": "approval precedes production lockfile"}
+        jsonschema.validate(record, self.schema)
+
+    def test_sha256_lockfile_without_hash_fails(self) -> None:
+        record = dict(self.valid)
+        record["lockfile"] = {"state": "sha256"}
         with self.assertRaises(jsonschema.ValidationError):
             jsonschema.validate(record, self.schema)
 

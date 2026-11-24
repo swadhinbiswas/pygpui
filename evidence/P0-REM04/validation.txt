@@ -1,0 +1,88 @@
+JSON_PARSE=PASS
+UNIQUE_IDS=PASS total=84 unique=84
+DEPS_RESOLVE=PASS checked=320
+CYCLES=PASS count=0
+TOPOLOGICAL_ORDER=PASS pass
+PHASE1_FIELDS=PASS tasks=65
+PHASE1_INITIAL_STATE=PASS blocked/attempt0/max4
+PHASE1_AP01_GATE=PASS checked=65
+PLAN_TASK_ORDER=PASS plan=65 json=65
+PLAN_JSON_METADATA=PASS checked=65
+ADR_GATE_COVERAGE=PASS adr=52 plan=52 aggregators=52
+ADR_GATE_MAPPINGS=PASS total=52
+STAGED_GATE_CLOSURE=PASS sub_gates=26
+GATE_RUNTIME=PASS schema+aggregate+independent-approval
+GATE_RESULT_LIFECYCLE=PASS unique_paths=78
+APPROVAL_BINDING=PASS session+artifact+registry+prelock
+ATOMIC_GATE_EVIDENCE=PASS repository+enforcement+MSRV+notice
+PHASE0_HISTORY=PASS compared=14
+COMMAND_PRODUCERS=PASS criteria=448
+REVIEW_MERGE_STATES=PASS merged-deps+premerge+session
+ARTIFACT_HANDOFF=PASS draft-release/fetch/verify
+CRATE_TAG_READINESS=PASS semantic
+PYTEST_ENTRYPOINT=PASS root pytest.ini
+SCOPE_NORMALIZATION=PASS normalized
+REMOTE_WORKFLOW=PASS stale=0
+SELF_TEST_PASS duplicate-id
+SELF_TEST_PASS missing-dependency
+SELF_TEST_PASS cycle
+SELF_TEST_PASS phase1-active
+SELF_TEST_PASS missing-gate
+SELF_TEST_PASS unowned-command
+SELF_TEST_PASS scope-mismatch
+SELF_TEST_PASS missing-review-evidence
+SELF_TEST_PASS stale-remote
+SELF_TEST_PASS plan-json-mismatch
+SELF_TEST_PASS title-mismatch
+SELF_TEST_PASS gate-mapping-mismatch
+SELF_TEST_PASS baseline-done-mutation
+SELF_TEST_PASS duplicate-producer
+SELF_TEST_PASS producer-outside-scope
+SELF_TEST_PASS deadlock-ar03-g5-ambiguity
+SELF_TEST_PASS deadlock-ar02-g1-proto-scene
+SELF_TEST_PASS deadlock-ar02-g1-proto-tst
+SELF_TEST_PASS deadlock-ar03-g1-api-tst
+SELF_TEST_PASS deadlock-ar07-g3-api-tst
+SELF_TEST_PASS deadlock-ar08-g1-bench00
+SELF_TEST_PASS deadlock-ar05-g2-render-plat01
+SELF_TEST_PASS deadlock-ar05-g2-render-plat02
+SELF_TEST_PASS deadlock-ar01-g1-platform-plat02
+SELF_TEST_PASS deadlock-ar02-g2-slice-plat02
+SELF_TEST_PASS deadlock-ar05-g2-plat01-plat02
+SELF_TEST_PASS deadlock-ar10-g1-rel-license
+SELF_TEST_PASS deadlock-ar07-g4-plat-wheel
+SELF_TEST_PASS deadlock-ar07-g4-plat-rel02
+SELF_TEST_PASS deadlock-ar07-g4-wheel-rel02
+SELF_TEST_PASS ar03-g5-forbidden-internal-contract
+SELF_TEST_PASS ignored-artifact-handoff
+SELF_TEST_PASS premerge-merged-state
+SELF_TEST_PASS proof-self-certification
+SELF_TEST_PASS illegal-core-test-dependency
+SELF_TEST_PASS post-contract-tag-timing
+SELF_TEST_PASS missing-native-lane-readiness
+SELF_TEST_PASS conflated-claim-readiness
+SELF_TEST_PASS missing-schema-validation
+SELF_TEST_PASS missing-aggregate-invocation
+SELF_TEST_PASS readiness-approval-self-certification
+SELF_TEST_PASS build-premerge-completion
+SELF_TEST_PASS rustcontract-missing-session-check
+SELF_TEST_PASS conrev-missing-branch-check
+SELF_TEST_PASS int01-missing-merge-record
+SELF_TEST_PASS repository-gate-missing-lic01
+SELF_TEST_PASS msrv-audit-missing
+SELF_TEST_PASS lic02-ignored-artifact
+SELF_TEST_PASS rel02-wayland-dependency
+SELF_TEST_PASS owner-notice-missing
+SELF_TEST_PASS d1-duplicate-result-path
+SELF_TEST_PASS d1-validation-before-creation
+SELF_TEST_PASS d2-control-code-producer
+SELF_TEST_PASS d3-missing-enforcement
+SELF_TEST_PASS d4-audit-before-fetch
+SELF_TEST_PASS d5-dist-wildcard-bypass
+SELF_TEST_PASS d6-unbound-approval
+VALIDATION=PASS
+......................................................... [100%]
+57 passed, 15 subtests passed in 5.87s
+HANDOFF_FIELDS=PASS fields=13/13 files=7
+FORBIDDEN_FILES_UNCHANGED=PASS
+HEAD_UNCHANGED=PASS 4e307b2
