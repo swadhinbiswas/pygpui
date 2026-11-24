@@ -46,6 +46,16 @@ Unverified claims cannot silently drive an ADR. Plausible claims require an expl
 
 Use `HANDOFFS/<from>-to-<to>-<task-id>-<attempt>.md` and the exact Part 3 fields. The receiver's first `LOG.md` action line must quote the handoff's exact next step. Append one concise line per agent action to `LOG.md`; never rewrite prior entries.
 
+## Build-agent PR workflow
+
+1. Create a short-lived branch/worktree named `feat/<task-id>-<slug>` or `fix/<task-id>-<slug>` from current green `main`.
+2. Read `STATE.md` and the assigned handoff before editing; quote the exact next step in the first `LOG.md` line.
+3. Write failing tests first where behavior changes. Keep the branch scoped to the assigned files/interfaces.
+4. Run the task's build, lint and test commands; record exact outputs in the handoff. A clean result is required before review.
+5. Commit with a Conventional Commit message, push the branch, and open a PR against `main` with `gh pr create`. Link the task, ADR gates, tests, benchmark evidence and rollback.
+6. Never push directly to `main`, force-push a shared branch, or merge your own unreviewed work. A different Reviewer and Test-Engineer must verify the change.
+7. Integrator merges in dependency order, reruns the full matrix and benchmarks, and reverts immediately if `main` becomes red.
+
 ## Git and integration
 
 - `origin` is `https://github.com/swadhinbiswas/pygpui.git`; `main` tracks `origin/main`. The initial remote was empty and received the harness/ADR baseline without force.

@@ -3,6 +3,17 @@
   "project": "pygpui",
   "updated_at": "2026-11-24",
   "current_phase": 0,
+  "accepted_adr_baseline": "5ce026d",
+  "phase_1_plan": ".harness/PLANS/phase-1-vertical-slice.md",
+  "phase_1_authorization_task": "P0-AP01",
+  "git_workflow": {
+    "remote": "https://github.com/swadhinbiswas/pygpui.git",
+    "tracking_branch": "main -> origin/main",
+    "authentication": "gh authenticated as swadhinbiswas",
+    "branch_workflow": "Each build task uses a short-lived branch/worktree from green main, pushes the branch and opens a PR against main with gh pr create.",
+    "merge_policy": "No direct pushes to main, no force-push, no self-merge of unreviewed work; independent Reviewer and Test-Engineer verification required; Integrator-only merges in dependency order."
+  },
+  "attempt_policy": "Maximum four attempts per task; at attempt four pass all gates or stop and escalate to the Orchestrator. No fifth attempt is authorized.",
   "tasks": [
     {
       "id": "H-001",
@@ -201,22 +212,29 @@
       "title": "Produce Phase 1 machine-checkable task graph",
       "owner_role": "Planner",
       "deps": ["P0-AR01"],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
         "Phase 1 tasks in TASKS.json have owners, deps, status, acceptance criteria, evidence links and attempt counts",
         "Acceptance criteria name tests, benchmark thresholds or commands that exit zero",
-        "At least one thin end-to-end demoable vertical slice precedes broader framework work"
+        "At least one thin end-to-end demoable vertical slice precedes broader framework work",
+        "Every ARxx-Gn gate maps to at least one Phase 1 task in the plan traceability matrix",
+        "All Phase 1 tasks depend transitively on P0-AP01 and start blocked at attempt zero"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        ".harness/TASKS.json",
+        ".harness/HANDOFFS/planner-to-red-team-P0-PL01-1.md",
+        "evidence/P0-PL01/validation.txt"
+      ]
     },
     {
       "id": "P0-RT01",
       "title": "Red-team the Phase 0 ADRs and Phase 1 plan",
       "owner_role": "Red-Team-Planner",
       "deps": ["P0-PL01"],
-      "status": "blocked",
-      "attempt_count": 0,
+      "status": "in_progress",
+      "attempt_count": 1,
       "acceptance_criteria": [
         "REVIEWS/phase-0-plan-red-team.md checks dependencies, hidden coupling, estimates, rollback and acceptance-criteria quality",
         "Findings are severity-tagged with exact file/task references",
@@ -237,6 +255,790 @@
         "No Phase 1 build task starts before this task is marked done"
       ],
       "evidence_links": []
+    },
+    {
+      "id": "P1-GOV01",
+      "title": "Authorize and register the Phase 1 execution environment",
+      "owner_role": "Orchestrator",
+      "deps": ["P0-AP01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "0",
+      "write_scope": [".harness/PHASE1-EVIDENCE.md", ".harness/HANDOFFS/orchestrator-*"],
+      "size": "S",
+      "estimate_range_days": [1, 2],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 .harness/scripts/validate_phase1_graph.py --baseline 5ce026d exits zero",
+        "PHASE1-EVIDENCE.md records candidate hardware/runner availability, unresolved OQs, branch/worktree/PR naming, rollback owner and the four-attempt rule",
+        "git remote get-url origin, git branch -vv and gh auth status confirm origin=https://github.com/swadhinbiswas/pygpui.git, main tracking origin/main and authenticated gh access",
+        "The graph validator confirms every Phase 1 task is blocked at attempt zero until P0-AP01 is done"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        ".harness/PHASE1-EVIDENCE.md",
+        "evidence/P1-GOV01/graph-validation.txt"
+      ]
+    },
+    {
+      "id": "P1-ARCH01",
+      "title": "Create the exact workspace, crate graph, pins and production lock",
+      "owner_role": "Integrator",
+      "deps": ["P1-GOV01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1",
+      "write_scope": ["Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "crates/*/Cargo.toml", "tests/architecture/**"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR03-G5", "AR04-G1"],
+      "acceptance_criteria": [
+        "cargo metadata --locked --format-version 1 exits zero and an architecture test asserts only the ADR 0003 dependency edges",
+        "cargo check --locked --all-targets exits zero",
+        "cargo metadata --locked --filter-platform x86_64-unknown-linux-gnu, --filter-platform x86_64-pc-windows-msvc and --filter-platform aarch64-apple-darwin each exit zero",
+        "A source/config audit exits zero for exact ADR 0004 direct pins and features, Rust 1.100.0, edition 2024, no GLES, no slice-1 AccessKit dependency and no Git/trunk dependencies"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0003-public-python-api-and-module-boundaries.md",
+        ".harness/DECISIONS/0004-exact-dependency-feature-and-toolchain-baseline.md",
+        "Cargo.lock",
+        "evidence/P1-ARCH01/metadata-and-audit.txt"
+      ]
+    },
+    {
+      "id": "P1-LIC01",
+      "title": "Establish clean-room provenance and Apache-2.0 repository baseline",
+      "owner_role": "License-Compliance-Reviewer",
+      "deps": ["P1-GOV01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "1",
+      "write_scope": ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES", "CONTRIBUTING.md", "tools/license/**", "provenance/**"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR09-G1", "AR09-G5", "AR10-G1", "AR10-G3"],
+      "acceptance_criteria": [
+        "python3 tools/license/provenance_audit.py --mode repository exits zero with every authored file covered by Apache-2.0 or an approved exception",
+        "The source-exception workflow test exits zero: incomplete provenance is rejected and a complete record requires upstream URL, exact version/commit, path, copyright/license, modification notice, attributions and NOTICE treatment",
+        "cargo metadata --no-deps --format-version 1 and a repository metadata audit exit zero for Apache-2.0 workspace metadata and PEP 639 configuration",
+        "The official Apache-2.0 text hash matches; no copyright holder notice is invented, and missing owner notice keeps distribution blocked"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0009-clean-room-license-and-provenance-policy.md",
+        ".harness/DECISIONS/0010-license-pygpui-under-apache-2-0.md",
+        "THIRD_PARTY_NOTICES",
+        "evidence/P1-LIC01/provenance-and-license.txt"
+      ]
+    },
+    {
+      "id": "P1-PROTO01",
+      "title": "Define shared snapshot, command, event, error and identity contracts",
+      "owner_role": "Protocol-Engineer",
+      "deps": ["P1-ARCH01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "2",
+      "write_scope": ["crates/pygpui-protocol/**"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR02-G1"],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-protocol --test contract_schema --test snapshot_properties exits zero",
+        "Golden-schema tests cover one complete immutable WindowSnapshot, stable keys, generations/versions, commands, coalesced semantic events, typed errors and rejected-snapshot rollback",
+        "A source audit exits zero proving the protocol crate has no PyO3, winit, wgpu or Taffy dependency and no Python reference type"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0002-snapshot-first-full-window-rebuild.md",
+        ".harness/DECISIONS/0003-public-python-api-and-module-boundaries.md",
+        "crates/pygpui-protocol/src/lib.rs",
+        "evidence/P1-PROTO01/contract-tests.txt"
+      ]
+    },
+    {
+      "id": "P1-CI01",
+      "title": "Stand up local-first CI and rehearse red-main recovery",
+      "owner_role": "Release-CI-Engineer",
+      "deps": ["P1-ARCH01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "2",
+      "write_scope": [".github/workflows/**", "tools/ci/**", "scripts/**"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": [],
+      "acceptance_criteria": [
+        "python3 tools/ci/run_local_gate.py --mode smoke exits zero for fmt, clippy, locked workspace tests and graph validation",
+        "python3 tools/ci/red_main_drill.py exits zero after injecting a failing commit on a throwaway feat/P1-CI01-red-main worktree, opening a PR, bisecting the failure, reverting/fixing it through a reviewed PR and restoring green origin/main",
+        "The drill records commands, PR URL and the restored green commit; it never pushes directly to main or force-pushes"
+      ],
+      "evidence_links": [
+        ".harness/PROCESS.md",
+        "tools/ci/run_local_gate.py",
+        "evidence/P1-CI01/red-main-recovery.md"
+      ]
+    },
+    {
+      "id": "P1-API01",
+      "title": "Freeze the typed Python API, handle semantics and public stub boundary",
+      "owner_role": "Python-API-Engineer",
+      "deps": ["P1-PROTO01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "3",
+      "write_scope": ["pygpui/**", "examples/counter.py", "tests/typing/**"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR03-G1", "AR07-G3"],
+      "acceptance_criteria": [
+        "mypy --strict --disallow-any-explicit --python-version 3.11 examples/counter.py exits zero",
+        "pytest tests/typing/test_api_contract.py exits zero and verifies explicit __all__, private _native, reviewed stubs, py.typed and expected rejection of invalid actions/callbacks/native imports",
+        "python3 -m compileall -q pygpui exits zero",
+        "The API contract documents setup/event-turn-only entity access, read-only build, refresh coalescing, opaque non-owning handles, stale/wrong-kind typed errors and deferred lifecycle commands"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0003-public-python-api-and-module-boundaries.md",
+        ".harness/DECISIONS/0007-abi3-strict-typing-wheel-and-release-evidence.md",
+        "pygpui/__init__.pyi",
+        "evidence/P1-API01/typing-contract.txt"
+      ]
+    },
+    {
+      "id": "P1-BENCH00",
+      "title": "Freeze the benchmark CLI, scene, counter and artifact interface",
+      "owner_role": "Perf-Engineer",
+      "deps": ["P1-PROTO01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "3",
+      "write_scope": ["pygpui_bench/**", "benches/contracts/**", "BENCH/schema/**"],
+      "size": "S-M",
+      "estimate_range_days": [2, 3],
+      "gates": ["AR08-G1"],
+      "acceptance_criteria": [
+        "python -m pygpui_bench --help exits zero",
+        "python -m pygpui_bench scene verify --contract-only BENCH/schema/contract-fixture.json exits zero",
+        "The interface schema includes protocol ID, scene hash, environment fingerprint, collector, native callback/frame/attachment/finalizer counters, sentinel expectations, raw-run hashes, five-block/ten-pair ABBA fields and claim status",
+        "The contract rejects headless/submitted data as proof of presentation and preserves the literal provisional thresholds without claiming certification"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0008-benchmark-certification-and-regression-gates.md",
+        "BENCH/schema/benchmark-contract.json",
+        "evidence/P1-BENCH00/contract-validation.txt"
+      ]
+    },
+    {
+      "id": "P1-CONREV01",
+      "title": "Independently review and freeze all shared contracts",
+      "owner_role": "Independent-Reviewer",
+      "deps": ["P1-API01", "P1-BENCH00", "P1-PROTO01", "P1-LIC01", "P1-CI01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "4",
+      "write_scope": [".harness/REVIEWS/phase-1-contract-freeze.md", ".harness/CONTRACT-FREEZE.json"],
+      "size": "S",
+      "estimate_range_days": [1, 2],
+      "gates": ["AR03-G5"],
+      "acceptance_criteria": [
+        "python3 .harness/scripts/check_contract_freeze.py exits zero and records hashes for protocol, API/stubs, benchmark interface and crate graph",
+        "The independent review contains zero blocking findings and verifies non-overlapping implementation write scopes",
+        "Any requested interface change is resolved before the freeze; consumer branches do not patch frozen interfaces"
+      ],
+      "evidence_links": [
+        ".harness/PLANS/phase-1-vertical-slice.md",
+        ".harness/REVIEWS/phase-1-contract-freeze.md",
+        ".harness/CONTRACT-FREEZE.json"
+      ]
+    },
+    {
+      "id": "P1-CORE01",
+      "title": "Implement the bounded command queue and demand/idle scheduler",
+      "owner_role": "Rust-Core-Engineer",
+      "deps": ["P1-CONREV01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5a",
+      "write_scope": ["crates/pygpui-core/src/queue/**", "crates/pygpui-core/src/scheduler/**", "crates/pygpui-core/tests/bounded_queue.rs", "crates/pygpui-core/tests/idle_scheduler.rs"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR01-G4"],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-core --test bounded_queue --test idle_scheduler exits zero",
+        "cargo test -p pygpui-core --test idle_scheduler -- --ignored exits zero for a 60-second idle proving Wait/bounded WaitUntil, no indefinite Poll, no unchanged-frame submissions and bounded wakeups",
+        "Backpressure tests prove validated commands are bounded, coalesced where specified and fail with typed errors rather than unbounded growth"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0001-rust-owned-runtime-and-python-semantic-boundary.md",
+        "crates/pygpui-core/src/lib.rs",
+        "evidence/P1-CORE01/queue-idle-tests.txt"
+      ]
+    },
+    {
+      "id": "P1-CORE02",
+      "title": "Implement generation-safe handles, slot cap and deterministic teardown",
+      "owner_role": "Rust-Core-Engineer",
+      "deps": ["P1-CORE01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5b",
+      "write_scope": ["crates/pygpui-core/src/identity/**", "crates/pygpui-core/tests/handles.rs", "crates/pygpui-core/tests/slotmap_guards.rs"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR03-G2", "AR04-G3"],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-core --test handles --test slotmap_guards exits zero",
+        "Tests cover strong/weak lifetime, generation reuse, wrong-kind/window handles, close-before-event, stale deferred commands, the 65,536 live-slot cap and stale-key reinsertion",
+        "python3 tools/audit/slotmap_policy.py exits zero and finds no detach/reattach calls in slice 1"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0003-public-python-api-and-module-boundaries.md",
+        ".harness/DECISIONS/0004-exact-dependency-feature-and-toolchain-baseline.md",
+        "evidence/P1-CORE02/handle-slot-tests.txt"
+      ]
+    },
+    {
+      "id": "P1-SCENE01",
+      "title": "Implement snapshot reconciliation, full rebuild and constrained layout",
+      "owner_role": "Rust-Scene-Engineer",
+      "deps": ["P1-CONREV01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5a",
+      "write_scope": ["crates/pygpui-scene/src/layout/**", "crates/pygpui-scene/src/reconcile/**", "crates/pygpui-scene/tests/reconcile.rs", "crates/pygpui-scene/tests/taffy_constraints.rs", "crates/pygpui-scene/tests/rebuild_counters.rs"],
+      "size": "L",
+      "estimate_range_days": [6, 8],
+      "gates": ["AR02-G1", "AR02-G3", "AR04-G2", "AR04-G5"],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-scene --test reconcile --test taffy_constraints --test rebuild_counters exits zero",
+        "Tests prove atomic replacement, rejected-snapshot rollback, stable-key reorder/insert/remove, duplicate-key rejection, stale handles and full-refresh equivalence",
+        "Native counters prove one root/layout/hit/focus/scene rebuild per semantic change and zero rebuilds for no change",
+        "Taffy #804/#1354/#1357 regressions and supported in-flow flex/block cases pass; unsupported public layouts return typed validation errors; one full rebuild is the fallback before fail-closed",
+        "python3 tools/audit/map_rebuild_safety.py exits zero and finds no rustc-hash #45 insertion-order rebuild pattern"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0002-snapshot-first-full-window-rebuild.md",
+        ".harness/DECISIONS/0004-exact-dependency-feature-and-toolchain-baseline.md",
+        "evidence/P1-SCENE01/reconcile-layout-tests.txt"
+      ]
+    },
+    {
+      "id": "P1-TEXT01",
+      "title": "Implement cosmic-text shaping, glyph atlas and fallback",
+      "owner_role": "Rust-Text-Engineer",
+      "deps": ["P1-CONREV01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5a",
+      "write_scope": ["crates/pygpui-scene/src/text/**", "crates/pygpui-scene/tests/text_atlas.rs"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR04-G4"],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-scene --test text_atlas exits zero for ASCII, CJK, RTL, emoji and font fallback",
+        "The adapter avoids the cosmic-text #543 borrow pattern and reports #518 behavior for generic versus an explicit resolved monospace family",
+        "A source audit exits zero proving text caches are keyed only by native snapshot data and contain no Python reference"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0004-exact-dependency-feature-and-toolchain-baseline.md",
+        "crates/pygpui-scene/src/text/mod.rs",
+        "evidence/P1-TEXT01/atlas-tests.txt"
+      ]
+    },
+    {
+      "id": "P1-INPUT01",
+      "title": "Implement Rust-owned pointer, key, focus and IME state machines",
+      "owner_role": "Rust-Input-Engineer",
+      "deps": ["P1-CONREV01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5a",
+      "write_scope": ["crates/pygpui-scene/src/input/**", "crates/pygpui-scene/tests/input_focus.rs", "crates/pygpui-scene/tests/ime_state_machine.rs"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR06-G1"],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-scene --test input_focus --test ime_state_machine exits zero",
+        "Property tests cover direct commit, empty-preedit clearing, UTF-8 byte offsets with CJK/emoji/combining marks, focus A-B-C races, stale disable events, focus-loss reset, external text version conflicts and close during composition",
+        "Counter tests prove click and Enter/Space activation route once, repeat/synthetic events are identified, physical keys drive positional input and logical keys drive shortcuts, and raw KeyboardInput never duplicates Ime::Commit text"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0006-input-ime-focus-and-accessibility-ownership.md",
+        "evidence/P1-INPUT01/input-ime-properties.txt"
+      ]
+    },
+    {
+      "id": "P1-RENDER01",
+      "title": "Implement the wgpu renderer and bounded surface state machine",
+      "owner_role": "Rust-Render-Engineer",
+      "deps": ["P1-CONREV01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5a",
+      "write_scope": ["crates/pygpui-render/**"],
+      "size": "L",
+      "estimate_range_days": [6, 8],
+      "gates": ["AR05-G2"],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-render exits zero for surface Success/Suboptimal/Outdated/Lost/Timeout/Occluded/Validation, zero extents, physical resize coalescing, adapter selection and device-loss handling",
+        "Tests assert explicit backend masks, nonempty format/present-mode lists, required features/limits, opaque SDR sRGB, Fifo and desired_maximum_frame_latency = 2",
+        "A headless golden-scene test exits zero with a deterministic scene hash; it is labelled capacity evidence, not presentation evidence",
+        "A source audit exits zero proving no PyO3 or winit import in the render crate"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0005-platform-window-and-render-backend-baseline.md",
+        "crates/pygpui-render/src/lib.rs",
+        "evidence/P1-RENDER01/surface-tests.txt"
+      ]
+    },
+    {
+      "id": "P1-PLATFORM01",
+      "title": "Implement the single winit main-thread loop and event orchestration",
+      "owner_role": "Rust-Platform-Engineer",
+      "deps": ["P1-CONREV01", "P1-RENDER01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5b",
+      "write_scope": ["crates/pygpui-platform/**"],
+      "size": "L",
+      "estimate_range_days": [6, 8],
+      "gates": ["AR01-G1"],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-platform --test main_thread_lifecycle --test event_orchestration exits zero",
+        "Tests prove one platform-main-thread loop, no render worker, matching owned display/window handles, clean close and no use-after-drop of window/display/surface handles",
+        "The native turn drains events/timers, routes input, delivers coalesced semantic events, accepts one snapshot, rebuilds, submits/presents and coalesces follow-up demand without Python frame callbacks",
+        "A source audit exits zero proving no PyO3 import in the platform crate"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0001-rust-owned-runtime-and-python-semantic-boundary.md",
+        ".harness/DECISIONS/0005-platform-window-and-render-backend-baseline.md",
+        "evidence/P1-PLATFORM01/lifecycle-tests.txt"
+      ]
+    },
+    {
+      "id": "P1-PY01",
+      "title": "Implement the PyO3 event actor and Python facade binding",
+      "owner_role": "Python-Binding-Engineer",
+      "deps": ["P1-CONREV01", "P1-CORE02"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "5b",
+      "write_scope": ["crates/pygpui-python/**"],
+      "size": "L",
+      "estimate_range_days": [6, 8],
+      "gates": ["AR03-G3"],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-python exits zero for event-actor conversion, bounded command validation and Send-only results",
+        "Tests prove App.run is synchronous and once per process on the platform main thread, detaches for native work, reattaches only at semantic/lifecycle boundaries and never exposes a Python frame callback",
+        "Reentrancy tests prove mutation during build, nested dispatch, run reentry, close during notification and release during callback raise typed errors without deadlock or panic",
+        "The binding uses PyO3 0.30.1 abi3-py311 with gil_used = true and is the only crate importing PyO3"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0001-rust-owned-runtime-and-python-semantic-boundary.md",
+        ".harness/DECISIONS/0003-public-python-api-and-module-boundaries.md",
+        "evidence/P1-PY01/event-actor-tests.txt"
+      ]
+    },
+    {
+      "id": "P1-SLICE01",
+      "title": "Integrate the Counter vertical slice end to end",
+      "owner_role": "Integrator",
+      "deps": ["P1-CORE01", "P1-CORE02", "P1-SCENE01", "P1-TEXT01", "P1-INPUT01", "P1-RENDER01", "P1-PLATFORM01", "P1-PY01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "6",
+      "write_scope": ["feat/P1-SLICE01-counter worktree", "examples/counter.py wiring", "tests/e2e/test_counter.py"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR02-G2"],
+      "acceptance_criteria": [
+        "cargo test --workspace --locked exits zero",
+        "cargo test -p pygpui-platform --test counter_headless exits zero and proves one complete snapshot, shaped Text plus Button, one rebuild and clean teardown",
+        "python examples/counter.py --headless --assert-scene-hash exits zero; the harness records click and key paths updating the label exactly once",
+        "The feat/P1-SLICE01-counter branch/worktree is pushed and gh pr create opens a PR against main linking the task, ADR gates, tests and rollback; the integration diff makes no presentation claim from headless evidence"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0002-snapshot-first-full-window-rebuild.md",
+        "examples/counter.py",
+        "evidence/P1-SLICE01/counter-headless.txt"
+      ]
+    },
+    {
+      "id": "P1-TST01",
+      "title": "Independently verify Counter behavior, typing and snapshot properties",
+      "owner_role": "Test-Engineer",
+      "deps": ["P1-SLICE01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "7a",
+      "write_scope": ["tests/e2e/**", "tests/property/**", "tests/typing/**", "evidence/P1-TST01/**"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR02-G1", "AR03-G1", "AR03-G2", "AR03-G3", "AR07-G3"],
+      "acceptance_criteria": [
+        "pytest tests/e2e/test_counter.py tests/property/test_snapshot_identity.py tests/typing/test_public_api.py exits zero in a clean local installed-wheel environment",
+        "mypy --strict --disallow-any-explicit --python-version 3.11 examples/counter.py and stubtest pygpui --allowlist tests/typing/stubtest-allowlist.txt each exit zero",
+        "Model-based property tests cover snapshot identity, reorder/insert/remove, duplicate keys, rejected rollback, stale handles, weak lifetime and teardown without use-after-free",
+        "Counter E2E tests prove click and key each update state exactly once, build runs once per accepted semantic change, close invalidates handles before another event and no Python entry occurs between snapshot submission and presentation"
+      ],
+      "evidence_links": [
+        "tests/property/test_snapshot_identity.py",
+        "tests/e2e/test_counter.py",
+        "evidence/P1-TST01/independent-tests.txt"
+      ]
+    },
+    {
+      "id": "P1-PLAT01",
+      "title": "Run Linux headless and native common-runtime smoke gates",
+      "owner_role": "Platform-Test-Engineer",
+      "deps": ["P1-SLICE01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "7a",
+      "write_scope": ["tests/platform/**", "evidence/P1-PLAT01/**"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR05-G2"],
+      "acceptance_criteria": [
+        "python3 .harness/scripts/platform_gate.py --candidate linux-local --suite T02-T12 exits zero on an installed local wheel",
+        "The run records explicit Vulkan selection, first presented frame, actionable failure output, surface statuses, exact physical resize, DPI/hit tests, lifecycle, input continuity, idle/responsiveness, SDR color and device-loss handling",
+        "Headless results are archived separately and are not counted as presented-frame evidence"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0005-platform-window-and-render-backend-baseline.md",
+        "evidence/P1-PLAT01/linux-local-runtime.txt"
+      ]
+    },
+    {
+      "id": "P1-REV01",
+      "title": "Perform independent correctness and unsafe/GIL/lifetime review",
+      "owner_role": "Independent-Reviewer",
+      "deps": ["P1-SLICE01", "P1-TST01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "7b",
+      "write_scope": [".harness/REVIEWS/phase-1-counter-safety.md", "tools/audit/frame_closure.py"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR01-G2", "AR03-G4"],
+      "acceptance_criteria": [
+        "cargo fmt --all -- --check, cargo clippy --workspace --all-targets -- -D warnings and cargo test --workspace --locked each exit zero",
+        "python3 tools/audit/frame_closure.py exits zero and proves only pygpui-python imports PyO3 and the frame closure has no Python entry, attach, object-access or finalizer path",
+        "The review records zero blocking findings for unsafe blocks, GIL attach/detach and panic unwind, Py<T> lifetime, non-Send UI state, Send-only results, handle/window/display lifetime and teardown order",
+        "No Python reference exists in WindowSnapshot, scene nodes or frame caches"
+      ],
+      "evidence_links": [
+        ".harness/REVIEWS/phase-1-counter-safety.md",
+        "evidence/P1-REV01/frame-closure-audit.txt"
+      ]
+    },
+    {
+      "id": "P1-INT01",
+      "title": "Merge the reviewed Counter slice and rehearse rollback",
+      "owner_role": "Integrator",
+      "deps": ["P1-REV01", "P1-CI01", "P1-LIC01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "7c",
+      "write_scope": ["Integrator-only merge of reviewed PRs into main", "evidence/P1-INT01/**"],
+      "size": "S",
+      "estimate_range_days": [1, 2],
+      "gates": [],
+      "acceptance_criteria": [
+        "The reviewed Counter PR is merged into main only by the Integrator, with the PR URL, merge commit and diff recorded; no direct push or force-push is used",
+        "python3 tools/ci/run_local_gate.py --mode full exits zero on main and origin/main",
+        "python3 tools/ci/rollback_drill.py --tag phase1/counter-premerge exits zero by opening a revert PR, rerunning the gate and restoring the reviewed merge through the Integrator",
+        "The premerge tag, PR URL, merge hash, diff and restored green origin/main hash are archived"
+      ],
+      "evidence_links": [
+        "evidence/P1-INT01/merge-and-rollback.txt",
+        ".harness/PLANS/phase-1-vertical-slice.md"
+      ]
+    },
+    {
+      "id": "P1-PERF01",
+      "title": "Prove callback-free frame windows with native counters and sentinels",
+      "owner_role": "Perf-Engineer",
+      "deps": ["P1-SLICE01", "P1-REV01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "later",
+      "write_scope": ["benches/boundary/**", "tests/perf/**", "evidence/P1-PERF01/**"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR01-G3", "AR02-G4", "AR06-G5", "AR08-G3"],
+      "acceptance_criteria": [
+        "python -m pygpui_bench boundary verify --suite V01 --output evidence/P1-PERF01/v01.json exits zero",
+        "Every marked static, native-animation, native-scroll and input frame window reports zero rust_to_python_callbacks, python_to_rust_frame_entries, render_thread_gil_acquires, attachments and Python finalizers",
+        "Deliberate callback and frame-entry sentinels each increment exactly once before warmup; failed or disabled counters make the run inconclusive",
+        "The Python 3.11 sys.setprofile plus native-counter fallback and Python 3.12+ threading.setprofile_all_threads corroboration are exercised without replacing native counters"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0008-benchmark-certification-and-regression-gates.md",
+        "evidence/P1-PERF01/v01.json"
+      ]
+    },
+    {
+      "id": "P1-A11Y01",
+      "title": "Add the Rust semantic mirror and AccessKit adapter after Counter merge",
+      "owner_role": "Rust-Accessibility-Engineer",
+      "deps": ["P1-INT01", "P1-INPUT01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "later",
+      "write_scope": ["crates/pygpui-scene/src/a11y/**", "crates/pygpui-platform/src/a11y/**", "tests/a11y/**"],
+      "size": "L",
+      "estimate_range_days": [6, 8],
+      "gates": ["AR06-G3", "AR06-G5"],
+      "acceptance_criteria": [
+        "cargo test -p pygpui-scene --test a11y_tree -p pygpui-platform --test a11y_adapter exits zero for stable NodeIds, full/incremental updates, focus removal/restoration, unchanged properties and exactly-once main-loop action routing",
+        "A source/config audit exits zero for AccessKit 0.25.2 plus accesskit_winit 0.34.2, disabled optional pyo3 feature and no Python call from adapter threads",
+        "Native counters/sentinels prove no Python call during a11y-only updates and enabling AT does not regress ADR 0008 frame/idle gates",
+        "The window sequence is create invisible, attach adapter, then show; no pre-show first-frame claim is made"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0006-input-ime-focus-and-accessibility-ownership.md",
+        "evidence/P1-A11Y01/consumer-tests.txt"
+      ]
+    },
+    {
+      "id": "P1-REL01",
+      "title": "Build and audit native candidate wheels and sdist",
+      "owner_role": "Release-CI-Engineer",
+      "deps": ["P1-INT01", "P1-LIC01", "P1-CI01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "later",
+      "write_scope": ["packaging/**", "tools/release/**", "dist/**", "evidence/P1-REL01/**"],
+      "size": "L",
+      "estimate_range_days": [6, 8],
+      "gates": ["AR05-G1", "AR07-G1", "AR10-G1"],
+      "acceptance_criteria": [
+        "Pinned maturin 1.16.0 native-lane commands build cp311-abi3-manylinux_2_28_x86_64, cp311-abi3-win_amd64, cp311-abi3-macosx_26_0_arm64 and one rebuildable sdist; each command exits zero",
+        "python3 tools/release/audit_artifacts.py --stage build exits zero for tag/suffix inspection, abi3audit, repair reports, native dependency audit, py.typed, stubs, license files and PEP 639 metadata",
+        "Artifact hashes, target, enabled features, lockfile hash and Rust 1.100.0 toolchain are recorded; cross-compilation alone does not pass",
+        "No free-threaded, abi3t or macOS universal2 artifact is present"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0005-platform-window-and-render-backend-baseline.md",
+        ".harness/DECISIONS/0007-abi3-strict-typing-wheel-and-release-evidence.md",
+        "evidence/P1-REL01/artifact-manifest.json"
+      ]
+    },
+    {
+      "id": "P1-PLAT02",
+      "title": "Close the candidate platform certification and support-manifest gates",
+      "owner_role": "Platform-Test-Engineer",
+      "deps": ["P1-REL01", "P1-PLAT01", "P1-A11Y01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "later",
+      "write_scope": ["tests/platform/candidates/**", "evidence/P1-PLAT02/**"],
+      "size": "L",
+      "estimate_range_days": [6, 8],
+      "gates": ["AR01-G1", "AR02-G2", "AR05-G2", "AR05-G3", "AR05-G4", "AR05-G5", "AR05-G6", "AR07-G4"],
+      "acceptance_criteria": [
+        "python3 .harness/scripts/platform_gate.py --suite AR05-G2-G6 exits zero only with installed-wheel physical evidence for Ubuntu 24.04/GNOME Wayland and Xorg, Windows 11 25H2+ x64 DX12 and physical macOS 26 Apple silicon Metal",
+        "Linux L01-L08 include Mesa AMD/Intel and NVIDIA Vulkan, fractional scale, withheld callbacks, present pairing and a 30-minute resize/idle soak",
+        "Windows W01-W07 include PMv2 mixed DPI, sustained input/redraw, lifecycle/TDR and a recorded FXC/static-DXC/dynamic-DXC strategy",
+        "macOS M01-M08 include the invisible/adapter/show/present sequence, cold/occluded first frame, quick app switching, Retina/mixed displays, live resize and pre-close IME disable",
+        "The Counter installed-wheel smoke reports a presented response frame and click/key update exactly once on each candidate; the support-manifest generator exits zero and omits any platform with missing evidence"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0005-platform-window-and-render-backend-baseline.md",
+        "evidence/P1-PLAT02/support-manifest.json"
+      ]
+    },
+    {
+      "id": "P1-BENCH01",
+      "title": "Implement deterministic scenes, qualify the harness and capture an immutable baseline",
+      "owner_role": "Perf-Engineer",
+      "deps": ["P1-INT01", "P1-BENCH00", "P1-PLAT01", "P1-PERF01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "later",
+      "write_scope": ["pygpui_bench/**", "benches/scenes/**", "BENCH/baselines/**"],
+      "size": "L",
+      "estimate_range_days": [6, 8],
+      "gates": ["AR08-G1", "AR08-G2"],
+      "acceptance_criteria": [
+        "python -m pygpui_bench scene verify BENCH/scenes/e1000.json BENCH/scenes/l10000.json exits zero",
+        "The l10000 verifier asserts 10,000 model rows, at most 51 mounted row nodes per frame, unique contiguous visible IDs and no offscreen Python row provider",
+        "Collector qualification exits zero for sentinel counters, clock-domain checks and raw-artifact hashing before any performance claim",
+        "python -m pygpui_bench baseline create --runs-per-scenario 10 --output BENCH/baselines/local/<baseline_id>/ exits zero with ten valid fresh processes per scenario, complete environment fields and immutable SHA-256 index"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0008-benchmark-certification-and-regression-gates.md",
+        "BENCH/baselines/local/<baseline_id>/manifest.json"
+      ]
+    },
+    {
+      "id": "P1-PERF02",
+      "title": "Qualify presented/input metrics, ABBA regression and the scaling decision",
+      "owner_role": "Perf-Engineer",
+      "deps": ["P1-BENCH01", "P1-PLAT02"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "later",
+      "write_scope": ["pygpui_bench/analysis/**", "tests/bench/**", "evidence/P1-PERF02/**"],
+      "size": "L",
+      "estimate_range_days": [6, 8],
+      "gates": ["AR02-G5", "AR08-G4", "AR08-G5", "AR08-G6"],
+      "acceptance_criteria": [
+        "python -m pygpui_bench compare --help and pytest tests/bench/test_abba_regression.py exit zero; tests verify five ABBA blocks, 20 process runs, ten pairs, >10.0% rejection, exactly 10.0% acceptance, zero-baseline tolerance and paired-bootstrap rules",
+        "python -m pygpui_bench input qualify --endpoint os-input-to-first-presented-response exits zero or records inconclusive; click and key are separate, 50 ms is a failed trial and submission/injector timestamps never substitute",
+        "python -m pygpui_bench report --scenes e1000,l10000 --allow-uncertified exits zero and records whether full rebuild is the blocker before any incremental design is proposed",
+        "A pass report requires OQ-02 approval and literal thresholds of at least 120.0 presented fps on a qualified 120 Hz path, p95 below 8.000000 ms and below 1% of one CPU core over 60 seconds with zero application submissions/presentations; otherwise status is not_certified, not_measured, fail or inconclusive"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0002-snapshot-first-full-window-rebuild.md",
+        ".harness/DECISIONS/0008-benchmark-certification-and-regression-gates.md",
+        "evidence/P1-PERF02/target-report.json"
+      ]
+    },
+    {
+      "id": "P1-IME01",
+      "title": "Run the physical IME matrix and cited platform defect exercises",
+      "owner_role": "Platform-Test-Engineer",
+      "deps": ["P1-PLAT02"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "later",
+      "write_scope": ["tests/platform/ime/**", "evidence/P1-IME01/**"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR06-G2"],
+      "acceptance_criteria": [
+        "python3 .harness/scripts/ime_gate.py --matrix ja,zh,ko,dead-keys --candidates linux-wayland,linux-xorg,windows,macos exits zero with logged physical evidence",
+        "Windows #4508, macOS #4807/#4626 and X11 #4839 are explicitly exercised with no duplicate text, stuck key or shortcut activation",
+        "Focus transfer and pre-close macOS set_ime_allowed(false) are verified while the window is alive"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0006-input-ime-focus-and-accessibility-ownership.md",
+        "evidence/P1-IME01/physical-matrix.json"
+      ]
+    },
+    {
+      "id": "P1-A11Y02",
+      "title": "Close physical assistive-technology and virtualized-list accessibility gates",
+      "owner_role": "Accessibility-Test-Engineer",
+      "deps": ["P1-A11Y01", "P1-PLAT02", "P1-BENCH01", "P1-PERF02"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "later",
+      "write_scope": ["tests/a11y/physical/**", "crates/pygpui-scene/src/a11y/list/**", "evidence/P1-A11Y02/**"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR06-G4", "AR06-G6"],
+      "acceptance_criteria": [
+        "python3 .harness/scripts/at_gate.py --matrix voiceover,narrator,orca exits zero for keyboard-only operation, navigation, action invocation, text input with IME and dynamic updates; inspector-only evidence fails",
+        "cargo test -p pygpui-scene --test accessible_virtualized_list exits zero for 10,000 model rows, at most 51 mounted row nodes, visible-range plus total-row/scroll semantics and an archived AccessKit #871 disposition",
+        "No WCAG, complete-IME or list-accessibility claim is emitted unless the corresponding evidence passes"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0006-input-ime-focus-and-accessibility-ownership.md",
+        "evidence/P1-A11Y02/at-and-list-gates.json"
+      ]
+    },
+    {
+      "id": "P1-LIC02",
+      "title": "Close artifact license, SBOM, notice and Wayland distribution gates",
+      "owner_role": "License-Compliance-Reviewer",
+      "deps": ["P1-REL01", "P1-LIC01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "later",
+      "write_scope": ["THIRD_PARTY_NOTICES", "provenance/**", "tools/license/**", "evidence/P1-LIC02/**"],
+      "size": "M",
+      "estimate_range_days": [3, 5],
+      "gates": ["AR09-G2", "AR09-G3", "AR09-G4", "AR10-G1", "AR10-G2", "AR10-G4"],
+      "acceptance_criteria": [
+        "python3 tools/license/audit_artifacts.py --lock Cargo.lock --artifacts dist/** exits zero using a pinned license/advisory scanner and artifact SBOM generator with no unreviewed exception for each target/feature build",
+        "Wheel and sdist content audits exit zero for required license/copyright texts, THIRD_PARTY_NOTICES, font/asset licenses, PEP 639 metadata and consistency with the SBOM; no third-party file is relicensed",
+        "The official LICENSE hash and owner-supplied copyright notice match the packaged artifacts; a missing notice keeps distribution blocked",
+        "Wayland publication remains blocked unless upstream clarification or qualified-counsel review plus AR09-G2/G3 evidence is archived; an X11-only preview is not labelled general Linux support"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0009-clean-room-license-and-provenance-policy.md",
+        ".harness/DECISIONS/0010-license-pygpui-under-apache-2-0.md",
+        "evidence/P1-LIC02/artifact-audit.json"
+      ]
+    },
+    {
+      "id": "P1-DOC01",
+      "title": "Write Counter documentation and the evidence-backed claim register",
+      "owner_role": "Technical-Writer",
+      "deps": ["P1-API01", "P1-INT01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "later",
+      "write_scope": ["README.md", "docs/**"],
+      "size": "S-M",
+      "estimate_range_days": [2, 3],
+      "gates": ["AR10-G4"],
+      "acceptance_criteria": [
+        "The documentation build command recorded in docs/Makefile exits zero and the Counter quickstart runs unchanged",
+        "python3 tools/docs/audit_claims.py exits zero and every performance, platform, IME, accessibility, license or signing claim links to passing evidence or is explicitly unverified/blocked",
+        "Public docs expose only the documented API, keep _native private and make no patent-clearance, trademark, worldwide-clean-room or permissive-only Wayland claim"
+      ],
+      "evidence_links": [
+        "docs/index.md",
+        "docs/claim-register.md",
+        "evidence/P1-DOC01/docs-and-claims.txt"
+      ]
+    },
+    {
+      "id": "P1-REL02",
+      "title": "Verify same-wheel clean installs and assemble the release evidence bundle",
+      "owner_role": "Release-CI-Engineer",
+      "deps": ["P1-REL01", "P1-PLAT02", "P1-PERF02", "P1-IME01", "P1-A11Y02", "P1-LIC02", "P1-DOC01"],
+      "status": "blocked",
+      "attempt_count": 0,
+      "max_attempts": 4,
+      "dispatch_wave": "later",
+      "write_scope": ["tools/release/**", "evidence/P1-REL02/**"],
+      "size": "L",
+      "estimate_range_days": [6, 8],
+      "gates": ["AR04-G6", "AR05-G6", "AR07-G2", "AR07-G4", "AR07-G5", "AR10-G4"],
+      "acceptance_criteria": [
+        "python3 tools/release/clean_install_matrix.py --python 3.11,3.12,3.13,3.14,3.15 --gil-only --candidates linux,windows,macos exits zero using the same wheels from P1-REL01 and running the Counter smoke on each",
+        "python3 tools/release/verify_bundle.py --require-platform-gates --require-callback-gates exits zero and archives toolchain/lockfile hashes, commands/logs, wheel/sdist SHA-256, abi3audit/repair reports, SBOM, notices and test reports",
+        "A reproducibility check exits zero and the support manifest includes only platforms with complete passing evidence",
+        "Release metadata states only pinned Rust 1.100.0 unless a clean exact-compiler MSRV run is archived; no upload, Developer ID/notarization, Authenticode, store or publishing command is run, and public signing/publishing remains blocked pending User channel and credential owners"
+      ],
+      "evidence_links": [
+        ".harness/DECISIONS/0007-abi3-strict-typing-wheel-and-release-evidence.md",
+        "evidence/P1-REL02/release-bundle-manifest.json"
+      ]
     }
   ]
 }

@@ -28,10 +28,11 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - Validated and accepted P0-R02A: exact dependency pins, three-target resolver evidence, Linux compile evidence, reproduced Taffy failures and licensing/soundness/MSRV risks are documented.
 - Accepted P0-SK01: Skeptic reproduced key evidence, reconciled all cross-stream conflicts, recorded binding corrections and conservative defaults, and requested no Round 2.
 - Accepted P0-AR01: ten immutable ADRs define the runtime, snapshot-first Counter slice, API/crate boundaries, exact pins, platform gates, input/a11y ownership, abi3/typing/release policy, benchmark gates, clean-room policy and Apache-2.0 project license.
+- Accepted P0-PL01 after independent validation: 32 blocked Phase 1 tasks, 89 resolving dependency edges, all 52 ADR gates mapped, required PR workflow and a thin Counter-first critical path.
 
 ## Active work
 
-Research progress: 8 of 8 Round 1 outputs accepted and committed as `cc378c2`. Skeptic review is accepted. Ten ADRs are accepted. Planner is now converting them and every `ARxx-Gn` gate into a dependency-ordered Phase 1 task graph; Red-Team-Planner remains blocked behind that plan.
+Research progress: 8 of 8 Round 1 outputs accepted and committed as `cc378c2`. Skeptic review and ten ADRs are accepted. The Phase 1 graph is validated and committed for review. Red-Team-Planner is now challenging dependencies, hidden coupling, acceptance criteria, estimates, rollback and PR workflow; feature implementation remains blocked behind `P0-AP01`.
 
 - RQ-01: prior-art architecture and clean-room boundaries.
 - RQ-02: Rust/Python dependency, version, license, and maintenance selection.
@@ -48,9 +49,9 @@ All eight researchers are Round 1 and may run concurrently. Their permitted writ
 
 ## Next 3 actions
 
-1. Architect drafts the required ADR set from Skeptic §6, preserving every correction and gate in Skeptic §§5–8.
-2. Planner converts accepted ADRs into a Phase 1 task graph with at least one thin end-to-end vertical slice.
-3. Red-Team-Planner challenges dependencies, coupling, estimates, rollback and machine-checkable acceptance criteria.
+1. Red-Team-Planner challenges Phase 1 dependencies, coupling, estimates, rollback, acceptance criteria and PR workflow.
+2. Resolve blocking findings with Planner; Orchestrator records the Phase 0 gate decision.
+3. Authorize Phase 1 and dispatch the first non-conflicting Counter-slice build wave.
 
 ## Phase 0 exit gate
 
