@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "task_id": "P1-TOOL-BRANCH01",
+  "record_path": "evidence/P1-TOOL-BRANCH01/review.json",
+  "session_id": "ses_df27261c9ffcukQUulA8P0LN89",
+  "role": "independent-reviewer",
+  "attempt": 2,
+  "implementation_attempt": 3,
+  "decision": "fail",
+  "decision_reason": "R-01 through R-07 are independently verified closed, but a new blocking integration defect prevents both required independent gates from running on the Orchestrator-authorized branch: evidence.py compares the branch against the full generated task slug instead of the process-authoritative feat/<task-id>-<slug> namespace. The actual branch feat/P1-TOOL-BRANCH01-tooling is rejected. Branch evidence is restored to implemented/independent_evidence=false; merge remains blocked.",
+  "branch": "feat/P1-TOOL-BRANCH01-tooling",
+  "base_commit": "15d29b32a066eeab7f4fdcc9b8a02456c4c0434f",
+  "source_commit": "64ad0559fad5ffcf2f9a60aa028cb8698aaec141",
+  "source_tree": "385946388f2d087a709baa871d25f07f76bdae3a",
+  "artifact_id": "P1-TOOL-BRANCH01-branch",
+  "artifact_sha256": "b52037513ac6b7e80fc202cfd2aa5c729af442807641fb553d84d64dc35908fc",
+  "reviewed_head_commit": "058b53ea1811c79b8a20c6f37774f9655d74bf4f",
+  "reviewed_head_tree": "6a8cebca5662257b97e5d4740671d140a363b119",
+  "registry": {
+    "path": ".harness/sessions/registry.json",
+    "sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498"
+  },
+  "registry_sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498",
+  "session_roles": {
+    "path": "evidence/P1-TOOL-BRANCH01/session-roles.json",
+    "sha256": "3c3bac9d6a1fecc19fb0654e557318b8c3ffe0764bc04d6de4ad26aca7148243"
+  },
+  "independent_test": {
+    "path": "evidence/P1-TOOL-BRANCH01/independent-test.json",
+    "sha256": "7ed3dfa68dbe611e3113b2b6ec32e869f3b6376d34d06f6ad37177679cac01f8",
+    "session_id": "ses_df27261c9ffdiy0RA5Ko2oSdxl",
+    "role": "test-engineer",
+    "attempt": 3,
+    "decision": "pass"
+  },
+  "pr": {
+    "number": 1,
+    "url": "https://github.com/swadhinbiswas/pygpui/pull/1",
+    "state_at_review": "OPEN",
+    "base_ref": "main",
+    "head_ref": "feat/P1-TOOL-BRANCH01-tooling",
+    "head_oid_at_dispatch": "058b53ea1811c79b8a20c6f37774f9655d74bf4f",
+    "head_oid_reviewed": "058b53ea1811c79b8a20c6f37774f9655d74bf4f",
+    "reviewed_head_tree": "6a8cebca5662257b97e5d4740671d140a363b119",
+    "mergeable_at_review": "MERGEABLE",
+    "merge_state_at_review": "CLEAN"
+  },
+  "reviewed_delta": {
+    "from_source_to_reviewed_head": "evidence/P1-TOOL-BRANCH01/** only",
+    "path_list_sha256": "915e670126d1d98dd9e81af495b28ef57d46182c1fef3e7b92ca96b6f7af86ed",
+    "implementation_paths": [],
+    "post_review_commits_must_remain_under": "evidence/P1-TOOL-BRANCH01/"
+  },
+  "branch_evidence_disposition": {
+    "path": "evidence/P1-TOOL-BRANCH01/branch-evidence.json",
+    "sha256_before": "df0451d717329a37bbe4d3d448b76326678fe50a5a17311828002cb9b88d0b39",
+    "sha256_after": "df0451d717329a37bbe4d3d448b76326678fe50a5a17311828002cb9b88d0b39",
+    "state": "implemented",
+    "independent_evidence": false,
+    "reviewed_head_commit": null,
+    "reviewed_head_tree": null,
+    "review_reference_updated": false,
+    "source_commit_changed": false,
+    "restored_exact_original_bytes": true
+  },
+  "closure_status": {
+    "R-01": "closed",
+    "R-02": "closed",
+    "R-03": "closed",
+    "R-04": "closed",
+    "R-05": "closed",
+    "R-06": "closed",
+    "R-07": "closed",
+    "R-08": "open_nonblocking"
+  },
+  "findings": [
+    {
+      "id": "B-01",
+      "severity": "high",
+      "blocking": true,
+      "status": "open",
+      "title": "Required gates reject the Orchestrator-authorized feature branch",
+      "location": "tools/ci/evidence.py:207-215; .harness/TASKS.json task P1-TOOL-BRANCH01 branch_prefix; .harness/PROCESS.md:49-56",
+      "expected": "Branch validation should enforce the process contract feat/<task-id>-<slug> (or another explicitly authorized canonical branch identity) and remain compatible with the dispatched worktree/branch.",
+      "actual": "The task branch_prefix is feat/P1-TOOL-BRANCH01-own-branch-evidence,-isolated-red-main,-tag-and-. evidence.py splits on the first comma and requires the actual branch to start with feat/P1-TOOL-BRANCH01-own-branch-evidence. The authorized branch feat/P1-TOOL-BRANCH01-tooling therefore fails both branch_gate.py verify and verify_roles.py with code=identity before any evidence validation.",
+      "impact": "The task's two mandatory independent gate commands cannot pass on the authorized branch, so the task cannot reach independently_verified or be merged through its own control plane.",
+      "reproduction": "Assemble otherwise valid review/branch evidence and run the two required commands. Both reject with branch name does not match the task's canonical branch prefix; see branch-gate-verify-precommit.txt and verify-roles-precommit.txt.",
+      "required_fix": "Validate the branch against the task-id namespace and Git ref rules rather than the full generated slug, or obtain an explicit Orchestrator branch identity and encode it consistently. Add an integration regression that loads the real P1-TOOL-BRANCH01 task and verifies feat/P1-TOOL-BRANCH01-tooling. Do not weaken identity checks to accept unrelated tasks.",
+      "evidence": {
+        "branch_gate_log_sha256": "e1045c7ffbedcc5f7c93ba570b3253388a7f2fe0f5f1c3e1fc92c08ef792a80c",
+        "verify_roles_log_sha256": "9b622f24ec50763098acfe2d433629533678777ef634f5ece88fdd61d7faea0f",
+        "branch_prefix_audit_sha256": "d07a058f93335613862c16ed8d95bc96eab6f77904295cdfc57634c3397d7115",
+        "comma_prefix_audit_sha256": "723b7aa6e2a2f2ae276de994b24d478e2a3b3959c906a308f400b7a41bf53fd6"
+      }
+    },
+    {
+      "id": "R-08",
+      "severity": "low",
+      "blocking": false,
+      "status": "open_nonblocking",
+      "title": "README retains one stale evidence-absence statement",
+      "location": "evidence/P1-TOOL-BRANCH01/README.md:29",
+      "actual": "The README says canonical attempt-3 review.json, independent-test.json and merge.json are absent, but independent-test.json is committed and branch-evidence.json references its exact non-null hash.",
+      "impact": "Documentation can mislead readers about available evidence; authoritative JSON remains correct.",
+      "required_fix": "Refresh the README absence sentence in a later evidence-only documentation commit.",
+      "evidence": {
+        "readme_sha256": "bd579bc83fc9de2ff894d54dbf3696ffb149d4d11f7c80e0250e26f55b08a93c",
+        "reviewer_probe_log_sha256": "d7aee1ea1373aaa0f50e0a39fe6b33c55a9ac9db2375b5931c324507a8e2b7e7"
+      }
+    }
+  ],
+  "verification": {
+    "focused_pytest": {
+      "exit_code": 0,
+      "result": "120 passed in 5.82s",
+      "log_sha256": "5bf5355e5da501385916fe84cacf11ea187920c54be3112c4cc5b0111584c1f1"
+    },
+    "full_local_gate": {
+      "exit_code": 0,
+      "result": "208 passed, 18 subtests passed; VALIDATION=PASS; LOCAL_GATE=PASS",
+      "log_sha256": "a26944fb88b899ec16b1a2cd045a163f1e554766d1c8b7f6d831505b59835a7e"
+    },
+    "self_tests": {
+      "exit_code": 0,
+      "result": "All seed/tool self-tests passed"
+    },
+    "t_probes": {
+      "exit_code": 0,
+      "result": "T-01 through T-05 PASS",
+      "log_sha256": "16260466f4560868b16b39d0a11ae565ad265a03642241e3d1531cb3d5fcd121"
+    },
+    "reviewer_r_probes": {
+      "exit_code": 0,
+      "result": "24 blocking control probes passed; no blocking R-01-R-07 failures; R-08 documentation probe failed nonblocking",
+      "script_sha256": "c7f15f03c22a043c2cdeb04805a3cb999de7a361cf3e200c84efd3736f1869e5",
+      "log_sha256": "d7aee1ea1373aaa0f50e0a39fe6b33c55a9ac9db2375b5931c324507a8e2b7e7"
+    },
+    "live_origin_binding": {
+      "exit_code": 0,
+      "result": "LIVE_ORIGIN_BINDING=PASS; live PR head=058b53ea1811c79b8a20c6f37774f9655d74bf4f",
+      "log_sha256": "b2fa3d1b7183e9299db932b4c0f99277ecd4e5cae1bf7e865dfaf206d8d75f76"
+    },
+    "fresh_drills": {
+      "red_main_exit_code": 0,
+      "rollback_exit_code": 0,
+      "production_unchanged": true,
+      "red_main_archive_sha256": "f626dbf3b0be64e1ce79e7f58314e3e21a7366b3bc07424821c44ff53f4c79cb",
+      "rollback_archive_sha256": "6cb67b29961ba9d27528e684dc30006523267ba29649a89b2a750c4d00427d3a"
+    },
+    "required_branch_gate": {
+      "command": "python3 tools/ci/branch_gate.py verify --task P1-TOOL-BRANCH01 --state independently_verified --evidence evidence/P1-TOOL-BRANCH01/branch-evidence.json",
+      "exit_code": 3,
+      "result": "BRANCH_GATE_REJECT code=identity message=branch name does not match the task's canonical branch prefix",
+      "log_sha256": "e1045c7ffbedcc5f7c93ba570b3253388a7f2fe0f5f1c3e1fc92c08ef792a80c"
+    },
+    "required_verify_roles": {
+      "command": "python3 tools/session/verify_roles.py --task P1-TOOL-BRANCH01 --evidence evidence/P1-TOOL-BRANCH01/branch-evidence.json",
+      "exit_code": 3,
+      "result": "SESSION_ROLES_REJECT code=identity message=branch name does not match the task's canonical branch prefix",
+      "log_sha256": "9b622f24ec50763098acfe2d433629533678777ef634f5ece88fdd61d7faea0f"
+    },
+    "production_main": {
+      "remote_before": "2529c361ef7c83b1fa6243b35132b62c9ba81106",
+      "remote_after": "2529c361ef7c83b1fa6243b35132b62c9ba81106",
+      "unchanged": true
+    }
+  },
+  "evidence_hashes": {
+    "index_path": "/tmp/opencode/P1-TOOL-BRANCH01-review2-ses_df27261c9ffcukQUulA8P0LN89/evidence-sha256.txt",
+    "index_sha256": "33c7eb8e3073a62c8d7a3e584654da0f419fc3372c149909170477a23581493f",
+    "orchestrator_handoff_sha256": "01f886f9cb4cf69706afe7d8682de52a948333e891995bc67a479c31540c1d72",
+    "tester_handoff_sha256": "5a722e1469c9c68dfdeed262216593032b73e693fbbbbb0d1b985bb5e5ad1923",
+    "full_pr_diff_sha256": "daafff522763f5a599a8b37e7943bd0524bd97b7c23c360efd1910cee97b89c3",
+    "pr_identity_log_sha256": "d9edd0eeac452ff47112c9fb410e52eb908f9044cff6859bdb62b670131f8604",
+    "attempt_2_review_sha256": "1e20e25db6550c6088526c06e1be85bf5365aaf9ddd28d1be493e4a410d2dc08"
+  },
+  "limitations": [
+    "Review and execution used one Linux runner; no second clean runner or independent static-analysis service was available.",
+    "The production PR is unmerged, so R-03 merged behavior was exercised with local Git fixtures and controlled metadata; live-origin selector behavior was exercised read-only against the real PR.",
+    "The branch-prefix blocker was reproduced after assembling otherwise valid evidence; branch-evidence.json was restored byte-for-byte immediately after the failed gate attempt.",
+    "R-08 remains a low-severity nonblocking README inconsistency."
+  ],
+  "scope_statement": "No implementation, independent-test.json, merge.json, TASKS.json, STATE.md, ADR, main, or UI file was edited. branch-evidence.json is restored to its exact original bytes with state=implemented and independent_evidence=false. Only this canonical fail review record will be committed under evidence/P1-TOOL-BRANCH01/. No merge is authorized."
+}
