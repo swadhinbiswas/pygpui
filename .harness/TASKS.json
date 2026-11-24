@@ -20,7 +20,9 @@
         ".harness/STATE.md",
         ".harness/TASKS.json",
         ".harness/OPEN_QUESTIONS.md",
-        ".harness/PROCESS.md"
+        ".harness/PROCESS.md",
+        ".harness/PLANS/phase-0-discovery-and-decisions.md",
+        "git:6589bd0"
       ]
     },
     {
@@ -28,112 +30,136 @@
       "title": "Research GPUI internals and clean-room boundaries",
       "owner_role": "Researcher-Prior-Art",
       "deps": ["H-001"],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
         "Assigned RESEARCH file contains question, dated primary sources, findings, confidence, contradictions and recommendation",
         "Each decision-driving claim is labelled verified, plausible or unverified",
         "Handoff follows Part 3 schema and LOG.md contains an action line"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/RESEARCH/2026-11-24-rq-01-gpui-internals.md",
+        ".harness/HANDOFFS/researcher-prior-art-to-skeptic-P0-R01A-1.md"
+      ]
     },
     {
       "id": "P0-R01B",
       "title": "Research cross-framework retained/immediate rendering models",
       "owner_role": "Researcher-Prior-Art",
       "deps": ["H-001"],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
         "Assigned RESEARCH file compares at least Slint, Iced and one additional relevant framework using dated sources",
         "Each decision-driving claim is labelled verified, plausible or unverified",
         "Handoff follows Part 3 schema and LOG.md contains an action line"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/RESEARCH/2026-11-24-rq-01-cross-framework.md",
+        ".harness/HANDOFFS/researcher-prior-art-to-skeptic-P0-R01B-1.md"
+      ]
     },
     {
       "id": "P0-R02A",
       "title": "Research core Rust rendering/layout/text dependencies",
       "owner_role": "Researcher-Libs",
       "deps": ["H-001"],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
         "Assigned RESEARCH file records candidate versions, licenses, maintenance evidence, platform gaps and known bugs for winit, wgpu, taffy, cosmic-text, accesskit and rustc-hash/slotmap",
         "Every recommended dependency has a dated primary source",
         "Handoff follows Part 3 schema and LOG.md contains an action line"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/RESEARCH/2026-11-24-rq-02-core-rust-stack.md",
+        ".harness/HANDOFFS/researcher-libs-to-skeptic-P0-R02A-1.md"
+      ]
     },
     {
       "id": "P0-R02B",
       "title": "Research PyO3, maturin, abi3 and strict typing constraints",
       "owner_role": "Researcher-Libs",
       "deps": ["H-001"],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
         "Assigned RESEARCH file evaluates PyO3, maturin and relevant async/GIL integration against macOS, Windows and Linux abi3 wheels",
         "mypy --strict public API strategy is supported by concrete tooling evidence",
         "Each decision-driving claim is labelled verified, plausible or unverified"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/RESEARCH/2026-11-24-rq-02-python-abi3-typing.md",
+        ".harness/HANDOFFS/researcher-libs-to-skeptic-P0-R02B-1.md"
+      ]
     },
     {
       "id": "P0-R03A",
       "title": "Research FFI/GIL and per-frame rendering cost models",
       "owner_role": "Researcher-Perf",
       "deps": ["H-001"],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
         "Assigned RESEARCH file explains where GIL transitions occur and proposes an event-only FFI boundary",
         "Includes evidence for tree diffing, batching/instancing, text atlas and animation/scroll costs",
         "Performance statements are estimates or measurements, never unlabelled assertions"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/RESEARCH/2026-11-24-rq-03-ffi-render-cost-model.md",
+        ".harness/HANDOFFS/researcher-perf-to-skeptic-P0-R03A-1.md"
+      ]
     },
     {
       "id": "P0-R03B",
       "title": "Design reproducible performance benchmark protocol",
       "owner_role": "Researcher-Perf",
       "deps": ["H-001"],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
         "Assigned RESEARCH file defines workloads, warmup, sample counts, statistics, hardware disclosure and pass/fail commands for all requested targets",
         "Protocol distinguishes headless frame cost from real display cadence and defines input-to-frame measurement",
         "Includes baseline capture and greater-than-10-percent regression detection"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/RESEARCH/2026-11-24-rq-03-benchmark-protocol.md",
+        ".harness/HANDOFFS/researcher-perf-to-skeptic-P0-R03B-1.md"
+      ]
     },
     {
       "id": "P0-R04A",
       "title": "Research desktop platform rendering and windowing constraints",
       "owner_role": "Researcher-Platform",
       "deps": ["H-001"],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
         "Assigned RESEARCH file covers Wayland/X11, Windows DX12/Vulkan and macOS Metal/HiDPI constraints with dated primary sources",
         "Identifies platform-specific risks for wgpu and winit",
         "Includes conservative recommendations for initial supported platforms"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/RESEARCH/2026-11-24-rq-04-desktop-runtime.md",
+        ".harness/HANDOFFS/researcher-platform-to-skeptic-P0-R04A-1.md"
+      ]
     },
     {
       "id": "P0-R04B",
       "title": "Research IME, accessibility and cross-platform distribution edge cases",
       "owner_role": "Researcher-Platform",
       "deps": ["H-001"],
-      "status": "in_progress",
+      "status": "done",
       "attempt_count": 1,
       "acceptance_criteria": [
         "Assigned RESEARCH file covers IME lifecycle, AccessKit integration and keyboard/focus edge cases",
         "Records wheel/CI/signing constraints for macOS, Windows and Linux without assuming unavailable infrastructure",
         "Each decision-driving claim is labelled verified, plausible or unverified"
       ],
-      "evidence_links": []
+      "evidence_links": [
+        ".harness/RESEARCH/2026-11-24-rq-04-ime-a11y-distribution.md",
+        ".harness/HANDOFFS/researcher-platform-to-skeptic-P0-R04B-1.md"
+      ]
     },
     {
       "id": "P0-SK01",

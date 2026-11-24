@@ -15,9 +15,21 @@ Resolve the architecture-driving unknowns for a Python-first, Rust-rendered UI f
 - Inspected `/home/swadhin/pygpui`: no files and no existing Git repository.
 - Loaded planning/specification guidance.
 - Created the file-backed harness contract and Phase 0 task graph.
+- Committed the initial harness baseline as `6589bd0`.
+- Validated all 14 task IDs, dependency edges and acceptance-criteria lists.
 - Defined four independent research questions and assigned two researchers per question.
+- Validated and accepted P0-R01A after the author corrected its handoff status; evidence is pinned to Zed commit `168964ea32451900149b5c15ccb2d515e4ecb936`.
+- Validated and accepted P0-R04B: IME/focus/accessibility ownership, wheel/CI constraints and credential-blocked release operations are documented with claim-level evidence.
+- Validated and accepted P0-R02B: exact PyO3/maturin candidates, abi3/GIL boundaries, reviewed strict stubs and no-default-async policy are documented with claim-level evidence.
+- Validated and accepted P0-R01B: pinned cross-framework evidence supports a retained Rust runtime, bounded phase pipeline and generation-safe handles; performance remains unverified.
+- Validated and accepted P0-R03A: callback-free architecture conditions, falsifiers, fourteen experiments and seven proposed gates are documented; no target is claimed achieved.
+- Validated and accepted P0-R03B: deterministic scenes, strict headless/presented/input/idle gates, native callback counters, immutable baselines and ABBA regression rules are documented; all targets remain unverified.
+- Validated and accepted P0-R04A after handoff normalization: explicit OS/backend masks, winit/wgpu constraints, known stable-release defects and platform test gates are documented; no platform is claimed verified.
+- Validated and accepted P0-R02A: exact dependency pins, three-target resolver evidence, Linux compile evidence, reproduced Taffy failures and licensing/soundness/MSRV risks are documented.
 
 ## Active work
+
+Research progress: 8 of 8 Round 1 outputs accepted. Next: commit the evidence batch and dispatch Skeptic over the combined findings.
 
 - RQ-01: prior-art architecture and clean-room boundaries.
 - RQ-02: Rust/Python dependency, version, license, and maintenance selection.
