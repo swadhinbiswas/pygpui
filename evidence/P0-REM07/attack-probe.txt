@@ -1,0 +1,16 @@
+BASE_GRAPH_ERRORS=0
+ATTACK=D1/D7 duplicate write_result --gate ACCEPTED=True ERRORS=[]
+ATTACK=D1/D7 duplicate write_result --task ACCEPTED=True ERRORS=[]
+ATTACK=D1 duplicate validate_result --result ACCEPTED=True ERRORS=[]
+ATTACK=D1 duplicate aggregate --inputs ACCEPTED=True ERRORS=[]
+ATTACK=D1 duplicate aggregate --output ACCEPTED=True ERRORS=[]
+ATTACK=D6 approval binding flags removed ACCEPTED=True ERRORS=[]
+ATTACK=D6 approval binding values changed ACCEPTED=True ERRORS=[]
+ATTACK=D9 gh output discarded for fabricated PR artifacts ACCEPTED=True ERRORS=[]
+ATTACK=D8 seed writes noncanonical registry ACCEPTED=True ERRORS=[]
+ATTACK=D2 postmerge command wrong task/output ACCEPTED=True ERRORS=[]
+ATTACK=D2 postmerge record wrong path ACCEPTED=True ERRORS=[]
+ATTACK=D4 verify uses wrong artifact manifest ACCEPTED=True ERRORS=[]
+ATTACK=D4 --dir= bypasses downloaded-path audit check ACCEPTED=True ERRORS=[]
+ATTACK=D10 backslash-escaped dist path ACCEPTED=True ERRORS=[]
+ATTACKS_TOTAL=14 ATTACKS_ACCEPTED=14

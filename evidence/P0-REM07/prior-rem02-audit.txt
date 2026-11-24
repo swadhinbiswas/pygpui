@@ -1,0 +1,30 @@
+TASKS=87 PHASE1=66 EDGES=325
+GATES=52 SUB_GATES=26 STAGED_FULL_GATES=12
+STAGED_AGGREGATOR_AUDIT
+AR01-G1 owner=P1-PLAT02 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PLAT02/AR01-G1.json
+AR02-G1 owner=P1-TST01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-TST01/AR02-G1.json
+AR02-G2 owner=P1-PLAT02 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PLAT02/AR02-G2.json
+AR03-G1 owner=P1-TST01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-TST01/AR03-G1.json
+AR05-G2 owner=P1-PLAT02 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PLAT02/AR05-G2.json
+AR07-G3 owner=P1-TST01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-TST01/AR07-G3.json
+AR07-G4 owner=P1-REL02 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-REL02/AR07-G4.json
+AR08-G1 owner=P1-BENCH01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-BENCH01/AR08-G1.json
+AR08-G6 owner=P1-CERT-GATE01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-CERT-GATE01/AR08-G6.json
+AR09-G1 owner=P1-PR-AUDIT01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PR-AUDIT01/AR09-G1.json
+AR09-G4 owner=P1-WAYLAND-GATE01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-WAYLAND-GATE01/AR09-G4.json
+AR10-G3 owner=P1-PR-AUDIT01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PR-AUDIT01/AR10-G3.json
+SELF_OVERWRITE_GATES=0 
+MULTI_RESULT_SINGLE_FILE_TASKS=15 P1-ARCH01,P1-LIC01,P1-PR-AUDIT01,P1-API01,P1-CORE02,P1-SCENE01,P1-TST01,P1-REV01,P1-PERF01,P1-BENCH01,P1-REL01,P1-PLAT02,P1-LIC02,P1-PERF02,P1-REL02
+SCHEMA_RESULT_TYPE=object
+BUILD_TASKS=38 MERGED_COMPLETION=38
+BUILD_DIRECT_IMPLEMENTATION_DEPS=0
+P1-RUSTCONTRACT01_BRANCH_CHECK=True SESSION_CHECK=True MERGED=True
+P1-CONREV01_BRANCH_CHECK=True SESSION_CHECK=True MERGED=True
+INT01_PREMERGE=True RECORD=True VERIFY=True
+AR09-G1_INPUTS=evidence/P1-LIC01/AR09-G1.repository-evidence.json,evidence/P1-PR-AUDIT01/AR09-G1.pr-enforcement.json REQUIRED=AR09-G1.repository-evidence,AR09-G1.pr-enforcement
+AR10-G3_INPUTS=evidence/P1-LIC01/AR10-G3.repository-evidence.json,evidence/P1-PR-AUDIT01/AR10-G3.pr-enforcement.json REQUIRED=AR10-G3.repository-evidence,AR10-G3.pr-enforcement
+AR04_G6_MSRV_AUDIT=True
+Traceback (most recent call last):
+  File "/home/swadhin/pygpui/evidence/P0-REM02/semantic_audit.py", line 112, in <module>
+    audit = next(i for i, c in enumerate(criteria) if "dist/release/**" in c)
+StopIteration

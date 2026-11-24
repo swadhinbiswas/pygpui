@@ -1,0 +1,282 @@
+........................FFFFFFFFFFFFFFFFF                                [100%]
+=================================== FAILURES ===================================
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D1/D7 duplicate write_result --gate] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3e096d0>
+name = 'D1/D7 duplicate write_result --gate'
+mutate = <function duplicate_write_gate at 0x7f26c3f49220>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D1/D7 duplicate write_result --gate
+E       assert []
+E        +  where [] = validate_mutation(<function duplicate_write_gate at 0x7f26c3f49220>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D1/D7 duplicate write_result --task] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3e09810>
+name = 'D1/D7 duplicate write_result --task'
+mutate = <function duplicate_write_task at 0x7f26c3f49380>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D1/D7 duplicate write_result --task
+E       assert []
+E        +  where [] = validate_mutation(<function duplicate_write_task at 0x7f26c3f49380>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D1 duplicate validate_result --result] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3ee3490>
+name = 'D1 duplicate validate_result --result'
+mutate = <function duplicate_validate_result at 0x7f26c3f494e0>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D1 duplicate validate_result --result
+E       assert []
+E        +  where [] = validate_mutation(<function duplicate_validate_result at 0x7f26c3f494e0>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D1 duplicate aggregate --inputs] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3ee35c0>
+name = 'D1 duplicate aggregate --inputs'
+mutate = <function duplicate_aggregate_inputs at 0x7f26c3f49640>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D1 duplicate aggregate --inputs
+E       assert []
+E        +  where [] = validate_mutation(<function duplicate_aggregate_inputs at 0x7f26c3f49640>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D1 duplicate aggregate --output] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3e8c170>
+name = 'D1 duplicate aggregate --output'
+mutate = <function duplicate_aggregate_output at 0x7f26c3f497a0>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D1 duplicate aggregate --output
+E       assert []
+E        +  where [] = validate_mutation(<function duplicate_aggregate_output at 0x7f26c3f497a0>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D6 approval binding flags removed] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c40c3350>
+name = 'D6 approval binding flags removed'
+mutate = <function approval_binding_flags_removed at 0x7f26c3f49900>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D6 approval binding flags removed
+E       assert []
+E        +  where [] = validate_mutation(<function approval_binding_flags_removed at 0x7f26c3f49900>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D6 approval binding values changed] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c40c3460>
+name = 'D6 approval binding values changed'
+mutate = <function approval_binding_values_changed at 0x7f26c3f49a60>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D6 approval binding values changed
+E       assert []
+E        +  where [] = validate_mutation(<function approval_binding_values_changed at 0x7f26c3f49a60>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D9 gh output discarded for fabricated PR artifacts] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3e79c50>
+name = 'D9 gh output discarded for fabricated PR artifacts'
+mutate = <function fabricated_pr_capture at 0x7f26c3f49bc0>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D9 gh output discarded for fabricated PR artifacts
+E       assert []
+E        +  where [] = validate_mutation(<function fabricated_pr_capture at 0x7f26c3f49bc0>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D8 seed writes noncanonical registry] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3e79e50>
+name = 'D8 seed writes noncanonical registry'
+mutate = <function seed_writes_noncanonical_registry at 0x7f26c3f49d20>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D8 seed writes noncanonical registry
+E       assert []
+E        +  where [] = validate_mutation(<function seed_writes_noncanonical_registry at 0x7f26c3f49d20>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D2 postmerge command wrong task/output] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3e2de50>
+name = 'D2 postmerge command wrong task/output'
+mutate = <function postmerge_command_wrong_identity at 0x7f26c3f49e80>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D2 postmerge command wrong task/output
+E       assert []
+E        +  where [] = validate_mutation(<function postmerge_command_wrong_identity at 0x7f26c3f49e80>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D2 postmerge record wrong path] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3e2df40>
+name = 'D2 postmerge record wrong path'
+mutate = <function postmerge_record_wrong_path at 0x7f26c3f49fe0>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D2 postmerge record wrong path
+E       assert []
+E        +  where [] = validate_mutation(<function postmerge_record_wrong_path at 0x7f26c3f49fe0>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D4 verify uses wrong artifact manifest] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3e90d70>
+name = 'D4 verify uses wrong artifact manifest'
+mutate = <function artifact_verifies_wrong_manifest at 0x7f26c3f4a140>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D4 verify uses wrong artifact manifest
+E       assert []
+E        +  where [] = validate_mutation(<function artifact_verifies_wrong_manifest at 0x7f26c3f4a140>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D4 --dir= bypasses downloaded-path audit check] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3e90f30>
+name = 'D4 --dir= bypasses downloaded-path audit check'
+mutate = <function artifact_equals_dir_bypasses_audit_path_check at 0x7f26c3f4a2a0>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D4 --dir= bypasses downloaded-path audit check
+E       assert []
+E        +  where [] = validate_mutation(<function artifact_equals_dir_bypasses_audit_path_check at 0x7f26c3f4a2a0>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestNewAdversarialAttacks.test_validator_rejects_new_semantic_attack[D10 backslash-escaped dist path] _
+
+self = <test_p0_rem07_semantics.TestNewAdversarialAttacks object at 0x7f26c3e3e1a0>
+name = 'D10 backslash-escaped dist path'
+mutate = <function escaped_dist_path at 0x7f26c3f4a400>
+
+    @pytest.mark.parametrize("name,mutate", ATTACKS_MODULE.ATTACKS, ids=[name for name, _ in ATTACKS_MODULE.ATTACKS])
+    def test_validator_rejects_new_semantic_attack(self, name: str, mutate) -> None:
+>       assert validate_mutation(mutate), f"validator accepted unsafe attack: {name}"
+E       AssertionError: validator accepted unsafe attack: D10 backslash-escaped dist path
+E       assert []
+E        +  where [] = validate_mutation(<function escaped_dist_path at 0x7f26c3f4a400>)
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:268: AssertionError
+_ TestSeedTrustRootContract.test_documented_seed_self_test_command_exits_zero __
+
+self = <test_p0_rem07_semantics.TestSeedTrustRootContract object at 0x7f26c3e09a90>
+
+    def test_documented_seed_self_test_command_exits_zero(self) -> None:
+        result = subprocess.run(
+            ["python3", str(ROOT / ".harness/scripts/seed_session_registry.py"), "--self-test"],
+            cwd=ROOT, text=True, capture_output=True,
+        )
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: usage: seed_session_registry.py [-h]
+E                                         --orchestrator-session ORCHESTRATOR_SESSION
+E                                         [--output OUTPUT] [--approval APPROVAL]
+E                                         [--self-test]
+E         seed_session_registry.py: error: the following arguments are required: --orchestrator-session
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['python3', '/home/swadhin/pygpui/.harness/scripts/seed_session_registry.py', '--self-test'], re...       [--self-test]\nseed_session_registry.py: error: the following arguments are required: --orchestrator-session\n').returncode
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:277: AssertionError
+_ TestSeedTrustRootContract.test_seed_approval_hash_matches_written_registry_file _
+
+self = <test_p0_rem07_semantics.TestSeedTrustRootContract object at 0x7f26c3e09bd0>
+
+    def test_seed_approval_hash_matches_written_registry_file(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/tmp/opencode") as directory:
+            registry = Path(directory) / "registry.json"
+            approval = Path(directory) / "seed-approval.json"
+            result = subprocess.run(
+                ["python3", str(ROOT / ".harness/scripts/seed_session_registry.py"),
+                 "--orchestrator-session", "orch-1", "--output", str(registry), "--approval", str(approval)],
+                cwd=ROOT, text=True, capture_output=True,
+            )
+            assert result.returncode == 0, result.stderr
+            approval_data = json.loads(approval.read_text())
+            actual = hashlib.sha256(registry.read_bytes()).hexdigest()
+>           assert approval_data["registry_sha256"] == actual
+E           AssertionError: assert 'a4b0d76036eb...0eb0deaef8a11' == '5068e83c6fa6...84f72e8419d30'
+E             
+E             - 5068e83c6fa60018703ab437ce02922c34d4a3cd57f23a7577f84f72e8419d30
+E             + a4b0d76036eb04be96346bffce05a3ce2a2ccbd53a1f8a261af0eb0deaef8a11
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:291: AssertionError
+_ TestSeedTrustRootContract.test_reseed_preserves_existing_append_only_sessions _
+
+self = <test_p0_rem07_semantics.TestSeedTrustRootContract object at 0x7f26c3ee36f0>
+
+    def test_reseed_preserves_existing_append_only_sessions(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/tmp/opencode") as directory:
+            registry = Path(directory) / "registry.json"
+            approval = Path(directory) / "seed-approval.json"
+            command = ["python3", str(ROOT / ".harness/scripts/seed_session_registry.py"),
+                       "--output", str(registry), "--approval", str(approval)]
+            first = subprocess.run(command + ["--orchestrator-session", "orch-1"], cwd=ROOT, text=True, capture_output=True)
+            assert first.returncode == 0, first.stderr
+            before = set(json.loads(registry.read_text())["sessions"])
+            second = subprocess.run(command + ["--orchestrator-session", "orch-2"], cwd=ROOT, text=True, capture_output=True)
+            assert second.returncode == 0, second.stderr
+            after = set(json.loads(registry.read_text())["sessions"])
+>           assert before.issubset(after)
+E           AssertionError: assert False
+E            +  where False = <built-in method issubset of set object at 0x7f26c3eafbc0>({'orch-2'})
+E            +    where <built-in method issubset of set object at 0x7f26c3eafbc0> = {'orch-1'}.issubset
+
+evidence/P0-REM07/test_p0_rem07_semantics.py:305: AssertionError
+=========================== short test summary info ============================
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D1/D7 duplicate write_result --gate]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D1/D7 duplicate write_result --task]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D1 duplicate validate_result --result]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D1 duplicate aggregate --inputs]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D1 duplicate aggregate --output]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D6 approval binding flags removed]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D6 approval binding values changed]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D9 gh output discarded for fabricated PR artifacts]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D8 seed writes noncanonical registry]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D2 postmerge command wrong task/output]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D2 postmerge record wrong path]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D4 verify uses wrong artifact manifest]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D4 --dir= bypasses downloaded-path audit check]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D10 backslash-escaped dist path]
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestSeedTrustRootContract::test_documented_seed_self_test_command_exits_zero
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestSeedTrustRootContract::test_seed_approval_hash_matches_written_registry_file
+FAILED evidence/P0-REM07/test_p0_rem07_semantics.py::TestSeedTrustRootContract::test_reseed_preserves_existing_append_only_sessions
+17 failed, 24 passed in 2.84s

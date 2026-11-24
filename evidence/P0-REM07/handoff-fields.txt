@@ -1,0 +1,4 @@
+HANDOFF_PART3=PASS
+fields=13/13 files=7 status=partial
+MISSING=[]
+HEADERS={'from': True, 'to': True, 'task': True, 'attempt': True, 'status_partial': True, 'next_step': True}

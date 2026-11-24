@@ -1,0 +1,443 @@
+FF.F...F.....FFFFF..FFFF..FF                                             [100%]
+=================================== FAILURES ===================================
+_ TestRemediatedInvariantTests.test_all_thirteen_staged_aggregators_have_schema_and_exact_model_inputs _
+
+self = <test_p0_rem02_semantics.TestRemediatedInvariantTests object at 0x7f70ec5165d0>
+
+    def test_all_thirteen_staged_aggregators_have_schema_and_exact_model_inputs(self) -> None:
+>       assert len(STAGED) == 13
+E       AssertionError: assert 12 == 13
+E        +  where 12 = len({'AR01-G1': {'aggregator': 'P1-PLAT02', 'required_sub_gates': ['AR01-G1.unit-lifecycle', 'AR01-G1.installed-lifecycle'...r': 'P1-TST01', 'required_sub_gates': ['AR03-G1.typing-contract', 'AR03-G1.stubtest'], 'forbidden_sub_gates': []}, ...})
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:100: AssertionError
+_ TestRemediatedInvariantTests.test_user_approval_fixtures_are_schema_valid_and_required_fields_fail _
+
+self = <test_p0_rem02_semantics.TestRemediatedInvariantTests object at 0x7f70ec0fee90>
+
+    def test_user_approval_fixtures_are_schema_valid_and_required_fields_fail(self) -> None:
+        jsonschema.Draft202012Validator.check_schema(SCHEMA)
+        fixtures = [
+            approval_record("P1-READY-CERT01", "AR08-G6.approval", "approval"),
+            approval_record("P1-READY-CLAIM01", "AR09-G4.wayland-disposition", "wayland-disposition"),
+        ]
+        for fixture in fixtures:
+>           jsonschema.validate(fixture, SCHEMA)
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+instance = {'schema_version': 1, 'gate_id': 'AR08-G6.approval', 'task_id': 'P1-READY-CERT01', 'stage': 'approval', ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'https://pygpui.local/harness/schemas/gate-results.schema.json', 'title': 'pygpui Phase 1 gate result', 'type': 'object', ...}
+cls = <class 'jsonschema.validators.Draft202012Validator'>, args = ()
+kwargs = {}
+
+    def validate(instance, schema, cls=None, *args, **kwargs):  # noqa: D417
+        """
+        Validate an instance under the given schema.
+    
+            >>> validate([2, 3, 4], {"maxItems": 2})
+            Traceback (most recent call last):
+                ...
+            ValidationError: [2, 3, 4] is too long
+    
+        :func:`~jsonschema.validators.validate` will first verify that the
+        provided schema is itself valid, since not doing so can lead to less
+        obvious error messages and fail in less obvious or consistent ways.
+    
+        If you know you have a valid schema already, especially
+        if you intend to validate multiple instances with
+        the same schema, you likely would prefer using the
+        `jsonschema.protocols.Validator.validate` method directly on a
+        specific validator (e.g. ``Draft202012Validator.validate``).
+    
+    
+        Arguments:
+    
+            instance:
+    
+                The instance to validate
+    
+            schema:
+    
+                The schema to validate with
+    
+            cls (jsonschema.protocols.Validator):
+    
+                The class that will be used to validate the instance.
+    
+        If the ``cls`` argument is not provided, two things will happen
+        in accordance with the specification. First, if the schema has a
+        :kw:`$schema` keyword containing a known meta-schema [#]_ then the
+        proper validator will be used. The specification recommends that
+        all schemas contain :kw:`$schema` properties for this reason. If no
+        :kw:`$schema` property is found, the default validator class is the
+        latest released draft.
+    
+        Any other provided positional and keyword arguments will be passed
+        on when instantiating the ``cls``.
+    
+        Raises:
+    
+            `jsonschema.exceptions.ValidationError`:
+    
+                if the instance is invalid
+    
+            `jsonschema.exceptions.SchemaError`:
+    
+                if the schema itself is invalid
+    
+        .. rubric:: Footnotes
+        .. [#] known by a validator registered with
+            `jsonschema.validators.validates`
+    
+        """
+        if cls is None:
+            cls = validator_for(schema)
+    
+        cls.check_schema(schema)
+        validator = cls(schema, *args, **kwargs)
+        error = exceptions.best_match(validator.iter_errors(instance))
+        if error is not None:
+>           raise error
+E           jsonschema.exceptions.ValidationError: 'approval_artifact' is a required property
+E           
+E           Failed validating 'required' in schema['allOf'][0]['then']:
+E               {'required': ['approver_session_id',
+E                             'approval_artifact',
+E                             'approval_registry',
+E                             'approval_scope']}
+E           
+E           On instance:
+E               {'schema_version': 1,
+E                'gate_id': 'AR08-G6.approval',
+E                'task_id': 'P1-READY-CERT01',
+E                'stage': 'approval',
+E                'status': 'pass',
+E                'evidence_type': 'user-approval',
+E                'evidence': [{'path': 'evidence/P1-READY-CERT01/gate-results.json',
+E                              'sha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}],
+E                'source_commit': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+E                'lockfile_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+E                'toolchain': 'rustc 1.100.0',
+E                'reviewer_session_id': 'reviewer-1',
+E                'tester_session_id': 'tester-1',
+E                'approver_session_id': 'approver-1',
+E                'aggregator': False}
+
+../.local/lib/python3.14/site-packages/jsonschema/validators.py:1332: ValidationError
+_ TestRemediatedInvariantTests.test_all_build_tasks_complete_merged_after_premerge_checks _
+
+self = <test_p0_rem02_semantics.TestRemediatedInvariantTests object at 0x7f70ebf922c0>
+
+    def test_all_build_tasks_complete_merged_after_premerge_checks(self) -> None:
+        builds = [owner for owner in PHASE1 if owner["workflow"] == "build"]
+>       assert len(builds) == 36
+E       AssertionError: assert 38 == 36
+E        +  where 38 = len([{'id': 'P1-TOOL-BRANCH01', 'title': 'Own branch evidence, isolated red-main, tag and rollback tooling', 'owner_role':...d claim-evidence audit tooling', 'owner_role': 'Technical-Writer', 'deps': ['P1-GOV01', 'P1-TOOL-BRANCH01'], ...}, ...])
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:144: AssertionError
+_ TestRemediatedInvariantTests.test_ar09_g1_and_ar10_g3_include_lic01_repository_subgates _
+
+self = <test_p0_rem02_semantics.TestRemediatedInvariantTests object at 0x7f70ebfe9c50>
+
+    def test_ar09_g1_and_ar10_g3_include_lic01_repository_subgates(self) -> None:
+        for gate in ("AR09-G1", "AR10-G3"):
+            model = DATA["gate_model"][gate]
+>           assert model["required_sub_gates"] == [f"{gate}.repository-evidence"]
+E           AssertionError: assert ['AR09-G1.rep...-enforcement'] == ['AR09-G1.rep...ory-evidence']
+E             
+E             Left contains one more item: 'AR09-G1.pr-enforcement'
+E             Use -v to get more diff
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:180: AssertionError
+_ TestDefectReproductionTests.test_reproduces_eight_staged_aggregators_reading_and_writing_the_same_file _
+
+self = <test_p0_rem02_semantics.TestDefectReproductionTests object at 0x7f70ec0ff4d0>
+
+    def test_reproduces_eight_staged_aggregators_reading_and_writing_the_same_file(self) -> None:
+        collisions = []
+        for gate, model in STAGED.items():
+            owner = task(model["aggregator"])
+            options = command_options(aggregate_command(owner["id"], gate))
+            if options["--output"] in options["--inputs"].split(","):
+                collisions.append(gate)
+>       assert collisions == [
+            "AR01-G1", "AR02-G1", "AR02-G2", "AR03-G1",
+            "AR05-G2", "AR07-G3", "AR08-G1", "AR10-G1",
+        ]
+E       AssertionError: assert [] == ['AR01-G1', '...AR07-G3', ...]
+E         
+E         Right contains 8 more items, first extra item: 'AR01-G1'
+E         Use -v to get more diff
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:240: AssertionError
+_ TestDefectReproductionTests.test_reproduces_multiple_gate_results_sharing_one_schema_object_file _
+
+self = <test_p0_rem02_semantics.TestDefectReproductionTests object at 0x7f70ec0ff390>
+
+    def test_reproduces_multiple_gate_results_sharing_one_schema_object_file(self) -> None:
+        affected = [
+            owner["id"] for owner in PHASE1
+            if len(owner.get("gates", [])) + len(owner.get("sub_gates", [])) > 1
+        ]
+>       assert len(affected) == 16
+E       AssertionError: assert 15 == 16
+E        +  where 15 = len(['P1-ARCH01', 'P1-LIC01', 'P1-PR-AUDIT01', 'P1-API01', 'P1-CORE02', 'P1-SCENE01', ...])
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:250: AssertionError
+_ TestDefectReproductionTests.test_reproduces_pr_audit_two_aggregates_writing_one_output _
+
+self = <test_p0_rem02_semantics.TestDefectReproductionTests object at 0x7f70ebf92780>
+
+    def test_reproduces_pr_audit_two_aggregates_writing_one_output(self) -> None:
+        first = command_options(aggregate_command("P1-PR-AUDIT01", "AR09-G1"))
+        second = command_options(aggregate_command("P1-PR-AUDIT01", "AR10-G3"))
+>       assert first["--output"] == second["--output"] == "evidence/P1-PR-AUDIT01/gate-results.json"
+E       AssertionError: assert 'evidence/P1-.../AR09-G1.json' == 'evidence/P1-.../AR10-G3.json'
+E         
+E         - evidence/P1-PR-AUDIT01/AR10-G3.json
+E         ?                          -   ^
+E         + evidence/P1-PR-AUDIT01/AR09-G1.json
+E         ?                           +  ^
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:260: AssertionError
+_ TestDefectReproductionTests.test_reproduces_schema_validation_before_aggregate_output_exists _
+
+self = <test_p0_rem02_semantics.TestDefectReproductionTests object at 0x7f70ebf928b0>
+
+    def test_reproduces_schema_validation_before_aggregate_output_exists(self) -> None:
+        for gate, model in STAGED.items():
+            owner = task(model["aggregator"])
+            criteria = owner["acceptance_criteria"]
+            validate_index = next(
+                index for index, criterion in enumerate(criteria)
+                if "tools/gates/validate_result.py" in criterion
+            )
+            aggregate_index = criteria.index(aggregate_command(owner["id"], gate))
+>           assert validate_index < aggregate_index, gate
+E           AssertionError: AR08-G6
+E           assert 2 < 1
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:271: AssertionError
+_ TestDefectReproductionTests.test_reproduces_unmerged_control_tasks_producing_code _
+
+self = <test_p0_rem02_semantics.TestDefectReproductionTests object at 0x7f70ebe4c950>
+
+    def test_reproduces_unmerged_control_tasks_producing_code(self) -> None:
+        for task_id in ("P1-SESSION-REGISTRY01", "P1-GATE-SCHEMA01"):
+            owner = task(task_id)
+>           assert owner["workflow"] == "control"
+E           AssertionError: assert 'build' == 'control'
+E             
+E             - control
+E             + build
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:283: AssertionError
+_ TestDefectReproductionTests.test_reproduces_repository_gates_without_enforcement_evidence _
+
+self = <test_p0_rem02_semantics.TestDefectReproductionTests object at 0x7f70ebfea750>
+
+    def test_reproduces_repository_gates_without_enforcement_evidence(self) -> None:
+        for gate in ("AR09-G1", "AR10-G3"):
+            model = DATA["gate_model"][gate]
+>           assert all("enforcement" not in sub for sub in model["required_sub_gates"])
+E           assert False
+E            +  where False = all(<generator object TestDefectReproductionTests.test_reproduces_repository_gates_without_enforcement_evidence.<locals>.<genexpr> at 0x7f70ebe1ab50>)
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:312: AssertionError
+_ TestDefectReproductionTests.test_reproduces_license_audits_before_fetch_and_against_unpopulated_dist _
+
+self = <test_p0_rem02_semantics.TestDefectReproductionTests object at 0x7f70ebfea950>
+
+    def test_reproduces_license_audits_before_fetch_and_against_unpopulated_dist(self) -> None:
+        for task_id in ("P1-LIC02", "P1-LICENSE-CLOSE01"):
+            criteria = task(task_id)["acceptance_criteria"]
+>           audit_index = next(
+                index for index, criterion in enumerate(criteria)
+                if "dist/release/**" in criterion
+            )
+E           StopIteration
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:322: StopIteration
+_ TestDefectReproductionTests.test_reproduces_approver_session_not_bound_to_approval_artifact_or_registry _
+
+self = <test_p0_rem02_semantics.TestDefectReproductionTests object at 0x7f70ebfe2f30>
+
+    def test_reproduces_approver_session_not_bound_to_approval_artifact_or_registry(self) -> None:
+        record = approval_record("P1-READY-CERT01", "AR08-G6.approval", "approval")
+        record["approver_session_id"] = "forged-approver"
+>       jsonschema.validate(record, SCHEMA)
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+instance = {'schema_version': 1, 'gate_id': 'AR08-G6.approval', 'task_id': 'P1-READY-CERT01', 'stage': 'approval', ...}
+schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$id': 'https://pygpui.local/harness/schemas/gate-results.schema.json', 'title': 'pygpui Phase 1 gate result', 'type': 'object', ...}
+cls = <class 'jsonschema.validators.Draft202012Validator'>, args = ()
+kwargs = {}
+
+    def validate(instance, schema, cls=None, *args, **kwargs):  # noqa: D417
+        """
+        Validate an instance under the given schema.
+    
+            >>> validate([2, 3, 4], {"maxItems": 2})
+            Traceback (most recent call last):
+                ...
+            ValidationError: [2, 3, 4] is too long
+    
+        :func:`~jsonschema.validators.validate` will first verify that the
+        provided schema is itself valid, since not doing so can lead to less
+        obvious error messages and fail in less obvious or consistent ways.
+    
+        If you know you have a valid schema already, especially
+        if you intend to validate multiple instances with
+        the same schema, you likely would prefer using the
+        `jsonschema.protocols.Validator.validate` method directly on a
+        specific validator (e.g. ``Draft202012Validator.validate``).
+    
+    
+        Arguments:
+    
+            instance:
+    
+                The instance to validate
+    
+            schema:
+    
+                The schema to validate with
+    
+            cls (jsonschema.protocols.Validator):
+    
+                The class that will be used to validate the instance.
+    
+        If the ``cls`` argument is not provided, two things will happen
+        in accordance with the specification. First, if the schema has a
+        :kw:`$schema` keyword containing a known meta-schema [#]_ then the
+        proper validator will be used. The specification recommends that
+        all schemas contain :kw:`$schema` properties for this reason. If no
+        :kw:`$schema` property is found, the default validator class is the
+        latest released draft.
+    
+        Any other provided positional and keyword arguments will be passed
+        on when instantiating the ``cls``.
+    
+        Raises:
+    
+            `jsonschema.exceptions.ValidationError`:
+    
+                if the instance is invalid
+    
+            `jsonschema.exceptions.SchemaError`:
+    
+                if the schema itself is invalid
+    
+        .. rubric:: Footnotes
+        .. [#] known by a validator registered with
+            `jsonschema.validators.validates`
+    
+        """
+        if cls is None:
+            cls = validator_for(schema)
+    
+        cls.check_schema(schema)
+        validator = cls(schema, *args, **kwargs)
+        error = exceptions.best_match(validator.iter_errors(instance))
+        if error is not None:
+>           raise error
+E           jsonschema.exceptions.ValidationError: 'approval_artifact' is a required property
+E           
+E           Failed validating 'required' in schema['allOf'][0]['then']:
+E               {'required': ['approver_session_id',
+E                             'approval_artifact',
+E                             'approval_registry',
+E                             'approval_scope']}
+E           
+E           On instance:
+E               {'schema_version': 1,
+E                'gate_id': 'AR08-G6.approval',
+E                'task_id': 'P1-READY-CERT01',
+E                'stage': 'approval',
+E                'status': 'pass',
+E                'evidence_type': 'user-approval',
+E                'evidence': [{'path': 'evidence/P1-READY-CERT01/gate-results.json',
+E                              'sha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}],
+E                'source_commit': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+E                'lockfile_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+E                'toolchain': 'rustc 1.100.0',
+E                'reviewer_session_id': 'reviewer-1',
+E                'tester_session_id': 'tester-1',
+E                'approver_session_id': 'forged-approver',
+E                'aggregator': False}
+
+../.local/lib/python3.14/site-packages/jsonschema/validators.py:1332: ValidationError
+_ TestDefectReproductionTests.test_reproduces_approval_tasks_without_a_real_lockfile_producer _
+
+self = <test_p0_rem02_semantics.TestDefectReproductionTests object at 0x7f70ebfe3110>
+
+    def test_reproduces_approval_tasks_without_a_real_lockfile_producer(self) -> None:
+        assert not (ROOT / "Cargo.lock").exists()
+        for task_id in ("P1-READY-CERT01", "P1-READY-CLAIM01"):
+            owner = task(task_id)
+            assert not VALIDATOR._reachable(task_id, BY_ID, "P1-ARCH01")
+            assert not any("Cargo.lock" in criterion for criterion in owner["acceptance_criteria"])
+>           assert "lockfile_sha256" in SCHEMA["required"]
+E           AssertionError: assert 'lockfile_sha256' in ['schema_version', 'gate_id', 'task_id', 'stage', 'status', 'evidence_type', ...]
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:358: AssertionError
+_ TestValidatorBlindSpotTests.test_validator_accepts_repository_gate_without_any_enforcement_command _
+
+self = <test_p0_rem02_semantics.TestValidatorBlindSpotTests object at 0x7f70ebf929e0>
+
+    def test_validator_accepts_repository_gate_without_any_enforcement_command(self) -> None:
+        def mutate(data):
+            owner = next(item for item in data["tasks"] if item["id"] == "P1-PR-AUDIT01")
+            owner["acceptance_criteria"] = [
+                criterion
+                for criterion in owner["acceptance_criteria"]
+                if "test_pr_policy.py" not in criterion
+                and "pr_audit_gate.py" not in criterion
+            ]
+    
+>       assert validate_mutation(mutate) == []
+E       AssertionError: assert ['AR09-G1 lac...ent producer'] == []
+E         
+E         Left contains 2 more items, first extra item: 'AR09-G1 lacks exactly one real per-PR enforcement producer'
+E         Use -v to get more diff
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:401: AssertionError
+_ TestValidatorBlindSpotTests.test_validator_accepts_control_code_producer_without_merge _
+
+self = <test_p0_rem02_semantics.TestValidatorBlindSpotTests object at 0x7f70ebf92b10>
+
+    def test_validator_accepts_control_code_producer_without_merge(self) -> None:
+        def mutate(data):
+            owner = next(item for item in data["tasks"] if item["id"] == "P1-GATE-SCHEMA01")
+            owner["workflow"] = "control"
+            owner["completion_state"] = "recorded"
+            owner.pop("premerge_state", None)
+            owner.pop("postmerge_command", None)
+    
+>       assert validate_mutation(mutate) == []
+E       AssertionError: assert ['P1-GATE-SCH...d build task'] == []
+E         
+E         Left contains one more item: 'P1-GATE-SCHEMA01 code-producing control/readiness task is not a merged build task'
+E         Use -v to get more diff
+
+evidence/P0-REM02/test_p0_rem02_semantics.py:411: AssertionError
+=========================== short test summary info ============================
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestRemediatedInvariantTests::test_all_thirteen_staged_aggregators_have_schema_and_exact_model_inputs
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestRemediatedInvariantTests::test_user_approval_fixtures_are_schema_valid_and_required_fields_fail
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestRemediatedInvariantTests::test_all_build_tasks_complete_merged_after_premerge_checks
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestRemediatedInvariantTests::test_ar09_g1_and_ar10_g3_include_lic01_repository_subgates
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestDefectReproductionTests::test_reproduces_eight_staged_aggregators_reading_and_writing_the_same_file
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestDefectReproductionTests::test_reproduces_multiple_gate_results_sharing_one_schema_object_file
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestDefectReproductionTests::test_reproduces_pr_audit_two_aggregates_writing_one_output
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestDefectReproductionTests::test_reproduces_schema_validation_before_aggregate_output_exists
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestDefectReproductionTests::test_reproduces_unmerged_control_tasks_producing_code
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestDefectReproductionTests::test_reproduces_repository_gates_without_enforcement_evidence
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestDefectReproductionTests::test_reproduces_license_audits_before_fetch_and_against_unpopulated_dist
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestDefectReproductionTests::test_reproduces_approver_session_not_bound_to_approval_artifact_or_registry
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestDefectReproductionTests::test_reproduces_approval_tasks_without_a_real_lockfile_producer
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestValidatorBlindSpotTests::test_validator_accepts_repository_gate_without_any_enforcement_command
+FAILED evidence/P0-REM02/test_p0_rem02_semantics.py::TestValidatorBlindSpotTests::test_validator_accepts_control_code_producer_without_merge
+15 failed, 13 passed in 0.46s

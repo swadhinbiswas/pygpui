@@ -1,0 +1,60 @@
+TASKS=87 PHASE1=66 EDGES=325
+GATES=52 SUB_GATES=26 STAGED_FULL_GATES=12
+BASE_GRAPH_ERRORS=0
+RESULT_PATHS=78 UNIQUE_RESULT_PATHS=78
+LIFECYCLE_ORDER_ERRORS=0
+AGGREGATE_SELF_OVERWRITES=0
+BUILD_TASKS=38 MERGED_COMPLETION=38
+P1-SESSION-REGISTRY01_WORKFLOW=build COMPLETION=merged PREMERGE=independently_verified POSTMERGE=merged REVIEW=True TEST=True MERGE_RECORD=True
+P1-GATE-SCHEMA01_WORKFLOW=build COMPLETION=merged PREMERGE=independently_verified POSTMERGE=merged REVIEW=True TEST=True MERGE_RECORD=True
+REGISTRY_EXISTS_AT_BASELINE=False
+SEED_PRECEDES_FIRST_BUILD=True
+SEED_REGISTRY_PRODUCER=True
+AR09-G1_REQUIRED=['AR09-G1.repository-evidence', 'AR09-G1.pr-enforcement']
+AR09-G1_INPUTS=evidence/P1-LIC01/AR09-G1.repository-evidence.json,evidence/P1-PR-AUDIT01/AR09-G1.pr-enforcement.json
+AR10-G3_REQUIRED=['AR10-G3.repository-evidence', 'AR10-G3.pr-enforcement']
+AR10-G3_INPUTS=evidence/P1-LIC01/AR10-G3.repository-evidence.json,evidence/P1-PR-AUDIT01/AR10-G3.pr-enforcement.json
+PR_IDENTITY_CAPTURE=True
+PR_CHANGED_FILES_CAPTURE=True
+P1-LIC02_FETCH=0 VERIFY=1 AUDITS=[2, 3, 4] ORDER_OK=True DOWNLOAD_DIR=evidence/P1-LIC02/downloads AUDITS_USE_DOWNLOAD_DIR=True IGNORED_DIST_REFS=[]
+P1-LICENSE-CLOSE01_FETCH=0 VERIFY=1 AUDITS=[3] ORDER_OK=True DOWNLOAD_DIR=evidence/P1-LICENSE-CLOSE01/downloads AUDITS_USE_DOWNLOAD_DIR=True IGNORED_DIST_REFS=[]
+DIST_VARIANT=dist/release/*.whl DETECTED=True
+DIST_VARIANT=dist/local/*.whl DETECTED=True
+DIST_VARIANT=dist/./release/*.whl DETECTED=True
+DIST_VARIANT=dist/{release,local}/*.whl DETECTED=True
+DIST_VARIANT=dist/*/*.whl DETECTED=True
+DIST_VARIANT=dist DETECTED=True
+P1-READY-CERT01_WRITE=1 VALIDATE=2 VERIFY_APPROVAL=3 VERIFY_PROOF=4 ORDER_OK=True REACHES_LOCK_PRODUCER=False HAS_NOT_APPLICABLE=True
+P1-READY-CLAIM01_WRITE=1 VALIDATE=2 VERIFY_APPROVAL=3 VERIFY_PROOF=4 ORDER_OK=True REACHES_LOCK_PRODUCER=False HAS_NOT_APPLICABLE=True
+P0_AP01=blocked/attempt0
+ALL_PHASE1_BLOCKED_ATTEMPT0=True
+NEW_ATTACK=D1/D7 duplicate write_result --gate ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D1/D7 duplicate write_result --task ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D1 duplicate validate_result --result ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D1 duplicate aggregate --inputs ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D1 duplicate aggregate --output ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D6 approval binding flags removed ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D6 approval binding values changed ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D9 gh output discarded for fabricated PR artifacts ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D8 seed writes noncanonical registry ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D2 postmerge command wrong task/output ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D2 postmerge record wrong path ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D4 verify uses wrong artifact manifest ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D4 --dir= bypasses downloaded-path audit check ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D10 backslash-escaped dist path ACCEPTED=True ERRORS=[]
+NEW_ATTACKS_TOTAL=14 NEW_ATTACKS_ACCEPTED=14
+SEED_DOCUMENTED_SELF_TEST_EXIT=2
+SEED_FIRST_EXIT=0 SEED_SECOND_EXIT=0
+SEED_APPROVAL_REGISTRY_SHA256=a4b0d76036eb04be96346bffce05a3ce2a2ccbd53a1f8a261af0eb0deaef8a11
+SEED_ACTUAL_REGISTRY_SHA256=5068e83c6fa60018703ab437ce02922c34d4a3cd57f23a7577f84f72e8419d30
+SEED_APPROVAL_HASH_MATCHES_FILE=False
+SEED_RESEED_APPEND_ONLY_PRESERVED=False
+UNRESOLVED_DEFECTS=7
+D11=registry seed command/hash/append-only/output binding is incomplete
+D12=duplicate CLI flags bypass canonical result identity and lifecycle checks
+D13=approval command artifact/registry/scope bindings are not enforced
+D14=gh PR capture can discard real output and substitute fabricated artifacts
+D15=post-merge command/record task and path identity are not enforced
+D16=artifact fetch/verify/audit manifest and path binding is incomplete
+D17=ignored-dist normalization misses shell-escaped spellings
+EXIT_CODE=0

@@ -1,0 +1,24 @@
+...............F                                                         [100%]
+=================================== FAILURES ===================================
+_ TestUnresolvedDefectAttacks.test_first_merged_tool_task_has_an_available_trusted_registry_producer _
+
+self = <test_p0_rem05_semantics.TestUnresolvedDefectAttacks object at 0x7f693557d950>
+
+    def test_first_merged_tool_task_has_an_available_trusted_registry_producer(self) -> None:
+        registry = ".harness/sessions/registry.json"
+        producers = [
+            owner["id"]
+            for owner in PHASE1
+            if any(VALIDATOR._matches(registry, pattern) for pattern in owner.get("produces", []))
+        ]
+>       assert producers == ["P1-SESSION-REGISTRY01"]
+E       AssertionError: assert ['P1-SESSION-...N-REGISTRY01'] == ['P1-SESSION-REGISTRY01']
+E         
+E         At index 0 diff: 'P1-SESSION-SEED01' != 'P1-SESSION-REGISTRY01'
+E         Left contains one more item: 'P1-SESSION-REGISTRY01'
+E         Use -v to get more diff
+
+evidence/P0-REM05/test_p0_rem05_semantics.py:247: AssertionError
+=========================== short test summary info ============================
+FAILED evidence/P0-REM05/test_p0_rem05_semantics.py::TestUnresolvedDefectAttacks::test_first_merged_tool_task_has_an_available_trusted_registry_producer
+1 failed, 15 passed in 0.52s

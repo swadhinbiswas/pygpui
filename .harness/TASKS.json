@@ -421,14 +421,15 @@
       "deps": [
         "P0-REM06"
       ],
-      "status": "in_progress",
+      "status": "blocked",
       "attempt_count": 1,
       "acceptance_criteria": [
         "A different session reruns all validators/tests and replays D1 through D10",
         "The independent report finds zero unresolved remediation defects"
       ],
       "evidence_links": [
-        "evidence/P0-REM07/independent-verification.txt"
+        "evidence/P0-REM07/independent-verification.txt",
+        ".harness/HANDOFFS/test-engineer-to-red-team-P0-REM07-1.md"
       ]
     },
     {
@@ -436,13 +437,13 @@
       "title": "Red-Team verify remediation and recommend gate decision",
       "owner_role": "Red-Team-Planner",
       "deps": [
-        "P0-REM07"
+        "P0-REM06"
       ],
-      "status": "blocked",
-      "attempt_count": 0,
+      "status": "in_progress",
+      "attempt_count": 1,
       "acceptance_criteria": [
-        "A different Red-Team session verifies RT3-B01 through RT3-B05 closure and issues a final zero/nonzero blocking count",
-        "The report either recommends P0-AP01 approval or identifies a new explicit Orchestrator decision"
+        "A different Red-Team session adjudicates D11-D17 and the proposed bounded exceptions",
+        "The report either recommends P0-AP01 approval with enforceable exception gates or rejects the authorization"
       ],
       "evidence_links": [
         ".harness/REVIEWS/phase-0-remediation-red-team.md"

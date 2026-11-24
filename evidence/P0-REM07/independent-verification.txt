@@ -1,0 +1,742 @@
+P0-REM07 independent verification — attempt 1
+Date: 2026-11-24
+Reviewer: Test-Engineer (fresh independent session)
+Round-3 baseline: a5ec49bab27e6c2bb2519e18dc7ea1dcd97ba388
+Accepted ADR baseline: 5ce026d
+Verdict: PARTIAL
+Unresolved defects: 7 (D11–D17)
+P0-AP01: remains blocked at attempt zero
+
+Scope and limitations
+---------------------
+I read the assigned State, Orchestrator and Planner handoffs, round-3 plan,
+prior independent evidence, Phase 1 plan, TASKS.json, gate schema, graph
+validator, registry seed script, committed validator tests, pytest.ini and
+Planner validation output. I independently reran the graph validator with
+self-tests, the Planner handoff validator with explicit metadata, bare root
+pytest, the prior D1–D6 reproduction suite/audit, the prior D7–D10 attack suite,
+and new adversarial tests under evidence/P0-REM07/.
+
+No future gate/session/artifact/runtime tool exists beyond the registry seed.
+This is static plan and evidence-contract verification plus direct execution of
+the seed script; it is not runtime certification of Phase 1 tools. The remote
+has no PRs (`gh pr list` returned `[]`), so actual per-PR enforcement could not
+be exercised. I did not edit the plan, TASKS.json, schema, validators, seed
+script, committed tests, ADRs, research, reviews, STATE.md, PROCESS.md or
+feature code. I did not fix defects or commit.
+
+Process note: the first P0-REM07 Test-Engineer action appended LOG.md line 106,
+quoting the Orchestrator handoff's EXACT NEXT STEP verbatim.
+
+Summary
+-------
+The committed structural validator, Planner handoff validator and bare root
+pytest all pass. The graph has 87 tasks, 66 Phase 1 tasks, 325 dependency edges,
+52 full gates, 26 sub-gates, 12 staged full gates, 78 unique canonical result
+paths and 38/38 merged build tasks. Root pytest passes 67 tests plus 18 subtests.
+
+The direct prior D1–D10 reproductions are closed: simple wrong gate/task IDs,
+duplicate result paths, validation-before-creation, unmerged control code,
+missing enforcement, audit-before-fetch, direct/dist-normalized wildcard
+spellings, missing approval fields, missing registry seed, fixture/self-test
+producers and the documented dot/brace/glob variants are rejected.
+
+Independent stronger attacks found seven unresolved defect groups. Fourteen of
+fourteen new in-memory graph attacks were accepted, and three direct seed-script
+contract tests failed. The remediation is not accepted and P0-AP01 must remain
+blocked.
+
+Exact commands and output
+-------------------------
+
+1. Initial worktree integrity
+
+Command:
+  git rev-parse HEAD
+
+Output:
+  a5ec49bab27e6c2bb2519e18dc7ea1dcd97ba388
+
+Command:
+  git status --short --untracked-files=all
+
+Output:
+   M .harness/LOG.md
+  ?? evidence/P0-REM07/graph-validator.txt
+  ?? evidence/P0-REM07/handoff-validator.txt
+  ?? evidence/P0-REM07/root-pytest.txt
+
+Command:
+  git diff --check
+
+Output:
+  (no output)
+EXIT_CODE=0
+
+2. Graph validator with self-tests
+
+Command:
+  python3 .harness/scripts/validate_phase1_graph.py --baseline 5ce026d --history-baseline 63beab0 --self-test
+
+Output:
+JSON_PARSE=PASS
+UNIQUE_IDS=PASS total=87 unique=87
+DEPS_RESOLVE=PASS checked=325
+CYCLES=PASS count=0
+TOPOLOGICAL_ORDER=PASS pass
+PHASE1_FIELDS=PASS tasks=66
+PHASE1_INITIAL_STATE=PASS blocked/attempt0/max4
+PHASE1_AP01_GATE=PASS checked=66
+PLAN_TASK_ORDER=PASS plan=66 json=66
+PLAN_JSON_METADATA=PASS checked=66
+ADR_GATE_COVERAGE=PASS adr=52 plan=52 aggregators=52
+ADR_GATE_MAPPINGS=PASS total=52
+STAGED_GATE_CLOSURE=PASS sub_gates=26
+GATE_RUNTIME=PASS schema+aggregate+independent-approval
+GATE_RESULT_LIFECYCLE=PASS unique_paths=78
+CANONICAL_RESULT_IDENTITY=PASS task+gate+path
+REGISTRY_BOOTSTRAP=PASS orchestrator-seed-before-build
+REAL_PR_EVIDENCE=PASS gh-pr-identity+diff
+APPROVAL_BINDING=PASS session+artifact+registry+prelock
+ATOMIC_GATE_EVIDENCE=PASS repository+enforcement+MSRV+notice
+PHASE0_HISTORY=PASS compared=15
+COMMAND_PRODUCERS=PASS criteria=453
+REVIEW_MERGE_STATES=PASS merged-deps+premerge+session
+ARTIFACT_HANDOFF=PASS draft-release/fetch/verify/normalized-dist
+DIST_NORMALIZATION=PASS segments+braces+globs
+CRATE_TAG_READINESS=PASS semantic
+PYTEST_ENTRYPOINT=PASS root pytest.ini
+SCOPE_NORMALIZATION=PASS normalized
+REMOTE_WORKFLOW=PASS stale=0
+SELF_TEST_PASS duplicate-id
+SELF_TEST_PASS missing-dependency
+SELF_TEST_PASS cycle
+SELF_TEST_PASS phase1-active
+SELF_TEST_PASS missing-gate
+SELF_TEST_PASS unowned-command
+SELF_TEST_PASS scope-mismatch
+SELF_TEST_PASS missing-review-evidence
+SELF_TEST_PASS stale-remote
+SELF_TEST_PASS plan-json-mismatch
+SELF_TEST_PASS title-mismatch
+SELF_TEST_PASS gate-mapping-mismatch
+SELF_TEST_PASS baseline-done-mutation
+SELF_TEST_PASS duplicate-producer
+SELF_TEST_PASS producer-outside-scope
+SELF_TEST_PASS deadlock-ar03-g5-ambiguity
+SELF_TEST_PASS deadlock-ar02-g1-proto-scene
+SELF_TEST_PASS deadlock-ar02-g1-proto-tst
+SELF_TEST_PASS deadlock-ar03-g1-api-tst
+SELF_TEST_PASS deadlock-ar07-g3-api-tst
+SELF_TEST_PASS deadlock-ar08-g1-bench00
+SELF_TEST_PASS deadlock-ar05-g2-render-plat01
+SELF_TEST_PASS deadlock-ar05-g2-render-plat02
+SELF_TEST_PASS deadlock-ar01-g1-platform-plat02
+SELF_TEST_PASS deadlock-ar02-g2-slice-plat02
+SELF_TEST_PASS deadlock-ar05-g2-plat01-plat02
+SELF_TEST_PASS deadlock-ar10-g1-rel-license
+SELF_TEST_PASS deadlock-ar07-g4-plat-wheel
+SELF_TEST_PASS deadlock-ar07-g4-plat-rel02
+SELF_TEST_PASS deadlock-ar07-g4-wheel-rel02
+SELF_TEST_PASS ar03-g5-forbidden-internal-contract
+SELF_TEST_PASS ignored-artifact-handoff
+SELF_TEST_PASS premerge-merged-state
+SELF_TEST_PASS proof-self-certification
+SELF_TEST_PASS illegal-core-test-dependency
+SELF_TEST_PASS post-contract-tag-timing
+SELF_TEST_PASS missing-native-lane-readiness
+SELF_TEST_PASS conflated-claim-readiness
+SELF_TEST_PASS missing-schema-validation
+SELF_TEST_PASS missing-aggregate-invocation
+SELF_TEST_PASS readiness-approval-self-certification
+SELF_TEST_PASS build-premerge-completion
+SELF_TEST_PASS rustcontract-missing-session-check
+SELF_TEST_PASS conrev-missing-branch-check
+SELF_TEST_PASS int01-missing-merge-record
+SELF_TEST_PASS repository-gate-missing-lic01
+SELF_TEST_PASS msrv-audit-missing
+SELF_TEST_PASS lic02-ignored-artifact
+SELF_TEST_PASS rel02-wayland-dependency
+SELF_TEST_PASS owner-notice-missing
+SELF_TEST_PASS d1-duplicate-result-path
+SELF_TEST_PASS d1-validation-before-creation
+SELF_TEST_PASS d2-control-code-producer
+SELF_TEST_PASS d3-missing-enforcement
+SELF_TEST_PASS d4-audit-before-fetch
+SELF_TEST_PASS d5-dist-wildcard-bypass
+SELF_TEST_PASS d6-unbound-approval
+SELF_TEST_PASS d7-wrong-gate-identity
+SELF_TEST_PASS d7-wrong-task-identity
+SELF_TEST_PASS d8-missing-registry-seed
+SELF_TEST_PASS d9-fixture-enforcement
+SELF_TEST_PASS d9-self-test-enforcement
+SELF_TEST_PASS d10-dist-variant-dist/./release/*.whl
+SELF_TEST_PASS d10-dist-variant-dist/{release,local}/*.whl
+SELF_TEST_PASS d10-dist-variant-dist/*/*.whl
+VALIDATION=PASS
+EXIT_CODE=0
+
+The same exact output is archived in evidence/P0-REM07/graph-validator.txt.
+
+3. Planner handoff validator with explicit metadata
+
+Command:
+  python3 .harness/scripts/validate_handoff.py .harness/HANDOFFS/planner-to-test-engineer-P0-REM06-1.md --task-id P0-REM06 --to Test-Engineer --attempt 1
+
+Output:
+  HANDOFF_FIELDS=PASS fields=13/13 files=7
+EXIT_CODE=0
+
+The same exact output is archived in evidence/P0-REM07/handoff-validator.txt.
+
+4. Bare root pytest
+
+Command:
+  pytest -q
+
+Output:
+  ......................................................                 [100%]
+  .............                                                            [100%]
+  67 passed, 18 subtests passed in 5.73s
+EXIT_CODE=0
+
+The same exact output is archived in evidence/P0-REM07/root-pytest.txt.
+
+5. Prior evidence replay
+
+Command:
+  python3 -m pytest -q evidence/P0-REM02/test_p0_rem02_semantics.py
+
+Output summary:
+  FF.F...F.....FFFFF..FFFF..FF                                         [100%]
+  15 failed, 13 passed in 0.46s
+EXIT_CODE=1
+
+These prior tests intentionally asserted unsafe conditions and stale positives
+(13 staged gates, 36 builds, old approval fixture, repository-only gate inputs,
+old shared-file behavior). Their failures show those conditions are gone. Full
+tracebacks are archived in evidence/P0-REM07/prior-rem02-tests.txt.
+
+Command:
+  python3 evidence/P0-REM02/semantic_audit.py
+
+Output head:
+  TASKS=87 PHASE1=66 EDGES=325
+  GATES=52 SUB_GATES=26 STAGED_FULL_GATES=12
+  STAGED_AGGREGATOR_AUDIT
+  AR01-G1 owner=P1-PLAT02 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PLAT02/AR01-G1.json
+  AR02-G1 owner=P1-TST01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-TST01/AR02-G1.json
+  AR02-G2 owner=P1-PLAT02 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PLAT02/AR02-G2.json
+  AR03-G1 owner=P1-TST01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-TST01/AR03-G1.json
+  AR05-G2 owner=P1-PLAT02 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PLAT02/AR05-G2.json
+  AR07-G3 owner=P1-TST01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-TST01/AR07-G3.json
+  AR07-G4 owner=P1-REL02 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-REL02/AR07-G4.json
+  AR08-G1 owner=P1-BENCH01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-BENCH01/AR08-G1.json
+  AR08-G6 owner=P1-CERT-GATE01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-CERT-GATE01/AR08-G6.json
+  AR09-G1 owner=P1-PR-AUDIT01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PR-AUDIT01/AR09-G1.json
+  AR09-G4 owner=P1-WAYLAND-GATE01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-WAYLAND-GATE01/AR09-G4.json
+  AR10-G3 owner=P1-PR-AUDIT01 schema=True exact_inputs=True self_overwrite=False output=evidence/P1-PR-AUDIT01/AR10-G3.json
+  SELF_OVERWRITE_GATES=0
+  MULTI_RESULT_SINGLE_FILE_TASKS=15 P1-ARCH01,P1-LIC01,P1-PR-AUDIT01,P1-API01,P1-CORE02,P1-SCENE01,P1-TST01,P1-REV01,P1-PERF01,P1-BENCH01,P1-REL01,P1-PLAT02,P1-LIC02,P1-PERF02,P1-REL02
+  SCHEMA_RESULT_TYPE=object
+  BUILD_TASKS=38 MERGED_COMPLETION=38
+  BUILD_DIRECT_IMPLEMENTATION_DEPS=0
+  P1-RUSTCONTRACT01_BRANCH_CHECK=True SESSION_CHECK=True MERGED=True
+  P1-CONREV01_BRANCH_CHECK=True SESSION_CHECK=True MERGED=True
+  INT01_PREMERGE=True RECORD=True VERIFY=True
+  AR09-G1_INPUTS=evidence/P1-LIC01/AR09-G1.repository-evidence.json,evidence/P1-PR-AUDIT01/AR09-G1.pr-enforcement.json REQUIRED=AR09-G1.repository-evidence,AR09-G1.pr-enforcement
+  AR10-G3_INPUTS=evidence/P1-LIC01/AR10-G3.repository-evidence.json,evidence/P1-PR-AUDIT01/AR10-G3.pr-enforcement.json REQUIRED=AR10-G3.repository-evidence,AR10-G3.pr-enforcement
+  AR04_G6_MSRV_AUDIT=True
+
+Output tail:
+  Traceback (most recent call last):
+    File "/home/swadhin/pygpui/evidence/P0-REM02/semantic_audit.py", line 112, in <module>
+      audit = next(i for i, c in enumerate(criteria) if "dist/release/**" in c)
+  StopIteration
+EXIT_CODE=1
+
+The old audit stops because the unsafe dist/release audit no longer exists.
+Full output is archived in evidence/P0-REM07/prior-rem02-audit.txt.
+
+Command:
+  python3 -m pytest -q evidence/P0-REM05/test_p0_rem05_semantics.py
+
+Output summary:
+  ...............F                                                  [100%]
+  1 failed, 15 passed in 0.52s
+EXIT_CODE=1
+
+The only failure is the stale positive assertion that the sole registry
+producer is P1-SESSION-REGISTRY01; the new seed task is now also a producer.
+All prior D7–D10 attack assertions pass. Full output is archived in
+evidence/P0-REM07/prior-rem05-tests.txt.
+
+6. Remote and PR evidence availability
+
+Command:
+  gh --version
+
+Output:
+  gh version 2.105.0 (2026-11-18)
+  https://github.com/cli/cli/releases/tag/v2.105.0
+
+Command:
+  gh auth status
+
+Output:
+  github.com
+    ✓ Logged in to github.com account swadhinbiswas (keyring)
+    - Active account: true
+    - Git operations protocol: ssh
+    - Token: gho_************************************
+    - Token scopes: 'admin:public_key', 'gist', 'read:org', 'repo'
+
+Command:
+  git remote get-url origin
+
+Output:
+  https://github.com/swadhinbiswas/pygpui.git
+
+Command:
+  git branch -vv
+
+Output:
+  * main a5ec49b [origin/main] docs: fix residual remediation defects
+
+Command:
+  gh pr list --limit 5 --json number,title,state,headRefOid,baseRefOid,author
+
+Output:
+  []
+EXIT_CODE=0
+
+No real PR exists to exercise. The D9 assessment is therefore static.
+
+7. Documented registry seed self-test
+
+Command:
+  python3 .harness/scripts/seed_session_registry.py --self-test
+
+Output:
+  usage: seed_session_registry.py [-h]
+                                  --orchestrator-session ORCHESTRATOR_SESSION
+                                  [--output OUTPUT]
+                                  [--approval APPROVAL]
+                                  [--self-test]
+  seed_session_registry.py: error: the following arguments are required: --orchestrator-session
+EXIT_CODE=2
+
+This is the exact command in P1-SESSION-SEED01 acceptance criterion 2. Output is
+archived in evidence/P0-REM07/seed-self-test.txt.
+
+8. Independent semantic audit
+
+Command:
+  python3 evidence/P0-REM07/semantic_audit.py
+
+Output:
+TASKS=87 PHASE1=66 EDGES=325
+GATES=52 SUB_GATES=26 STAGED_FULL_GATES=12
+BASE_GRAPH_ERRORS=0
+RESULT_PATHS=78 UNIQUE_RESULT_PATHS=78
+LIFECYCLE_ORDER_ERRORS=0
+AGGREGATE_SELF_OVERWRITES=0
+BUILD_TASKS=38 MERGED_COMPLETION=38
+P1-SESSION-REGISTRY01_WORKFLOW=build COMPLETION=merged PREMERGE=independently_verified POSTMERGE=merged REVIEW=True TEST=True MERGE_RECORD=True
+P1-GATE-SCHEMA01_WORKFLOW=build COMPLETION=merged PREMERGE=independently_verified POSTMERGE=merged REVIEW=True TEST=True MERGE_RECORD=True
+REGISTRY_EXISTS_AT_BASELINE=False
+SEED_PRECEDES_FIRST_BUILD=True
+SEED_REGISTRY_PRODUCER=True
+AR09-G1_REQUIRED=['AR09-G1.repository-evidence', 'AR09-G1.pr-enforcement']
+AR09-G1_INPUTS=evidence/P1-LIC01/AR09-G1.repository-evidence.json,evidence/P1-PR-AUDIT01/AR09-G1.pr-enforcement.json
+AR10-G3_REQUIRED=['AR10-G3.repository-evidence', 'AR10-G3.pr-enforcement']
+AR10-G3_INPUTS=evidence/P1-LIC01/AR10-G3.repository-evidence.json,evidence/P1-PR-AUDIT01/AR10-G3.pr-enforcement.json
+PR_IDENTITY_CAPTURE=True
+PR_CHANGED_FILES_CAPTURE=True
+P1-LIC02_FETCH=0 VERIFY=1 AUDITS=[2, 3, 4] ORDER_OK=True DOWNLOAD_DIR=evidence/P1-LIC02/downloads AUDITS_USE_DOWNLOAD_DIR=True IGNORED_DIST_REFS=[]
+P1-LICENSE-CLOSE01_FETCH=0 VERIFY=1 AUDITS=[3] ORDER_OK=True DOWNLOAD_DIR=evidence/P1-LICENSE-CLOSE01/downloads AUDITS_USE_DOWNLOAD_DIR=True IGNORED_DIST_REFS=[]
+DIST_VARIANT=dist/release/*.whl DETECTED=True
+DIST_VARIANT=dist/local/*.whl DETECTED=True
+DIST_VARIANT=dist/./release/*.whl DETECTED=True
+DIST_VARIANT=dist/{release,local}/*.whl DETECTED=True
+DIST_VARIANT=dist/*/*.whl DETECTED=True
+DIST_VARIANT=dist DETECTED=True
+P1-READY-CERT01_WRITE=1 VALIDATE=2 VERIFY_APPROVAL=3 VERIFY_PROOF=4 ORDER_OK=True REACHES_LOCK_PRODUCER=False HAS_NOT_APPLICABLE=True
+P1-READY-CLAIM01_WRITE=1 VALIDATE=2 VERIFY_APPROVAL=3 VERIFY_PROOF=4 ORDER_OK=True REACHES_LOCK_PRODUCER=False HAS_NOT_APPLICABLE=True
+P0_AP01=blocked/attempt0
+ALL_PHASE1_BLOCKED_ATTEMPT0=True
+NEW_ATTACK=D1/D7 duplicate write_result --gate ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D1/D7 duplicate write_result --task ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D1 duplicate validate_result --result ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D1 duplicate aggregate --inputs ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D1 duplicate aggregate --output ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D6 approval binding flags removed ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D6 approval binding values changed ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D9 gh output discarded for fabricated PR artifacts ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D8 seed writes noncanonical registry ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D2 postmerge command wrong task/output ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D2 postmerge record wrong path ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D4 verify uses wrong artifact manifest ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D4 --dir= bypasses downloaded-path audit check ACCEPTED=True ERRORS=[]
+NEW_ATTACK=D10 backslash-escaped dist path ACCEPTED=True ERRORS=[]
+NEW_ATTACKS_TOTAL=14 NEW_ATTACKS_ACCEPTED=14
+SEED_DOCUMENTED_SELF_TEST_EXIT=2
+SEED_FIRST_EXIT=0 SEED_SECOND_EXIT=0
+SEED_APPROVAL_REGISTRY_SHA256=a4b0d76036eb04be96346bffce05a3ce2a2ccbd53a1f8a261af0eb0deaef8a11
+SEED_ACTUAL_REGISTRY_SHA256=5068e83c6fa60018703ab437ce02922c34d4a3cd57f23a7577f84f72e8419d30
+SEED_APPROVAL_HASH_MATCHES_FILE=False
+SEED_RESEED_APPEND_ONLY_PRESERVED=False
+UNRESOLVED_DEFECTS=7
+D11=registry seed command/hash/append-only/output binding is incomplete
+D12=duplicate CLI flags bypass canonical result identity and lifecycle checks
+D13=approval command artifact/registry/scope bindings are not enforced
+D14=gh PR capture can discard real output and substitute fabricated artifacts
+D15=post-merge command/record task and path identity are not enforced
+D16=artifact fetch/verify/audit manifest and path binding is incomplete
+D17=ignored-dist normalization misses shell-escaped spellings
+EXIT_CODE=0
+
+The same exact output is archived in evidence/P0-REM07/semantic-audit.txt.
+
+9. Independent adversarial tests
+
+Command:
+  python3 evidence/P0-REM07/attack_probe.py
+
+Output:
+BASE_GRAPH_ERRORS=0
+ATTACK=D1/D7 duplicate write_result --gate ACCEPTED=True ERRORS=[]
+ATTACK=D1/D7 duplicate write_result --task ACCEPTED=True ERRORS=[]
+ATTACK=D1 duplicate validate_result --result ACCEPTED=True ERRORS=[]
+ATTACK=D1 duplicate aggregate --inputs ACCEPTED=True ERRORS=[]
+ATTACK=D1 duplicate aggregate --output ACCEPTED=True ERRORS=[]
+ATTACK=D6 approval binding flags removed ACCEPTED=True ERRORS=[]
+ATTACK=D6 approval binding values changed ACCEPTED=True ERRORS=[]
+ATTACK=D9 gh output discarded for fabricated PR artifacts ACCEPTED=True ERRORS=[]
+ATTACK=D8 seed writes noncanonical registry ACCEPTED=True ERRORS=[]
+ATTACK=D2 postmerge command wrong task/output ACCEPTED=True ERRORS=[]
+ATTACK=D2 postmerge record wrong path ACCEPTED=True ERRORS=[]
+ATTACK=D4 verify uses wrong artifact manifest ACCEPTED=True ERRORS=[]
+ATTACK=D4 --dir= bypasses downloaded-path audit check ACCEPTED=True ERRORS=[]
+ATTACK=D10 backslash-escaped dist path ACCEPTED=True ERRORS=[]
+ATTACKS_TOTAL=14 ATTACKS_ACCEPTED=14
+EXIT_CODE=0
+
+The same exact output is archived in evidence/P0-REM07/attack-probe.txt.
+
+Command:
+  python3 -m pytest -q evidence/P0-REM07/test_p0_rem07_semantics.py
+
+Output summary:
+  ........................FFFFFFFFFFFFFFFFF                          [100%]
+  17 failed, 24 passed in 2.84s
+EXIT_CODE=1
+
+The 24 passing tests independently confirm the original D1–D10 direct closures
+and current positive invariants. The 17 failures are the 14 new graph attacks
+plus three seed-script contract failures. No test was weakened, skipped or
+xfailed. Full tracebacks are archived in evidence/P0-REM07/semantic-tests.txt.
+
+10. Shell normalization of the ignored-dist bypass
+
+Command:
+  python3 - <<'PY'
+  import shlex
+  print('SHELL_TOKEN=', r'd\ist/release/*.whl', sep='')
+  print('SHLEX_NORMALIZED=', shlex.split(r'd\ist/release/*.whl')[0], sep='')
+  PY
+
+Output:
+  SHELL_TOKEN=d\ist/release/*.whl
+  SHLEX_NORMALIZED=dist/release/*.whl
+EXIT_CODE=0
+
+The same exact output is archived in evidence/P0-REM07/dist-normalization.txt.
+
+Defect list
+-----------
+
+D11 — BLOCKING, D8 residual: the registry seed is not executable, bound to the
+written registry bytes, append-only on rerun, or statically bound to its
+canonical output path.
+
+References:
+- .harness/TASKS.json P1-SESSION-SEED01 acceptance_criteria (lines 540–544)
+- .harness/scripts/seed_session_registry.py lines 18–29 and 34–57
+- .harness/scripts/validate_phase1_graph.py lines 321–331
+- .harness/scripts/tests/test_validate_phase1_graph.py lines 307–330
+
+Evidence:
+1. The exact documented `--self-test` command exits 2 because
+   `--orchestrator-session` is required even in self-test mode.
+2. The seed writes pretty-printed registry JSON but stores
+   `registry_sha256` over compact canonical JSON bytes. The approval hash
+   `a4b0d760...ef8a11` does not match the actual file hash
+   `5068e83c...419d30`.
+3. A second seed run replaces `{'orch-1': ...}` with `{'orch-2': ...}` instead
+   of preserving append-only history.
+4. An in-memory graph mutation moves both seed outputs under
+   `evidence/P1-SESSION-SEED01/` and updates the hash command, while
+   `produces` still claims `.harness/sessions/registry.json`; validation returns
+   no errors.
+
+Impact:
+P1-SESSION-SEED01 cannot satisfy its own acceptance criterion as written. If
+the command is adjusted ad hoc, its approval does not bind the actual registry
+file, reruns can destroy trusted roles, and the first merged build can depend on
+a seed that never created the canonical trust root.
+
+Falsification:
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestSeedTrustRootContract::test_documented_seed_self_test_command_exits_zero
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestSeedTrustRootContract::test_seed_approval_hash_matches_written_registry_file
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestSeedTrustRootContract::test_reseed_preserves_existing_append_only_sessions
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D8 seed writes noncanonical registry]
+
+D12 — BLOCKING, D1/D7 residual: duplicate CLI flags bypass canonical result
+identity and lifecycle validation.
+
+References:
+- .harness/scripts/validate_phase1_graph.py lines 69–82, 421–450 and 463–478
+- .harness/TASKS.json P1-TST01 gate_results and acceptance_criteria
+- .harness/schemas/gate-results.schema.json lines 24–25
+
+Evidence:
+All five mutations validate with no errors:
+1. `write_result.py --gate <correct> --gate <wrong>`.
+2. `write_result.py --task <correct> --task <wrong>`.
+3. `validate_result.py --result <canonical> --result <wrong>`.
+4. `aggregate.py` keeps the expected first `--inputs` but appends a second
+   `--inputs evidence/P1-TST01/./AR02-G1.json` after `--output`.
+5. `aggregate.py --output <canonical> --output <wrong>`.
+
+`_parse_write_result` uses the first occurrence of each flag. Lifecycle checks
+use substrings, and aggregate input parsing splits only the first occurrence.
+Duplicate options are ambiguous; common CLI parsers use the last value, so the
+executed command can write, validate or aggregate a different identity/path
+than the validator approved.
+
+Impact:
+A schema-valid result can be mislabeled, validated at the wrong path, or have an
+aggregator read its own output through an alternate spelling. The canonical
+result lifecycle is not fully machine-checkable.
+
+Falsification:
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D1/D7 duplicate write_result --gate]
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D1/D7 duplicate write_result --task]
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D1 duplicate validate_result --result]
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D1 duplicate aggregate --inputs]
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D1 duplicate aggregate --output]
+
+D13 — BLOCKING, D6 residual: approval command artifact/registry/scope bindings
+are not validator-enforced.
+
+References:
+- .harness/scripts/validate_phase1_graph.py lines 484–503
+- .harness/TASKS.json P1-READY-CERT01 and P1-READY-CLAIM01 sub_gates/write_result commands
+- .harness/schemas/gate-results.schema.json lines 96–107
+
+Evidence:
+The validator checks that the sub-gate object has approval fields and that the
+write command has `--approver-session` plus `not_applicable`. It does not parse
+or compare `--approval-artifact`, `--approval-registry` or `--approval-scope`.
+Removing all three flags validates with no errors. Changing them to
+`forged.json`, `untrusted.json` and `unrelated-claim` also validates with no
+errors.
+
+Impact:
+The command that creates the approval record can claim a different artifact,
+registry or scope than the independently reviewed sub-gate declaration. The
+schema only checks presence, not equality to the approved binding.
+
+Falsification:
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D6 approval binding flags removed]
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D6 approval binding values changed]
+
+D14 — BLOCKING, D3/D9 residual: real `gh` output can be discarded and replaced
+with fabricated PR artifacts while validation passes.
+
+References:
+- .harness/scripts/validate_phase1_graph.py lines 509–525
+- .harness/TASKS.json P1-PR-AUDIT01 acceptance_criteria lines 1884–1900
+- .harness/PLANS/phase-1-vertical-slice.md lines 62, 68 and 316/323
+
+Evidence:
+The validator only requires that some criterion contains `gh pr view` with the
+expected JSON fields and some criterion contains `gh pr diff --name-only`. A
+mutation keeps both commands but redirects their output to `/dev/null`, then
+writes fabricated `pr.json` and `changed-files.txt` with `printf`. The
+unchanged enforcement producers consume those fabricated files, and validation
+returns no errors.
+
+Impact:
+AR09-G1 and AR10-G3 can pass without identity or changed files derived from the
+actual PR, contrary to the real-PR enforcement requirement.
+
+Falsification:
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D9 gh output discarded for fabricated PR artifacts]
+
+D15 — BLOCKING, D2 residual: post-merge command and record identity/path are not
+validator-enforced.
+
+References:
+- .harness/scripts/validate_phase1_graph.py lines 229–247
+- .harness/TASKS.json P1-TOOL-BRANCH01 postmerge_command/postmerge_record lines 612–617
+- .harness/PLANS/phase-1-vertical-slice.md §5
+
+Evidence:
+For build tasks the validator requires nonempty post-merge fields but never
+parses `postmerge_command` or checks `postmerge_record` identity. Changing
+P1-TOOL-BRANCH01's command to `--task P1-GATE-SCHEMA01 --output
+evidence/P1-GATE-SCHEMA01/merge.json` validates with no errors. Changing only
+`postmerge_record` to that same unrelated path also validates with no errors.
+
+Impact:
+A task can be treated as merged on the basis of another task's merge command or
+record, breaking the merged-dependency semantics required before consumers
+branch from main.
+
+Falsification:
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D2 postmerge command wrong task/output]
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D2 postmerge record wrong path]
+
+D16 — BLOCKING, D4 residual: artifact fetch/verify/audit binding is incomplete.
+
+References:
+- .harness/scripts/validate_phase1_graph.py lines 550–588
+- .harness/TASKS.json P1-LIC02 consumes_artifacts and acceptance_criteria lines 4384–4464
+- .harness/PLANS/phase-1-vertical-slice.md §6
+
+Evidence:
+1. P1-LIC02 declares the release producer/manifest, but changing its verify
+   command to `artifacts/local/<artifact-id>/manifest.json` while still auditing
+   the release download directory validates with no errors.
+2. The downloaded-path audit check regex recognizes only `--dir <value>`. A
+   mutation changes the fetch to `--dir=evidence/P1-LIC02/downloads`, changes
+   audit inputs to `somewhere-else/**`, and validates with no errors because
+   `download_dirs` becomes empty and the path check is skipped.
+
+Impact:
+License audits can run against files that were not verified by the declared
+artifact manifest, or against an arbitrary path, while ARTIFACT_HANDOFF and
+DIST_NORMALIZATION still report PASS.
+
+Falsification:
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D4 verify uses wrong artifact manifest]
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D4 --dir= bypasses downloaded-path audit check]
+
+D17 — BLOCKING, D5/D10 residual: ignored-dist normalization misses shell-escaped
+spellings.
+
+References:
+- .harness/scripts/validate_phase1_graph.py lines 57–66
+- .harness/PLANS/phase-1-vertical-slice.md lines 64, 69 and 119
+- .harness/TASKS.json P1-LIC02 acceptance_criteria
+
+Evidence:
+`shlex.split(r'd\ist/release/*.whl')` normalizes to
+`dist/release/*.whl`. Appending a non-producer command that references
+`d\ist/release/*.whl` validates with no errors because
+`_ignored_artifact_refs` applies a literal regex without shell unescaping.
+
+Impact:
+A shell-escaped spelling can reintroduce ignored `dist/` contents into a
+non-producer task while the validator reports normalized-dist PASS.
+
+Falsification:
+- evidence/P0-REM07/test_p0_rem07_semantics.py::TestNewAdversarialAttacks::test_validator_rejects_new_semantic_attack[D10 backslash-escaped dist path]
+
+Closure matrix
+--------------
+
+D1 — PARTIAL. Unique paths, one create/validate pair, creation-before-validation,
+no simple aggregate self-overwrite and distinct PR-AUDIT outputs pass. D12 is a
+residual in canonical lifecycle enforcement.
+D2 — PARTIAL. Foundational tasks are merged builds with pre-merge review/test
+and Integrator records. D15 is a residual in post-merge identity binding.
+D3 — PARTIAL. AR09-G1/AR10-G3 aggregate LIC01 repository evidence plus distinct
+enforcement sub-gates. D14 is a residual in real-PR capture.
+D4 — PARTIAL. Current LIC02/LICENSE-CLOSE01 commands fetch, verify and then audit
+the download directory. D16 is a residual in artifact/path binding.
+D5 — PARTIAL. Direct release/local and documented normalized variants are
+rejected. D17 is a residual in shell-escape normalization.
+D6 — PARTIAL. Bound approval fixtures validate and verification is ordered.
+D13 is a residual in command-to-subgate binding.
+D7 — PARTIAL. Simple wrong gate/task IDs are rejected. D12 is a residual in
+duplicate-option parsing.
+D8 — PARTIAL. The seed task precedes the first merged build and the registry
+build extends it. D11 is a residual in seed executability and trust binding.
+D9 — PARTIAL. Commands name real `gh` identity/diff capture and reject
+fixture/self-test producers. D14 is a residual in capture authenticity.
+D10 — PARTIAL. Dot segments, braces, bare dist and glob variants are rejected.
+D17 is a residual in shell-escaped spellings.
+
+Positive independent findings
+-----------------------------
+
+- All 52 ADR gates retain one final aggregator; all 26 sub-gates retain one producer.
+- All 78 current result paths are globally unique and canonical.
+- Every current result has exactly one creation and one validation command, in order.
+- No current aggregate command reads its own output.
+- PR-AUDIT01 writes distinct AR09-G1 and AR10-G3 files.
+- All 38 build tasks complete at merged after pre-merge verification.
+- AR09-G1/AR10-G3 retain repository plus enforcement sub-gates.
+- LIC02/LICENSE-CLOSE01 currently audit only fetched and verified downloaded artifacts.
+- Bound approval records validate and use explicit pre-lock not-applicable state.
+- Root pytest discovers and passes the committed suite.
+- P0-AP01 and every Phase 1 task remain blocked at attempt zero.
+
+Final handoff and integrity checks
+----------------------------------
+
+Command:
+  python3 evidence/P0-REM07/check_handoff.py
+
+Output:
+  HANDOFF_PART3=PASS
+  fields=13/13 files=7 status=partial
+  MISSING=[]
+  HEADERS={'from': True, 'to': True, 'task': True, 'attempt': True, 'status_partial': True, 'next_step': True}
+EXIT_CODE=0
+
+The same exact output is archived in evidence/P0-REM07/handoff-fields.txt.
+
+Commands:
+  git rev-parse HEAD
+  git diff --name-only
+  git status --short --untracked-files=all
+  git diff --check
+
+Output:
+  a5ec49bab27e6c2bb2519e18dc7ea1dcd97ba388
+  .harness/LOG.md
+   M .harness/LOG.md
+  ?? .harness/HANDOFFS/test-engineer-to-red-team-P0-REM07-1.md
+  ?? evidence/P0-REM07/attack-probe.txt
+  ?? evidence/P0-REM07/attack_probe.py
+  ?? evidence/P0-REM07/check_handoff.py
+  ?? evidence/P0-REM07/dist-normalization.txt
+  ?? evidence/P0-REM07/gh-pr-list.txt
+  ?? evidence/P0-REM07/graph-validator.txt
+  ?? evidence/P0-REM07/handoff-fields.txt
+  ?? evidence/P0-REM07/handoff-validator.txt
+  ?? evidence/P0-REM07/independent-verification.txt
+  ?? evidence/P0-REM07/prior-rem02-audit.txt
+  ?? evidence/P0-REM07/prior-rem02-tests.txt
+  ?? evidence/P0-REM07/prior-rem05-tests.txt
+  ?? evidence/P0-REM07/root-pytest.txt
+  ?? evidence/P0-REM07/seed-self-test.txt
+  ?? evidence/P0-REM07/semantic-audit.txt
+  ?? evidence/P0-REM07/semantic-tests.txt
+  ?? evidence/P0-REM07/semantic_audit.py
+  ?? evidence/P0-REM07/test_p0_rem07_semantics.py
+  (no output from git diff --check)
+
+HEAD is unchanged. The only tracked modification is the required LOG.md append,
+including the exact initial NEXT STEP quotation and the final action line. All
+P0-REM07 artifacts and the handoff are untracked evidence. No protected planning
+file or feature code changed, and no commit was made.
+
+Final disposition
+-----------------
+STATUS: partial. Seven unresolved defect groups remain (D11–D17). P0-AP01 must
+remain blocked. No defect was fixed and no feature code was started.

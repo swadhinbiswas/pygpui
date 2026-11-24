@@ -1,0 +1,5 @@
+usage: seed_session_registry.py [-h]
+                                --orchestrator-session ORCHESTRATOR_SESSION
+                                [--output OUTPUT] [--approval APPROVAL]
+                                [--self-test]
+seed_session_registry.py: error: the following arguments are required: --orchestrator-session

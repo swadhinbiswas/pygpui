@@ -1,0 +1,2 @@
+SHELL_TOKEN=d\ist/release/*.whl
+SHLEX_NORMALIZED=dist/release/*.whl
