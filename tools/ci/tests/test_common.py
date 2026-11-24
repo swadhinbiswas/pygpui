@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tools.ci.common import GateError, canonical_repo_path, load_json
+from tools.ci.common import GateError, canonical_repo_path, load_json, load_tasks
 
 
 def test_canonical_repo_path_rejects_traversal_and_absolute_paths(
@@ -34,6 +34,22 @@ def test_load_json_rejects_duplicate_keys(tmp_path: Path) -> None:
     with pytest.raises(GateError) as caught:
         load_json(path)
     assert caught.value.code == "json"
+
+
+def test_load_tasks_accepts_harness_task_id_formats(tmp_path: Path) -> None:
+    tasks = tmp_path / ".harness/TASKS.json"
+    tasks.parent.mkdir(parents=True)
+    tasks.write_text(
+        json.dumps(
+            {"tasks": [{"id": "P0-AP01"}, {"id": "P1-TOOL-BRANCH01"}, {"id": "H-001"}]}
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    indexed = load_tasks(tmp_path)
+
+    assert set(indexed) == {"P0-AP01", "P1-TOOL-BRANCH01", "H-001"}
 
 
 def test_load_json_rejects_non_object_root(tmp_path: Path) -> None:

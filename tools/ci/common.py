@@ -17,7 +17,7 @@ CANONICAL_APPROVAL = ".harness/sessions/seed-approval.json"
 CANONICAL_TASKS = ".harness/TASKS.json"
 COMMIT_RE = re.compile(r"^[a-f0-9]{40}$")
 SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
-TASK_RE = re.compile(r"^P1-[A-Z0-9-]+$")
+TASK_RE = re.compile(r"^(?:P[0-9]+|H)-[A-Z0-9-]+$")
 TAG_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/-]*$")
 
 
