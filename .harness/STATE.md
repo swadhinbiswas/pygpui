@@ -50,7 +50,7 @@ Begin Wave 0/1 foundational implementation: governance records, trusted registry
 
 ## Active work
 
-`P1-TOOL-BRANCH01` implementation is next. The build agent will implement and self-test branch/merge/rollback tooling on a PR branch. Orchestrator will register distinct implementer/reviewer/tester/Integrator sessions as they are spawned; independent verification and merge follow implementation.
+`P1-TOOL-BRANCH01` implementation is active on `feat/P1-TOOL-BRANCH01-tooling`. The build agent will implement and self-test branch/merge/rollback tooling on a PR branch. Orchestrator will register distinct implementer/reviewer/tester/Integrator sessions as they are spawned; independent verification and merge follow implementation.
 
 ## Blocked
 

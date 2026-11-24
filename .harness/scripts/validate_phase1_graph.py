@@ -257,11 +257,18 @@ def validate(
             and task.get("attempt_count", 0) >= 1
             and task.get("branch_state") == "recorded"
         )
-        if not recorded_control and (task.get("status") != "blocked" or task.get("attempt_count") != 0):
+        active_build = (
+            phase1_authorized
+            and task.get("workflow") == "build"
+            and task.get("status") == "in_progress"
+            and task.get("attempt_count", 0) >= 1
+            and task.get("branch_state") == "implementing"
+        )
+        if not (recorded_control or active_build) and (task.get("status") != "blocked" or task.get("attempt_count") != 0):
             field_errors.append(f"{task['id']} is not blocked at attempt zero")
         if task.get("max_attempts") != 4:
             field_errors.append(f"{task['id']} does not preserve max_attempts=4")
-        if not recorded_control and task.get("branch_state") != "not_started":
+        if not (recorded_control or active_build) and task.get("branch_state") != "not_started":
             field_errors.append(f"{task['id']} branch_state is not not_started")
         if not task.get("acceptance_criteria") or not task.get("evidence_links"):
             field_errors.append(f"{task['id']} has empty criteria/evidence")

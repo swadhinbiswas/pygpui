@@ -120,3 +120,4 @@ Read `.harness/STATE.md`, this handoff, `.harness/HANDOFFS/planner-to-red-team-P
 2026-11-24 | orchestrator | P0-AP01 | Validated final Red-Team approval with zero blockers; marked P0-AP01 done at attempt 1 and authorized Wave 0/1 foundational tooling only.
 2026-11-24 | orchestrator | P1-GOV01 | Recorded governance evidence: graph validation, origin/main tracking and authenticated gh; marked Wave 0 done.
 2026-11-24 | orchestrator | P1-SESSION-SEED01 | Created append-only hash-bound registry seed; self-test, verify and 4 dedicated tests pass; marked seed done.
+2026-11-24 | orchestrator | P1-TOOL-BRANCH01 | Marked first Wave 1 build task in progress and prepared feature-branch Release-CI handoff; independent verification and merge remain separate.
