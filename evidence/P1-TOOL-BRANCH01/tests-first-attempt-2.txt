@@ -1,0 +1,782 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/opencode/pygpui-P1-TOOL-BRANCH01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.5
+collected 48 items
+
+tools/ci/tests/test_branch_gate.py .FFFFFFFFFFFFFF..........             [ 52%]
+tools/ci/tests/test_verify_roles.py .FFFF.........                       [ 81%]
+tools/ci/tests/test_run_local_gate.py .......F.                          [100%]
+
+=================================== FAILURES ===================================
+______________ test_branch_gate_rejects_missing_named_branch_ref _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_rejects_missi0')
+
+    def test_branch_gate_rejects_missing_named_branch_ref(tmp_path: Path) -> None:
+        base, source = make_repository(tmp_path)
+        write_bundle(tmp_path, base, source)
+        git(tmp_path, "branch", "-m", "feat/P1-TOOL-BRANCH01-renamed")
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:43: Failed
+________ test_branch_gate_rejects_source_not_contained_by_named_branch _________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_rejects_sourc0')
+
+    def test_branch_gate_rejects_source_not_contained_by_named_branch(
+        tmp_path: Path,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        write_bundle(tmp_path, base, source)
+        git(tmp_path, "switch", "main")
+        git(tmp_path, "branch", "-f", f"feat/{TASK_ID}-tooling", base)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:57: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-0000000000000000000000000000000000000000-artifact-review-evidence/P1-TOOL-BRANCH01/review.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac0')
+key = 'review', path = 'evidence/P1-TOOL-BRANCH01/review.json'
+field = 'source_tree', value = '0000000000000000000000000000000000000000'
+expected_code = 'artifact'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-0000000000000000000000000000000000000000-artifact-test-evidence/P1-TOOL-BRANCH01/independent-test.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac1')
+key = 'test', path = 'evidence/P1-TOOL-BRANCH01/independent-test.json'
+field = 'source_tree', value = '0000000000000000000000000000000000000000'
+expected_code = 'artifact'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-0000000000000000000000000000000000000000-artifact-session_roles-evidence/P1-TOOL-BRANCH01/session-roles.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac2')
+key = 'session_roles', path = 'evidence/P1-TOOL-BRANCH01/session-roles.json'
+field = 'source_tree', value = '0000000000000000000000000000000000000000'
+expected_code = 'artifact'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-None-artifact-review-evidence/P1-TOOL-BRANCH01/review.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac3')
+key = 'review', path = 'evidence/P1-TOOL-BRANCH01/review.json'
+field = 'source_tree', value = None, expected_code = 'artifact'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-None-artifact-test-evidence/P1-TOOL-BRANCH01/independent-test.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac4')
+key = 'test', path = 'evidence/P1-TOOL-BRANCH01/independent-test.json'
+field = 'source_tree', value = None, expected_code = 'artifact'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-None-artifact-session_roles-evidence/P1-TOOL-BRANCH01/session-roles.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac5')
+key = 'session_roles', path = 'evidence/P1-TOOL-BRANCH01/session-roles.json'
+field = 'source_tree', value = None, expected_code = 'artifact'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-feat/P1-TOOL-BRANCH01-other-identity-review-evidence/P1-TOOL-BRANCH01/review.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac6')
+key = 'review', path = 'evidence/P1-TOOL-BRANCH01/review.json', field = 'branch'
+value = 'feat/P1-TOOL-BRANCH01-other', expected_code = 'identity'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-feat/P1-TOOL-BRANCH01-other-identity-test-evidence/P1-TOOL-BRANCH01/independent-test.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac7')
+key = 'test', path = 'evidence/P1-TOOL-BRANCH01/independent-test.json'
+field = 'branch', value = 'feat/P1-TOOL-BRANCH01-other'
+expected_code = 'identity'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-feat/P1-TOOL-BRANCH01-other-identity-session_roles-evidence/P1-TOOL-BRANCH01/session-roles.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac8')
+key = 'session_roles', path = 'evidence/P1-TOOL-BRANCH01/session-roles.json'
+field = 'branch', value = 'feat/P1-TOOL-BRANCH01-other'
+expected_code = 'identity'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-None-identity-review-evidence/P1-TOOL-BRANCH01/review.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac9')
+key = 'review', path = 'evidence/P1-TOOL-BRANCH01/review.json', field = 'branch'
+value = None, expected_code = 'identity'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-None-identity-test-evidence/P1-TOOL-BRANCH01/independent-test.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac10')
+key = 'test', path = 'evidence/P1-TOOL-BRANCH01/independent-test.json'
+field = 'branch', value = None, expected_code = 'identity'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-None-identity-session_roles-evidence/P1-TOOL-BRANCH01/session-roles.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_branch_gate_requires_exac11')
+key = 'session_roles', path = 'evidence/P1-TOOL-BRANCH01/session-roles.json'
+field = 'branch', value = None, expected_code = 'identity'
+
+    @pytest.mark.parametrize(
+        ("key", "path"),
+        [
+            ("review", REVIEW_EVIDENCE),
+            ("test", TEST_EVIDENCE),
+            ("session_roles", ROLES_EVIDENCE),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("field", "value", "expected_code"),
+        [
+            ("source_tree", "0" * 40, "artifact"),
+            ("source_tree", None, "artifact"),
+            ("branch", "feat/P1-TOOL-BRANCH01-other", "identity"),
+            ("branch", None, "identity"),
+        ],
+    )
+    def test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record(
+        tmp_path: Path,
+        key: str,
+        path: str,
+        field: str,
+        value: str | None,
+        expected_code: str,
+    ) -> None:
+        base, source = make_repository(tmp_path)
+        evidence = write_bundle(tmp_path, base, source)
+        record = load_json(tmp_path / path)
+        if value is None:
+            record.pop(field, None)
+        else:
+            record[field] = value
+        write_json(tmp_path / path, record)
+        refresh_reference(tmp_path, evidence, key)
+        write_json(tmp_path / BRANCH_EVIDENCE, evidence)
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_branch_gate.py:99: Failed
+_ test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role[implementer-accepted_roles0] _
+
+role = 'implementer', accepted_roles = {'implementer'}
+
+    @pytest.mark.parametrize(
+        ("role", "accepted_roles"),
+        [
+            ("implementer", {"implementer"}),
+            ("reviewer", {"reviewer"}),
+            ("tester", {"tester"}),
+            ("integrator", {"integrator"}),
+        ],
+    )
+    def test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role(
+        role: str, accepted_roles: set[str]
+    ) -> None:
+        registry = {
+            "sessions": {
+                "unbound-session": {
+                    "role": role,
+                    "trusted": True,
+                }
+            }
+        }
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_verify_roles.py:63: Failed
+_ test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role[reviewer-accepted_roles1] _
+
+role = 'reviewer', accepted_roles = {'reviewer'}
+
+    @pytest.mark.parametrize(
+        ("role", "accepted_roles"),
+        [
+            ("implementer", {"implementer"}),
+            ("reviewer", {"reviewer"}),
+            ("tester", {"tester"}),
+            ("integrator", {"integrator"}),
+        ],
+    )
+    def test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role(
+        role: str, accepted_roles: set[str]
+    ) -> None:
+        registry = {
+            "sessions": {
+                "unbound-session": {
+                    "role": role,
+                    "trusted": True,
+                }
+            }
+        }
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_verify_roles.py:63: Failed
+_ test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role[tester-accepted_roles2] _
+
+role = 'tester', accepted_roles = {'tester'}
+
+    @pytest.mark.parametrize(
+        ("role", "accepted_roles"),
+        [
+            ("implementer", {"implementer"}),
+            ("reviewer", {"reviewer"}),
+            ("tester", {"tester"}),
+            ("integrator", {"integrator"}),
+        ],
+    )
+    def test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role(
+        role: str, accepted_roles: set[str]
+    ) -> None:
+        registry = {
+            "sessions": {
+                "unbound-session": {
+                    "role": role,
+                    "trusted": True,
+                }
+            }
+        }
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_verify_roles.py:63: Failed
+_ test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role[integrator-accepted_roles3] _
+
+role = 'integrator', accepted_roles = {'integrator'}
+
+    @pytest.mark.parametrize(
+        ("role", "accepted_roles"),
+        [
+            ("implementer", {"implementer"}),
+            ("reviewer", {"reviewer"}),
+            ("tester", {"tester"}),
+            ("integrator", {"integrator"}),
+        ],
+    )
+    def test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role(
+        role: str, accepted_roles: set[str]
+    ) -> None:
+        registry = {
+            "sessions": {
+                "unbound-session": {
+                    "role": role,
+                    "trusted": True,
+                }
+            }
+        }
+
+>       with pytest.raises(GateError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE GateError
+
+tools/ci/tests/test_verify_roles.py:63: Failed
+___________ test_configured_missing_ruff_returns_dependency_exit_69 ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-swadhin/pytest-30/test_configured_missing_ruff_r0')
+
+    def test_configured_missing_ruff_returns_dependency_exit_69(tmp_path: Path) -> None:
+        env = dict(os.environ)
+        env["PYGPUI_RUFF"] = "/tmp/opencode/definitely-missing-ruff-attempt-2"
+
+        result = subprocess.run(
+            [
+                python_executable(),
+                str(SCRIPT),
+                "--repository",
+                str(tmp_path),
+                "--mode",
+                "full",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=False,
+            text=True,
+            capture_output=True,
+        )
+
+>       assert result.returncode == 69
+E       AssertionError: assert 1 == 69
+E        +  where 1 = CompletedProcess(args=['/usr/bin/python3', '/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/run_local_gate.py', '--repo...ename)\nFileNotFoundError: [Errno 2] No such file or directory: \'/tmp/opencode/definitely-missing-ruff-attempt-2\'\n').returncode
+
+tools/ci/tests/test_run_local_gate.py:116: AssertionError
+=========================== short test summary info ============================
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_rejects_missing_named_branch_ref
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_rejects_source_not_contained_by_named_branch
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-0000000000000000000000000000000000000000-artifact-review-evidence/P1-TOOL-BRANCH01/review.json]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-0000000000000000000000000000000000000000-artifact-test-evidence/P1-TOOL-BRANCH01/independent-test.json]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-0000000000000000000000000000000000000000-artifact-session_roles-evidence/P1-TOOL-BRANCH01/session-roles.json]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-None-artifact-review-evidence/P1-TOOL-BRANCH01/review.json]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-None-artifact-test-evidence/P1-TOOL-BRANCH01/independent-test.json]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[source_tree-None-artifact-session_roles-evidence/P1-TOOL-BRANCH01/session-roles.json]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-feat/P1-TOOL-BRANCH01-other-identity-review-evidence/P1-TOOL-BRANCH01/review.json]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-feat/P1-TOOL-BRANCH01-other-identity-test-evidence/P1-TOOL-BRANCH01/independent-test.json]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-feat/P1-TOOL-BRANCH01-other-identity-session_roles-evidence/P1-TOOL-BRANCH01/session-roles.json]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-None-identity-review-evidence/P1-TOOL-BRANCH01/review.json]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-None-identity-test-evidence/P1-TOOL-BRANCH01/independent-test.json]
+FAILED tools/ci/tests/test_branch_gate.py::test_branch_gate_requires_exact_tree_and_branch_on_every_bound_record[branch-None-identity-session_roles-evidence/P1-TOOL-BRANCH01/session-roles.json]
+FAILED tools/ci/tests/test_verify_roles.py::test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role[implementer-accepted_roles0]
+FAILED tools/ci/tests/test_verify_roles.py::test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role[reviewer-accepted_roles1]
+FAILED tools/ci/tests/test_verify_roles.py::test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role[tester-accepted_roles2]
+FAILED tools/ci/tests/test_verify_roles.py::test_verify_roles_requires_explicit_matching_task_on_every_nonseed_role[integrator-accepted_roles3]
+FAILED tools/ci/tests/test_run_local_gate.py::test_configured_missing_ruff_returns_dependency_exit_69
+======================== 19 failed, 29 passed in 3.51s =========================

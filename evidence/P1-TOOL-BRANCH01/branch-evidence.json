@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "task_id": "P1-TOOL-BRANCH01",
+  "record_path": "evidence/P1-TOOL-BRANCH01/branch-evidence.json",
+  "state": "implemented",
+  "independent_evidence": false,
+  "branch": "feat/P1-TOOL-BRANCH01-tooling",
+  "base_commit": "15d29b32a066eeab7f4fdcc9b8a02456c4c0434f",
+  "source_commit": "64ad0559fad5ffcf2f9a60aa028cb8698aaec141",
+  "source_tree": "385946388f2d087a709baa871d25f07f76bdae3a",
+  "artifact_id": "P1-TOOL-BRANCH01-branch",
+  "artifact_sha256": "b52037513ac6b7e80fc202cfd2aa5c729af442807641fb553d84d64dc35908fc",
+  "registry_sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498",
+  "registry": {
+    "path": ".harness/sessions/registry.json",
+    "sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498"
+  },
+  "implementer_session_id": "ses_df2be4996ffek8O5wu7RwOeubn",
+  "reviewer_session_id": "ses_df27261c9ffcukQUulA8P0LN89",
+  "tester_session_id": "ses_df27261c9ffdiy0RA5Ko2oSdxl",
+  "integrator_session_id": "ses_df27261c8ffeJbVXcZMsund3Hf",
+  "reviewed_head_commit": null,
+  "reviewed_head_tree": null,
+  "review": {
+    "path": "evidence/P1-TOOL-BRANCH01/review.json",
+    "sha256": null
+  },
+  "test": {
+    "path": "evidence/P1-TOOL-BRANCH01/independent-test.json",
+    "sha256": "7ed3dfa68dbe611e3113b2b6ec32e869f3b6376d34d06f6ad37177679cac01f8"
+  },
+  "session_roles": {
+    "path": "evidence/P1-TOOL-BRANCH01/session-roles.json",
+    "sha256": "3c3bac9d6a1fecc19fb0654e557318b8c3ffe0764bc04d6de4ad26aca7148243"
+  },
+  "blocked_reason": "R-01 through R-08 are addressed and author-run probes pass. Attempt-2 review fail and test pass are archived unchanged. This new source/artifact intentionally has null reviewed-head, review, and test identities and remains state=implemented with independent_evidence=false pending fresh independent verification."
+}

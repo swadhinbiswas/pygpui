@@ -1,0 +1,7 @@
+LOCAL_GATE_STEP=PASS step=fmt exit=0
+LOCAL_GATE_STEP=PASS step=lint exit=0
+LOCAL_GATE_STEP=PASS step=tests exit=0
+LOCAL_GATE_STEP=PASS step=graph exit=0
+LOCAL_GATE=PASS steps=fmt,lint,tests,graph
+LOCAL_GATE=FAIL step=fmt exit=1 gate_exit=10
+LOCAL_GATE_SELF_TEST=PASS

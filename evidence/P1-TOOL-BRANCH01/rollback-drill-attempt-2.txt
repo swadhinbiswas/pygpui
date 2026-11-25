@@ -1,0 +1,1 @@
+ROLLBACK_DRILL=PASS fixture=/tmp/opencode/rollback-attempt-2 tag=phase1/contracts-premerge revert=6725cac26edcaaccae42daf1d1c155584aab5f40 revert_of_revert=949cc035fd3dca36872f00b432e22f7ab830c202 restored_green=3db9beb3f26e5599a120a48b0b257d9c0729d75b production_unchanged=true

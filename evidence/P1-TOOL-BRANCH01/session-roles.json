@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "task_id": "P1-TOOL-BRANCH01",
+  "record_path": "evidence/P1-TOOL-BRANCH01/session-roles.json",
+  "branch": "feat/P1-TOOL-BRANCH01-tooling",
+  "source_commit": "64ad0559fad5ffcf2f9a60aa028cb8698aaec141",
+  "source_tree": "385946388f2d087a709baa871d25f07f76bdae3a",
+  "artifact_id": "P1-TOOL-BRANCH01-branch",
+  "artifact_sha256": "b52037513ac6b7e80fc202cfd2aa5c729af442807641fb553d84d64dc35908fc",
+  "registry_path": ".harness/sessions/registry.json",
+  "registry_sha256": "bff3da2e946852d3cfc1a52e237e2ee106d42222bf231992197f0aa114d65498",
+  "status": "assigned",
+  "independent_evidence": false,
+  "registration_tool": "tools/session/register_roles.py",
+  "implementer_session_id": "ses_df2be4996ffek8O5wu7RwOeubn",
+  "reviewer_session_id": "ses_df27261c9ffcukQUulA8P0LN89",
+  "tester_session_id": "ses_df27261c9ffdiy0RA5Ko2oSdxl",
+  "integrator_session_id": "ses_df27261c8ffeJbVXcZMsund3Hf",
+  "blocked_reason": "Distinct task-bound roles remain registered and the registry approval verifies. Attempt-2 review fail and test pass are archived unchanged. Attempt-3 independent review/test evidence and the Integrator merge record are intentionally absent; state remains implemented and independent_evidence remains false."
+}

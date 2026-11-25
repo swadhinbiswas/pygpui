@@ -1,0 +1,88 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/opencode/pygpui-P1-TOOL-BRANCH01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.5
+collected 0 items / 7 errors
+
+==================================== ERRORS ====================================
+_____________ ERROR collecting tools/ci/tests/test_branch_gate.py ______________
+ImportError while importing test module '/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/tests/test_branch_gate.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/ci/tests/test_branch_gate.py:9: in <module>
+    from tools.ci.common import GateError, load_json, write_json
+E   ModuleNotFoundError: No module named 'tools.ci.common'
+________________ ERROR collecting tools/ci/tests/test_common.py ________________
+ImportError while importing test module '/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/tests/test_common.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/ci/tests/test_common.py:8: in <module>
+    from tools.ci.common import GateError, canonical_repo_path, load_json
+E   ModuleNotFoundError: No module named 'tools.ci.common'
+________________ ERROR collecting tools/ci/tests/test_drills.py ________________
+ImportError while importing test module '/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/tests/test_drills.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/ci/tests/test_drills.py:11: in <module>
+    from tools.ci.common import GateError
+E   ModuleNotFoundError: No module named 'tools.ci.common'
+_____________ ERROR collecting tools/ci/tests/test_record_merge.py _____________
+ImportError while importing test module '/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/tests/test_record_merge.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/ci/tests/test_record_merge.py:9: in <module>
+    from tools.ci.common import GateError, load_json, write_json
+E   ModuleNotFoundError: No module named 'tools.ci.common'
+____________ ERROR collecting tools/ci/tests/test_run_local_gate.py ____________
+ImportError while importing test module '/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/tests/test_run_local_gate.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/ci/tests/test_run_local_gate.py:7: in <module>
+    from tools.ci.common import GateError
+E   ModuleNotFoundError: No module named 'tools.ci.common'
+______________ ERROR collecting tools/ci/tests/test_tag_point.py _______________
+ImportError while importing test module '/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/tests/test_tag_point.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/ci/tests/test_tag_point.py:9: in <module>
+    from tools.ci.common import GateError
+E   ModuleNotFoundError: No module named 'tools.ci.common'
+_____________ ERROR collecting tools/ci/tests/test_verify_roles.py _____________
+ImportError while importing test module '/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/tests/test_verify_roles.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/ci/tests/test_verify_roles.py:8: in <module>
+    from tools.ci.common import GateError, load_json, write_json
+E   ModuleNotFoundError: No module named 'tools.ci.common'
+=========================== short test summary info ============================
+ERROR tools/ci/tests/test_branch_gate.py
+ERROR tools/ci/tests/test_common.py
+ERROR tools/ci/tests/test_drills.py
+ERROR tools/ci/tests/test_record_merge.py
+ERROR tools/ci/tests/test_run_local_gate.py
+ERROR tools/ci/tests/test_tag_point.py
+ERROR tools/ci/tests/test_verify_roles.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 7 errors during collection !!!!!!!!!!!!!!!!!!!!
+============================== 7 errors in 0.11s ===============================

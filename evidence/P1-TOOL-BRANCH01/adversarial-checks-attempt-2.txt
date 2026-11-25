@@ -1,0 +1,11 @@
+PASS named_branch_ref_must_exist_and_contain_source: rejected code=commit message=named branch ref does not exist: refs/heads/feat/P1-TOOL-BRANCH01-tooling
+PASS reviewer_role_must_have_explicit_task_binding: rejected code=role message=reviewer_session_id session lacks an explicit matching task binding: reviewer-1
+PASS review_record_tree_must_match_branch_artifact: rejected code=artifact message=review source tree does not match the branch artifact
+PASS review_record_branch_must_match_branch_artifact: rejected code=identity message=review branch does not match the branch artifact
+MISSING_RUFF_STDOUT_BEGIN
+MISSING_RUFF_STDOUT_END
+MISSING_RUFF_STDERR_BEGIN
+LOCAL_GATE_REJECT code=dependency message=cannot execute /tmp/opencode/definitely-missing-ruff-independent: [Errno 2] No such file or directory: PosixPath('/tmp/opencode/independent-adversarial-qe9nfrk3')
+MISSING_RUFF_STDERR_END
+PASS configured_missing_ruff_must_return_dependency_exit_69: expected exit=69 actual exit=69
+ADVERSARIAL_SUMMARY={"checks": [{"detail": "rejected code=commit message=named branch ref does not exist: refs/heads/feat/P1-TOOL-BRANCH01-tooling", "name": "named_branch_ref_must_exist_and_contain_source", "passed": true}, {"detail": "rejected code=role message=reviewer_session_id session lacks an explicit matching task binding: reviewer-1", "name": "reviewer_role_must_have_explicit_task_binding", "passed": true}, {"detail": "rejected code=artifact message=review source tree does not match the branch artifact", "name": "review_record_tree_must_match_branch_artifact", "passed": true}, {"detail": "rejected code=identity message=review branch does not match the branch artifact", "name": "review_record_branch_must_match_branch_artifact", "passed": true}, {"detail": "expected exit=69 actual exit=69", "name": "configured_missing_ruff_must_return_dependency_exit_69", "passed": true}], "failed": [], "passed": true}

@@ -1,0 +1,62 @@
+{
+  "baseline_sha": "010cea56b6c472470df4485fe4a980107b85e567",
+  "fixture": true,
+  "fixture_origin_main": "23714a509dfbfb4eb23c75e57092b52bdb08c518",
+  "fixture_remote": "/tmp/opencode/red-main-fixture/origin.git",
+  "gate_after_fix": {
+    "exit_code": 0,
+    "status": "pass",
+    "stderr": "",
+    "stdout": ""
+  },
+  "gate_on_red": {
+    "exit_code": 1,
+    "status": "fail",
+    "stderr": "",
+    "stdout": ""
+  },
+  "independent_evidence": false,
+  "pause_unrelated_merges": true,
+  "production_after": {
+    "head": "9b303160cfe4c6ab3e998423fbc33967a6286957",
+    "main_refs": [
+      "refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f"
+    ],
+    "remotes": [
+      "origin\thttps://github.com/swadhinbiswas/pygpui.git (fetch)",
+      "origin\thttps://github.com/swadhinbiswas/pygpui.git (push)"
+    ],
+    "root": "/tmp/opencode/pygpui-P1-TOOL-BRANCH01"
+  },
+  "production_before": {
+    "head": "9b303160cfe4c6ab3e998423fbc33967a6286957",
+    "main_refs": [
+      "refs/remotes/origin/main 15d29b32a066eeab7f4fdcc9b8a02456c4c0434f"
+    ],
+    "remotes": [
+      "origin\thttps://github.com/swadhinbiswas/pygpui.git (fetch)",
+      "origin\thttps://github.com/swadhinbiswas/pygpui.git (push)"
+    ],
+    "root": "/tmp/opencode/pygpui-P1-TOOL-BRANCH01"
+  },
+  "production_unchanged": true,
+  "pull_requests": [
+    {
+      "fixture": true,
+      "kind": "red-main-injection",
+      "merge_sha": "af756be3e9fe6829bb0f096c8e499bea85cbbee3",
+      "review": "simulated-two-parent-fixture-merge"
+    },
+    {
+      "fixture": true,
+      "kind": "restoration",
+      "merge_sha": "23714a509dfbfb4eb23c75e57092b52bdb08c518",
+      "review": "simulated-two-parent-fixture-merge"
+    }
+  ],
+  "red_commit": "8b7dadc9d677d3b57762fd39c8e11ea01d7f7c1c",
+  "red_main_sha": "af756be3e9fe6829bb0f096c8e499bea85cbbee3",
+  "restore_commit": "12c08afb302a601d65ecfe6933705f844511406c",
+  "restored_green_sha": "23714a509dfbfb4eb23c75e57092b52bdb08c518",
+  "schema_version": 1
+}

@@ -1,0 +1,22 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/opencode/pygpui-P1-TOOL-BRANCH01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.5
+collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+____________ ERROR collecting tools/ci/tests/test_register_roles.py ____________
+ImportError while importing test module '/tmp/opencode/pygpui-P1-TOOL-BRANCH01/tools/ci/tests/test_register_roles.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/ci/tests/test_register_roles.py:9: in <module>
+    from tools.session.register_roles import register_roles
+E   ModuleNotFoundError: No module named 'tools.session.register_roles'
+=========================== short test summary info ============================
+ERROR tools/ci/tests/test_register_roles.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.05s ===============================

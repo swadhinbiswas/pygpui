@@ -1,0 +1,47 @@
+20 files already formatted
+LOCAL_GATE_STEP=PASS step=fmt exit=0
+All checks passed!
+LOCAL_GATE_STEP=PASS step=lint exit=0
+........................................................................ [ 34%]
+......................................................... [ 62%]
+..................................................................... [ 95%]
+..........                                                               [100%]
+208 passed, 18 subtests passed in 26.58s
+LOCAL_GATE_STEP=PASS step=tests exit=0
+JSON_PARSE=PASS
+UNIQUE_IDS=PASS total=88 unique=88
+DEPS_RESOLVE=PASS checked=326
+CYCLES=PASS count=0
+TOPOLOGICAL_ORDER=PASS pass
+PHASE1_FIELDS=PASS tasks=66
+PHASE1_INITIAL_STATE=PASS blocked/attempt0/max4
+PHASE1_AP01_GATE=PASS checked=66
+PLAN_TASK_ORDER=PASS plan=66 json=66
+PLAN_JSON_METADATA=PASS checked=66
+ADR_GATE_COVERAGE=PASS adr=52 plan=52 aggregators=52
+ADR_GATE_MAPPINGS=PASS total=52
+STAGED_GATE_CLOSURE=PASS sub_gates=26
+GATE_RUNTIME=PASS schema+aggregate+independent-approval
+GATE_RESULT_LIFECYCLE=PASS unique_paths=78
+CANONICAL_RESULT_IDENTITY=PASS task+gate+path
+CLI_ARGUMENT_PARSING=PASS singleton-flags
+SEED_CONTRACT=PASS self-test+hash+append+canonical
+REGISTRY_BOOTSTRAP=PASS orchestrator-seed-before-build
+REAL_PR_EVIDENCE=PASS gh-pr-identity+diff
+PR_CAPTURE_AUTHENTICITY=PASS canonical-capture-no-fabrication
+APPROVAL_BINDING=PASS session+artifact+registry+scope+prelock
+ATOMIC_GATE_EVIDENCE=PASS repository+enforcement+MSRV+notice
+PHASE0_HISTORY=PASS compared=16
+COMMAND_PRODUCERS=PASS criteria=468
+REVIEW_MERGE_STATES=PASS merged-deps+premerge+session
+POSTMERGE_IDENTITY=PASS task+output+record
+ARTIFACT_HANDOFF=PASS draft-release/fetch/verify/normalized-dist
+ARTIFACT_COMMAND_BINDING=PASS manifest+dir+audit-path
+DIST_NORMALIZATION=PASS segments+braces+globs+shell-unescape
+CRATE_TAG_READINESS=PASS semantic
+PYTEST_ENTRYPOINT=PASS root pytest.ini
+SCOPE_NORMALIZATION=PASS normalized
+REMOTE_WORKFLOW=PASS stale=0
+VALIDATION=PASS
+LOCAL_GATE_STEP=PASS step=graph exit=0
+LOCAL_GATE=PASS steps=fmt,lint,tests,graph
